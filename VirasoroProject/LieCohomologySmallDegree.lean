@@ -9,6 +9,9 @@ import VirasoroProject.ToMathlib.Algebra.Lie.Basic
 /-!
 # Lie algebra cohomology in degree two (for central extensions)
 
+(*WARNING*: This file needs cleaning up. It was not the main goal and it was the first time I
+tried to use multilinear maps in Lean.)
+
 This file defines Lie algebra 2-cocycles and 2-coboundaries and constructs the Lie algebra
 cohomology in degree two, with coefficients in a vector space (an Abelian Lie algebra).
 
