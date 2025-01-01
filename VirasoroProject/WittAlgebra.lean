@@ -3,6 +3,7 @@ Copyright (c) 2024 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
+import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.LinearAlgebra.Basis.Bilinear
 import VirasoroProject.CyclicTripleSum
 import VirasoroProject.ToMathlib.LinearAlgebra.Basis.Defs
@@ -105,8 +106,8 @@ lemma bracketCyclic_eq_zero :
   intro n m
   apply (lgen _).ext
   intro k
-  simp only [cyclicTripleSumHom_apply, LinearMap.coe_mk, AddHom.coe_mk, bracket_lgen_lgen',
-             LinearMapClass.map_smul, Int.cast_add, LinearMap.zero_apply, smul_smul]
+  simp only [cyclicTripleSumHom_apply, bracket_lgen_lgen', map_smul, Int.cast_add, smul_smul,
+             LinearMap.zero_apply]
   rw [show n + (m + k) = n + m + k by ring,
       show m + (k + n) = n + m + k by ring,
       show k + (n + m) = n + m + k by ring]

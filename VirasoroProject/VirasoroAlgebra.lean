@@ -4,8 +4,8 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
 import VirasoroProject.IsCentralExtension
-import VirasoroProject.VirasoroCocycle
 import VirasoroProject.ToMathlib.Algebra.Lie.Abelian
+import VirasoroProject.VirasoroCocycle
 
 /-!
 # The Virasoro algebra
@@ -107,9 +107,11 @@ private lemma smul_def' (c : 𝕜) (X : VirasoroAlgebra 𝕜) :
 instance isCentralExtension : LieAlgebra.IsCentralExtension (ofCentral 𝕜) toWittAlgebra :=
   LieTwoCocycle.CentralExtension.isCentralExtension _
 
+/-- The (commonly used) `Lₙ` elements of the Virasoro algebra, for `n ∈ ℤ`. -/
 noncomputable def lgen (n : ℤ) : VirasoroAlgebra 𝕜 :=
   ⟨WittAlgebra.lgen 𝕜 n, 0⟩
 
+/-- The (commonly used) `C` central element of the Virasoro algebra. -/
 noncomputable def cgen : VirasoroAlgebra 𝕜 := ofCentral 𝕜 1
 
 lemma cgen_eq_ofCentral_one : cgen 𝕜 = ofCentral 𝕜 1 := rfl
@@ -142,7 +144,7 @@ lemma toWittAlgebra_cgen :
     · simp [lgen]
     · simp [WittAlgebra.virasoroCocycle_apply_lgen_lgen, h, lgen]
 
-@[simp] lemma lgen_bracket' (n m : ℤ) :
+lemma lgen_bracket' (n m : ℤ) :
     ⁅lgen 𝕜 n, lgen 𝕜 m⁆
       = (n - m : 𝕜) • lgen 𝕜 (n + m) + if n + m = 0 then ((n-1 : 𝕜)*n*(n+1)/12) • cgen 𝕜 else 0 := by
   rw [lgen_bracket] ; congr ; ring

@@ -222,8 +222,11 @@ private lemma smul_def' (c : 𝕜) (X : HeisenbergAlgebra 𝕜) :
 instance isCentralExtension : LieAlgebra.IsCentralExtension (ofCentral 𝕜) toAbelianLieAlgebraOn :=
   LieTwoCocycle.CentralExtension.isCentralExtension _
 
+/-- The (commonly used) `Jₖ` elements of the Heisenberg algebra, for `k ∈ ℤ`. -/
 noncomputable def jgen (k : ℤ) : HeisenbergAlgebra 𝕜 := ⟨.jgen 𝕜 k, 0⟩
 
+/-- The `K` central element of the Heisenberg algebra, which is commonly set to 1 (in
+representations). -/
 noncomputable def kgen : HeisenbergAlgebra 𝕜 := ofCentral 𝕜 1
 
 lemma kgen_eq_ofCentral_one : kgen 𝕜 = ofCentral 𝕜 1 := rfl

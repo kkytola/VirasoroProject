@@ -39,6 +39,8 @@ variable [CharZero 𝕜]
 
 variable (γ : LieTwoCocycle 𝕜 (WittAlgebra 𝕜) 𝕜)
 
+/-- A 1-cocycle of the Witt algebra, which is used to make a 2-cocycle proportional to the
+Virasoro cocycle by the addition of the corresponding coboundary. -/
 noncomputable def normalizingCocycle : LieOneCocycle 𝕜 (WittAlgebra 𝕜) 𝕜 where
   toLinearMap := (WittAlgebra.lgen 𝕜).constr 𝕜 <|
       fun n ↦ if n = 0
@@ -98,7 +100,7 @@ private lemma lieTwoCocycle_apply_lgen_lgen_eq_zero_of_add_ne_zero {n m : ℤ} (
 
 lemma exists_add_normalizingCocycle_eq_smul_virasoroCocycle :
     ∃ (r : 𝕜), γ + (normalizingCocycle γ).bdry = r • virasoroCocycle 𝕜 := by
-  set γ₀ := γ + (normalizingCocycle γ).bdry with hγ₀ -- notation decluttering
+  set γ₀ := γ + (normalizingCocycle γ).bdry -- notation decluttering
   set r := 2 * γ₀ ((lgen 𝕜) 2) ((lgen 𝕜) (-2)) with hr -- notation decluttering
   use r
   -- By bilinearity, it suffices to check the equality on basis element pairs.

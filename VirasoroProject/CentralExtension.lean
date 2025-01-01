@@ -3,8 +3,6 @@ Copyright (c) 2024 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
-import Mathlib.Algebra.Lie.OfAssociative
-import VirasoroProject.ToMathlib.Algebra.Lie.Basic
 import VirasoroProject.LieCohomologySmallDegree
 
 /-!
@@ -109,10 +107,9 @@ private def bracket : γ.CentralExtension
 @[simp] private lemma bracket_apply (Z W : γ.CentralExtension) :
     γ.bracket Z W = ⟨⁅Z.fst, W.fst⁆, γ Z.fst W.fst⟩ := rfl
 
-@[simp] private lemma bracket_self (Z : γ.CentralExtension) :
+private lemma bracket_self (Z : γ.CentralExtension) :
     γ.bracket Z Z = 0 := by
-  simp only [γ.bracket_apply, lie_self, γ.self]
-  rfl
+  simp
 
 private lemma bracket_smul (c : 𝕜) (Z W : γ.CentralExtension) :
     γ.bracket Z (c • W) = c • γ.bracket Z W := by
@@ -208,7 +205,7 @@ lemma congr_apply {γ₁ γ₂ : LieTwoCocycle 𝕜 𝓖 𝓐} (h : γ₁ = γ�
     (congr h₁₂).trans (congr h₂₃) = (congr (h₁₂.trans h₂₃)) :=
   rfl
 
-@[simp] lemma congr_congr_symm {γ₁ γ₂ : LieTwoCocycle 𝕜 𝓖 𝓐} (h : γ₁ = γ₂) :
+lemma congr_congr_symm {γ₁ γ₂ : LieTwoCocycle 𝕜 𝓖 𝓐} (h : γ₁ = γ₂) :
     (congr h).trans (congr h.symm) = LieEquiv.refl :=
   rfl
 

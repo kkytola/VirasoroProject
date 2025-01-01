@@ -3,7 +3,6 @@ Copyright (c) 2024 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
-import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.Algebra.Lie.Abelian
 import VirasoroProject.ToMathlib.Algebra.Lie.Basic
 
@@ -46,6 +45,7 @@ section LieOneCocycle
 
 /-- Lie algebra 1-cocycles. -/
 @[ext] structure LieOneCocycle where
+  /-- The underlying linear map of a Lie algebra 1-cocycle. -/
   toLinearMap : 𝓖 →ₗ[𝕜] 𝓐
 
 instance : Zero (LieOneCocycle 𝕜 𝓖 𝓐) where
@@ -131,6 +131,7 @@ section LieTwoCocycle
 
 /-- Lie algebra 2-cocycles. -/
 @[ext] structure LieTwoCocycle where
+  /-- The underlying bilinear map of a Lie algebra 2-cocycle. -/
   toBilin : 𝓖 →ₗ[𝕜] 𝓖 →ₗ[𝕜] 𝓐
   self' : ∀ X, toBilin X X = 0
   leibniz' : ∀ X Y Z, toBilin X ⁅Y, Z⁆ = toBilin ⁅X, Y⁆ Z + toBilin Y ⁅X, Z⁆
@@ -154,7 +155,6 @@ variable (γ : LieTwoCocycle 𝕜 𝓖 𝓐)
 @[simp]
 lemma self {X : 𝓖} : γ X X = 0 := γ.self' X
 
-@[simp]
 lemma leibniz {X Y Z : 𝓖} : γ X ⁅Y, Z⁆ = γ ⁅X, Y⁆ Z + γ Y ⁅X, Z⁆ := γ.leibniz' X Y Z
 
 lemma apply_add (X₁ X₂ Y : 𝓖) : γ (X₁ + X₂) Y = γ X₁ Y + γ X₂ Y := by simp

@@ -97,8 +97,7 @@ lemma ker_emb_eq_bot [IsLieAbelian 𝓐] :
     (LieTwoCocycle.CentralExtension.emb γ).ker = ⊥ :=
   (LieHom.ker_eq_bot (emb γ)).mpr fun _ _ hA ↦ congr_arg (fun Z ↦ Z.2) hA
 
-lemma mem_range_emb_iff [IsLieAbelian 𝓐]
-    (Z : γ.CentralExtension) :
+lemma mem_range_emb_iff [IsLieAbelian 𝓐] (Z : γ.CentralExtension) :
     Z ∈ (LieTwoCocycle.CentralExtension.emb γ).range ↔ Z.1 = 0 := by
   rw [LieHom.mem_range]
   refine ⟨?_, ?_⟩
@@ -109,8 +108,7 @@ lemma mem_range_emb_iff [IsLieAbelian 𝓐]
     simp only [emb, LieHom.coe_mk]
     ext <;> simp_all
 
-lemma mem_ker_proj_iff [IsLieAbelian 𝓐]
-    (Z : γ.CentralExtension) :
+lemma mem_ker_proj_iff (Z : γ.CentralExtension) :
     Z ∈ (LieTwoCocycle.CentralExtension.proj γ).ker ↔ Z.1 = 0 := by
   rw [LieHom.mem_ker]
   refine ⟨?_, ?_⟩
