@@ -13,18 +13,21 @@ that two central extensions are isomorphic if the corresponding cocycles differ 
 
 ## Main definitions
 
-* ...
-* ...
+* `LieTwoCocycle.CentralExtension`: The central extension of a Lie algebra 𝓖 by an abelian Lie
+  algebra 𝓐 defined by a 2-cocycle γ ∈ H²(𝓖,𝓐).
+* `LieTwoCocycle.CentralExtension.equiv_of_lieTwoCoboundary`: An isomorphism between the central
+  extensions defined by two 2-cocycles which differ by a coboundary.
 
 ## Main statements
 
-* ...
-
-* ...
+* `LieTwoCocycle.CentralExtension.instLieAlgebra`: The central extension defined by a 2-cocycle
+  is a Lie algebra.
 
 ## Implementation notes
 
-
+`LieTwoCocycle.CentralExtension` is the concrete construction of a central extension. The defining
+property (characteristic predicate) of central extensions is `IsCentralExtension`
+(see the file `IsCentralExtension.lean`.)
 
 ## Tags
 

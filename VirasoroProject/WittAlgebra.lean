@@ -22,14 +22,12 @@ Typical interpretations of the Witt algebra are the following:
 
 ## Main definitions
 
-* ...
-* ...
+* `WittAlgebra`: The Witt algebra.
+* `WittAlgebra.lgen`: The (commonly used) basis {ℓₙ : n ∈ ℤ} of the Witt algebra.
 
 ## Main statements
 
-* ...
-
-* ...
+* `WittAlgebra.instLieAlgebra`: The Witt algebra is a Lie algebra.
 
 ## Implementation notes
 

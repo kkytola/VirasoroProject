@@ -14,18 +14,28 @@ cohomology in degree two, with coefficients in a vector space (an Abelian Lie al
 
 ## Main definitions
 
-* ...
-* ...
+* `LieOneCocycle`: The set C¹(𝓖,𝓐) of 1-cocycles of a Lie algebra 𝓖 with coefficients in a
+  vector space 𝓐.
+* `LieTwoCocycle`: The set C²(𝓖,𝓐) of 2-cocycles of a Lie algebra 𝓖 with coefficients in a
+  vector space 𝓐.
+* `LieTwoCoboundary`: The subspace B²(𝓖,𝓐) ⊆ C²(𝓖,𝓐) of 2-coboundaries.
+* `LieTwoCohomology`: The 2-cohomology H²(𝓖,𝓐) := C²(𝓖,𝓐) ⧸ B²(𝓖,𝓐) of a Lie algebra 𝓖 with
+  coefficients in a vector space 𝓐.
 
 ## Main statements
 
-* ...
-
-* ...
+* `LieTwoCocycle.toLieTwoCohomologyEquiv`: If 𝓖 is abelian, then the canonical projection
+  from 2-cocycles to 2-cohomologies is a linear isomorphism.
 
 ## Implementation notes
 
+This file needs some clean-up! (But it works for the purposes of concrete calculations of
+central extensions etc.)
 
+A reasonable thing to do would be to define Lie algebra cohomology in general degrees. But for
+concrete applications, the special case of degree two probably deserves its own API. Once a
+general definition is made, the API for the degree 2 case (especially central extensions)
+could be refactored. (But even in the current generality, clean-up is needed here.)
 
 ## Tags
 

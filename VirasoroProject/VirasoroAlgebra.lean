@@ -19,16 +19,23 @@ space of local fields.)
 
 ## Main definitions
 
-* ...
-* ...
+* `VirasoroAlgebra`: The Virasoro algebra.
+* `VirasoroAlgebra.lgen`: The (commonly used) elements Lₙ, n ∈ ℤ, of the Virasoro algebra.
+* `VirasoroAlgebra.cgen`: The (commonly used) central element C of the Virasoro algebra.
+* `VirasoroAlgebra.ofCentral` and `VirasoroAlgebra.toWittAlgebra`: The maps in the short exact
+  sequence 0 ⟶ 𝕜 ⟶ VirasoroAlgebra ⟶ WittAlgebra ⟶ 0.
 
 ## Main statements
 
-* ...
-
-* ...
+* `VirasoroAlgebra.instLieAlgebra`: The Virasoro algebra is a Lie algebra.
+* `VirasoroAlgebra.isCentralExtension`: The Virasoro algebra is a cetral extension of the
+  Witt algebra.
 
 ## Implementation notes
+
+The Virasoro algebra is defined as a central extension of the Witt algebra. (A more direct
+definition based on defining a Lie bracket on a countably infinite dimensional vector space
+would also be possible.)
 
 ## Tags
 

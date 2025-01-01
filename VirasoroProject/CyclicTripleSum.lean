@@ -13,13 +13,25 @@ identities and Lie algebra 2-cocycle conditions.
 
 ## Main definitions
 
-* ...
-* ...
+* `cyclicTripleSum`: An auxiliary function given by
+  ⟨x,y,z⟩ ↦ φ(x,β(y,z)) + φ(y,β(z,x)) + φ(z,β(x,y)) where φ and β are two-variable functions
+  on a set V with values in sets W and V, respectively.
+* `cyclicTripleSumHom`: A trilinear function given by
+  ⟨x,y,z⟩ ↦ φ(x,β(y,z)) + φ(y,β(z,x)) + φ(z,β(x,y)) where φ and β are bilinear functions on V
+  with values in sets W and V, respectively. This function can be used in calculations towards
+  the Jacobi identity in Lie algebras and the Lie algebra 2-cocycle condition.
 
 ## Main statements
 
-* ...
-* ...
+A number of easy but convenient auxiliary properties towards trilinearity
+of `cyclicTripleSumHom β φ` (which is mathematically trivial but should not be repeated
+too often in Lean) are proven for the cyclic triple sums:
+* `cyclicTripleSum_map_add_of_bilin`: If the functions φ and β are bilinear, then the cyclic triple
+  sum is additive in its last variable. Additivity in the first and second variable are similarly
+  obtained (the results immediately after).
+* `cyclicTripleSum_map_smul_of_bilin`: If the functions φ and β are bilinear, then the cyclic triple
+  sum respects scalar multiplication in its last variable. Scalar multiplication in the first and
+  second variable are similarly obtained (the results immediately after).
 
 ## Tags
 
@@ -35,7 +47,11 @@ section cyclicTripleSum
 
 variable {V W : Type*}
 
-/-- An auxiliary function for proofs of Jacobi identities etc. -/
+/-- An auxiliary function for proofs of Jacobi identities etc.
+
+Given functions β : V × V → V and φ : V × V → W where W has additive structure,
+`cyclicTripleSum β φ` is the function of three variables on V defined by:
+⟨x,y,z⟩ ↦ φ(x,β(y,z)) + φ(y,β(z,x)) + φ(z,β(x,y)). -/
 def cyclicTripleSum [Add W] (β : V → V → V) (φ : V → V → W) (x y z : V) : W :=
   φ x (β y z) + φ y (β z x) + φ z (β x y)
 
@@ -155,7 +171,10 @@ variable {V W : Type*} [AddCommMonoid V] [AddCommMonoid W]
 variable {𝕜 : Type*} [CommSemiring 𝕜]
 variable [Module 𝕜 V] [Module 𝕜 W]
 
-/-- An auxiliary trilinear map for proofs of Jacobi identities. -/
+/-- An auxiliary trilinear map for proofs of Jacobi identities.
+
+Given bilinear functions β : V × V → V and φ : V × V → W, `cyclicTripleSumHom β φ` is the
+trilinear function on V defined by: ⟨x,y,z⟩ ↦ φ(x,β(y,z)) + φ(y,β(z,x)) + φ(z,β(x,y)). -/
 noncomputable def cyclicTripleSumHom (β : V →ₗ[𝕜] V →ₗ[𝕜] V) (φ : V →ₗ[𝕜] V →ₗ[𝕜] W) :
     V →ₗ[𝕜] V →ₗ[𝕜] V →ₗ[𝕜] W where
   toFun := fun x ↦

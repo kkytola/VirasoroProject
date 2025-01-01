@@ -9,7 +9,7 @@ import VirasoroProject.ToMathlib.Algebra.Lie.Abelian
 import VirasoroProject.ToMathlib.LinearAlgebra.Basis.Defs
 
 /-!
-# Heisenberg algebra algebra
+# Heisenberg algebra
 
 This file defines the Heisenberg algebra, as the one-dimensional central extension of a countably
 infinite dimensional abelian Lie algebra associated to a nontrivial 2-cocycle.
@@ -20,18 +20,24 @@ into representations of the Virasoro algebra by a Sugawara construction.)
 
 ## Main definitions
 
-* ...
-* ...
+* `HeisenbergAlgebra`: The Heisenberg algebra.
+* `HeisenbergAlgebra.jgen`: The (commonly used) elements Jₖ, k ∈ ℤ, of the Heisenberg algebra.
+* `HeisenbergAlgebra.kgen`: The central element K of the Heisenberg algebra (commonly set
+  to 1 in representations).
 
 ## Main statements
 
-* ...
-
-* ...
+* `HeisenbergAlgebra.instLieAlgebra`: The Heisenberg algebra is a Lie algebra.
 
 ## Implementation notes
 
+The Heisenberg algebra is defined as a central extension of an infinite-dimensional abelian Lie
+algebra. (A more direct definition based on defining a Lie bracket on a countably infinite
+dimensional vector space would also be possible.)
+
 ## Tags
+
+Heisenberg algebra
 
 -/
 

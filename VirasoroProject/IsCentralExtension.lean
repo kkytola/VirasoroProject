@@ -14,18 +14,19 @@ predicate.
 
 ## Main definitions
 
-* ...
-* ...
+* `LieAlgebra.IsCentralExtension`: The abstract definition (characteristic predicate) of a
+  central extension of a Lie algebra 𝓖 by an abelian Lie algebra 𝓐: there exists a short exact
+  sequence 0 ⟶ 𝓐 ⟶ 𝓔 ⟶ 𝓖 ⟶ 0 of Lie algebras, where the image of 𝓐 is contained in the centre
+  of 𝓔.
+* `LieTwoCocycle.CentralExtension.emb`: Given a 2-cocycle γ ∈ C²(𝓖,𝓐) and the correspondingly
+  constructed central extension 𝓔, this is the map 𝓐 ⟶ 𝓔 in the short exact sequence.
+* `LieTwoCocycle.CentralExtension.proj`: Given a 2-cocycle γ ∈ C²(𝓖,𝓐) and the correspondingly
+  constructed central extension 𝓔, this is the map 𝓔 ⟶ 𝓖 in the short exact sequence.
 
 ## Main statements
 
-* ...
-
-* ...
-
-## Implementation notes
-
-
+* `LieTwoCocycle.CentralExtension.isCentralExtension`: The central extension defined by a 2-cocycle
+  is a central extension in the abstract sense (it satisfies the characteristic predicate).
 
 ## Tags
 

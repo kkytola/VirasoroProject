@@ -19,16 +19,15 @@ Witt algebra in degree two does not vanish.
 
 ## Main definitions
 
-* ...
-* ...
+* `WittAlgebra.virasoroCocycle`: The 2-cocycle which defines the Virasoro algebra as a central
+  extension of the Witt algebra and whose cohomology class generates H²(WittAlgebra, 𝕜).
 
 ## Main statements
 
-* ...
-
-* ...
-
-## Implementation notes
+* `WittAlgebra.cohomologyClass_virasoroCocycle_ne_zero`: The cohomology class of the Virasoro
+  cocycle is nonzero.
+* `WittAlgebra.nontrivial_lieTwoCohomology`: The Witt algebra cohomology in degree two is
+  nontrivial, H²(WittAlgebra, 𝕜) ≠ 0.
 
 ## Tags
 
