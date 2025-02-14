@@ -1,0 +1,112 @@
+\section{Central extensions of Lie algebras}
+
+\begin{definition}[Lie algebra extension]
+  \label{def:LieExtension}
+  % \uses{}
+  \lean{VirasoroProject.LieAlgebra.IsExtension}
+  \leanok
+  An \term{extension} $\egLie$ of a Lie algebra $\gLie$ by a Lie algebra $\aLie$ is
+  a Lie algebra together with a pair of two Lie algebra homomorphisms
+  $\iota \colon \aLie \longrightarrow \egLie$ and
+  $\pi \colon \egLie \longrightarrow \gLie$ which form a
+  short exact sequence
+  \begin{align*}
+    0 \longrightarrow \aLie
+      \overset{\iota}{\longrightarrow} \egLie
+      \overset{\pi}{\longrightarrow} \gLie
+      \longrightarrow 0 ,
+  \end{align*}
+  i.e., such that $\iota$ is injective, $\pi$ is surjective,
+  and $\Ima (\iota) = \Ker (\pi)$.
+\end{definition}
+
+\begin{definition}[Lie algebra central extension]
+  \label{def:LieCentralExtension}
+  \uses{def:LieExtension}
+  \lean{VirasoroProject.LieAlgebra.IsCentralExtension}
+  \leanok
+  A \term{central extension} $\egLie$ of a Lie algebra $\gLie$ by an abelian Lie algebra $\aLie$ is
+  a Lie algebra extension
+  \begin{align*}
+    0 \longrightarrow \aLie
+      \overset{\iota}{\longrightarrow} \egLie
+      \overset{\pi}{\longrightarrow} \gLie
+      \longrightarrow 0
+  \end{align*}
+  such that $\Ima (\iota)$ is contained in the centre of $\egLie$,
+  i.e., $[\iota(A), W] = 0$ for all $A \in \aLie$, $W \in \egLie$.
+\end{definition}
+
+
+
+\section{Central extensions determined by 2-cocycles}
+
+\begin{definition}[Central extension determined by a cocycle]
+  \label{def:CentralExtensionOfCocycle}
+  \uses{def:LieCentralExtension, def:LieTwoCocycle}
+  \lean{VirasoroProject.LieTwoCocycle.CentralExtension,
+    VirasoroProject.LieTwoCocycle.CentralExtension.instLieAlgebra}
+  \leanok
+  Given a Lie algebra 2-cocycle $\gamma \in C^2(\gLie,\aLie)$,
+  on the vector space
+  \begin{align*}
+    \egLie = \gLie \oplus \aLie
+  \end{align*}
+  define a bracket by
+  \begin{align*}
+    [(X, A), (Y, B)]_{\egLie} := \big([X, Y]_{\gLie}, \gamma(X, Y) \big) .
+  \end{align*}
+  Then $\egLie$ becomes a Lie algebra with the Lie bracket
+  $[\cdot,\cdot]_{\egLie}$.
+\end{definition}
+
+\begin{lemma}[Central extension determined by cohomologous cocycles]
+  \label{lem:CentralExtensionOfCocycleModCoboundary}
+  \uses{def:CentralExtensionOfCocycle, def:LieTwoCoboundary}
+  \lean{VirasoroProject.LieOneCocycle.bdryHom,
+    VirasoroProject.LieTwoCocycle.CentralExtension.equiv_of_lieTwoCoboundary}
+  \leanok
+  Let $\gamma_1, \gamma_2 \in C^2(\gLie,\aLie)$ be two Lie algebra
+  2-cocycles and $\egLie_1, \egLie_2$ the central extensions corresponding
+  to these according to Definition~\ref{def:CentralExtensionOfCocycle}.
+  If the two 2-cocycles differ by a coboundary,
+  $\gamma_2 - \gamma_1 = \partial \beta$ with some $\beta \in C^1(\gLie,\aLie)$,
+  then the mapping $\egLie_1 \to \egLie_2$ given by
+  \begin{align*}
+    (X,A) \mapsto \big( X, A + \beta(X) \big)
+  \end{align*}
+  is an isomophism of Lie algebras.
+\end{lemma}
+\begin{proof}
+  % \uses{}
+  \leanok
+  Calculation.
+\end{proof}
+
+\begin{lemma}[Central extension determined by a cocycle is a central extension]
+  \label{lem:OfCocycleIsCentralExtension}
+  \uses{def:CentralExtensionOfCocycle}
+  \lean{VirasoroProject.LieTwoCocycle.CentralExtension.isCentralExtension}
+  \leanok
+  Given a Lie algebra 2-cocycle $\gamma \in C^2(\gLie,\aLie)$,
+  consider the Lie algebra $\egLie = \gLie \oplus \aLie$ as
+  in Definition~\ref{def:CentralExtensionOfCocycle}.
+  With the inclusion $\iota \colon \aLie \to \gLie \oplus \aLie$
+  and projection $\pi \colon \gLie \oplus \aLie \to \gLie$,
+  the Lie algebra $\egLie = \gLie \oplus \aLie$ becomes a central
+  extension of $\gLie$ by $\aLie$.
+\end{lemma}
+\begin{proof}
+  % \uses{}
+  \leanok
+  Clearly
+  \begin{align*}
+    0 \longrightarrow \aLie
+      \overset{\iota}{\longrightarrow} \egLie
+      \overset{\pi}{\longrightarrow} \gLie
+      \longrightarrow 0
+  \end{align*}
+  is an exact sequence of vector spaces, and it is straightforward
+  to check with Definition~\ref{def:CentralExtensionOfCocycle}
+  that $\iota$ and $\pi$ are Lie algebra homomorphisms.
+\end{proof}
