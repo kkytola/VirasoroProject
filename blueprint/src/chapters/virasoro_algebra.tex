@@ -1,8 +1,11 @@
-\section{A}
-
-a
-
-
-\section{B}
-
-b
+\begin{definition}[Virasoro algebra]
+  \label{def:VirasoroAlgebra}
+  \uses{def:VirasoroCocycle, def:CentralExtensionOfCocycle}
+  \lean{VirasoroProject.VirasoroAlgebra, VirasoroProject.VirasoroAlgebra.instLieAlgebra,
+  VirasoroProject.VirasoroAlgebra.isCentralExtension}
+  \leanok
+  Let $\bbk$ be a field of characteristic zero.
+  The \term{Virasoro algebra} $\vir$ is the Lie algebra over $\bbk$
+  obtained as the central extension of the Witt algebra $\witt$
+  corresponding to the Virasoro cocycle $\gamma_\vir \in C^2(\witt,\bbk)$.
+\end{definition}

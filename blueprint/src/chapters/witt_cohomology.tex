@@ -1,8 +1,112 @@
-\section{A}
+\section{Definition of the Witt algebra}
 
-a
+\begin{definition}[Witt algebra]
+  \label{def:WittAlgebra}
+  %\uses{}
+  \lean{VirasoroProject.WittAlgebra, VirasoroProject.WittAlgebra.bracket}
+  \leanok
+  Let $\bbk$ be a field (or a commutative ring). The \term{Witt algebra} over $\bbk$ is
+  the $\bbk$-vector space $\witt$ (or free $\bbk$-module) with basis $(\ell_n)_{n \in \bZ}$
+  and a $\bbk$-bilinear bracket $\witt \times \witt \to \witt$ given on basis
+  elements by
+  \begin{align*}
+    [\ell_n , \ell_m] = (n-m) \, \ell_{n+m} .
+  \end{align*}
+\end{definition}
 
+With some assumptions on $\bbk$, the Witt algebra $\witt$ with the above
+bracket is an $\infty$-dimensional Lie algebra over $\bbk$.
 
-\section{B}
+\begin{lemma}[Witt algebra is a Lie algebra]
+  \label{lem:WittAlgebraIsLieAlgebra}
+  \uses{def:WittAlgebra}
+  \lean{VirasoroProject.WittAlgebra.instLieAlgebra}
+  \leanok
+  If $\bbk$ is a field of characteristic zero, then $\witt$ is
+  a Lie algebra over $\bbk$.
 
-b
+  (In the case when $\bbk$ is a commutative ring, the $\witt$ is also
+  a Lie algebra assuming the $\bbk$ has characteristic zero and
+  that for $c \in \bbk$ and $X \in \witt$ we have $c \cdot X = 0$ only if
+  either $c = 0$ or $X = 0$.)
+\end{lemma}
+\begin{proof}
+  \uses{def:CyclicTripleSum}
+  \leanok
+  Calculations.
+\end{proof}
+
+\section{Virasoro cocycle}
+
+In this section we assume that $\bbk$ is a field of characteristic zero
+and $\witt$ is the Witt algebra over $\bbk$ as in
+Definition~\ref{def:WittAlgebra}.
+
+\begin{definition}[Virasoro cocycle]
+  \label{def:VirasoroCocycle}
+  \uses{lem:WittAlgebraIsLieAlgebra, def:LieTwoCocycle}
+  \lean{VirasoroProject.WittAlgebra.virasoroCocycle}
+  \leanok
+  The bilinear map $\gamma_\vir \colon \witt \times \witt \to \bbk$
+  given on basis elements of $\witt$ by
+  \begin{align*}
+    \gamma_\vir(\ell_n,\ell_m) = \frac{n^3 - n}{12} \, \delta_{n+m,0}
+  \end{align*}
+  is a Lie algebra 2-cocycle, $\gamma_\vir \in C^2(\witt,\bbk)$.
+  We call $\gamma_\vir$ the \term{Virasoro cocycle}.
+\end{definition}
+
+\begin{lemma}[The Virasoro cocyle is nontrivial]
+  \label{lem:VirasoroCocycleNontrivial}
+  \uses{def:VirasoroCocycle, def:LieTwoCohomology}
+  \lean{VirasoroProject.WittAlgebra.cohomologyClass_virasoroCocycle_ne_zero}
+  \leanok
+  The cohomology class $[\gamma_\vir] \in H^2(\witt,\bbk)$
+  of the Virasoro cocycle is nonzero.
+\end{lemma}
+\begin{proof}
+  % \uses{}
+  \leanok
+  \ldots
+\end{proof}
+
+\section{Witt algebra 2-cohomology}
+
+\begin{lemma}[Normalization of Witt algebra 2-cocycles]
+  \label{lem:WittTwoCocycleNormalization}
+  \uses{def:VirasoroCocycle, def:LieTwoCoboundary}
+  \lean{VirasoroProject.WittAlgebra.exists_add_bdry_eq_smul_virasoroCocycle}
+  \leanok
+  For any 2-cocycle $\gamma \in C^2(\witt,\bbk)$, there exists
+  a coboundary $\partial \beta$ with $\beta \in C^1(\witt,\bbk)$
+  such that
+  \begin{align*}
+    \gamma + \partial \beta \; = \; r \cdot \gamma_{\vir}
+  \end{align*}
+  for some scalar $r \in \bbk$.
+\end{lemma}
+\begin{proof}
+  % \uses{}
+  \leanok
+  Calculation.
+\end{proof}
+
+\begin{lemma}[Witt algebra 2-cohomology is spanned by the Virasoro cocycle]
+  \label{lem:WittTwoCohomologyIsOneDimensional}
+  \uses{def:WittAlgebra, def:LieTwoCohomology}
+  \lean{VirasoroProject.WittAlgebra.rank_lieTwoCohomology_eq_one}
+  \leanok
+  The Lie algebra 2-cohomology $H^2(\witt,\bbk)$ of the Witt
+  algebra $\witt$ with coefficients in $\bbk$ is one-dimensional
+  and spanned by the class of the Virasoro cocycle $\gamma_\vir$,
+  \begin{align*}
+    H^2(\witt,\bbk) \; = \; \bbk \cdot [\gamma_{\vir}] .
+  \end{align*}
+\end{lemma}
+\begin{proof}
+  \uses{lem:WittTwoCocycleNormalization, lem:VirasoroCocycleNontrivial}
+  \leanok
+  This follows directly from
+  Lemmas~\ref{lem:WittTwoCocycleNormalization}
+  and~\ref{lem:VirasoroCocycleNontrivial}.
+\end{proof}

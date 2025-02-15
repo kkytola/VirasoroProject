@@ -50,14 +50,14 @@
   Given a Lie algebra 2-cocycle $\gamma \in C^2(\gLie,\aLie)$,
   on the vector space
   \begin{align*}
-    \egLie = \gLie \oplus \aLie
+    \egLie_\gamma = \gLie \oplus \aLie
   \end{align*}
   define a bracket by
   \begin{align*}
-    [(X, A), (Y, B)]_{\egLie} := \big([X, Y]_{\gLie}, \gamma(X, Y) \big) .
+    [(X, A), (Y, B)]_{\gamma} := \big([X, Y]_{\gLie}, \gamma(X, Y) \big) .
   \end{align*}
-  Then $\egLie$ becomes a Lie algebra with the Lie bracket
-  $[\cdot,\cdot]_{\egLie}$.
+  Then $\egLie_\gamma$ becomes a Lie algebra with the Lie bracket
+  $[\cdot,\cdot]_{\gamma}$.
 \end{definition}
 
 \begin{lemma}[Central extension determined by cohomologous cocycles]
@@ -66,16 +66,16 @@
   \lean{VirasoroProject.LieOneCocycle.bdryHom,
     VirasoroProject.LieTwoCocycle.CentralExtension.equiv_of_lieTwoCoboundary}
   \leanok
-  Let $\gamma_1, \gamma_2 \in C^2(\gLie,\aLie)$ be two Lie algebra
-  2-cocycles and $\egLie_1, \egLie_2$ the central extensions corresponding
+  Let $\gamma_1, \gamma_2 \in C^2(\gLie,\aLie)$ be two Lie algebra 2-cocycles
+  and $\egLie_{\gamma_1}, \egLie_{\gamma_2}$ the central extensions corresponding
   to these according to Definition~\ref{def:CentralExtensionOfCocycle}.
   If the two 2-cocycles differ by a coboundary,
   $\gamma_2 - \gamma_1 = \partial \beta$ with some $\beta \in C^1(\gLie,\aLie)$,
-  then the mapping $\egLie_1 \to \egLie_2$ given by
+  then the mapping $\egLie_{\gamma_1} \to \egLie_{\gamma_2}$ given by
   \begin{align*}
     (X,A) \mapsto \big( X, A + \beta(X) \big)
   \end{align*}
-  is an isomophism of Lie algebras.
+  is an isomophism of Lie algebras $\egLie_{\gamma_1} \cong \egLie_{\gamma_2}$.
 \end{lemma}
 \begin{proof}
   % \uses{}
@@ -89,12 +89,20 @@
   \lean{VirasoroProject.LieTwoCocycle.CentralExtension.isCentralExtension}
   \leanok
   Given a Lie algebra 2-cocycle $\gamma \in C^2(\gLie,\aLie)$,
-  consider the Lie algebra $\egLie = \gLie \oplus \aLie$ as
+  consider the Lie algebra $\egLie_\gamma = \gLie \oplus \aLie$ as
   in Definition~\ref{def:CentralExtensionOfCocycle}.
   With the inclusion $\iota \colon \aLie \to \gLie \oplus \aLie$
-  and projection $\pi \colon \gLie \oplus \aLie \to \gLie$,
-  the Lie algebra $\egLie = \gLie \oplus \aLie$ becomes a central
-  extension of $\gLie$ by $\aLie$.
+  in the second direct summand and the
+  projection $\pi \colon \gLie \oplus \aLie \to \gLie$ to the first direct
+  summand, the Lie algebra $\egLie_\gamma = \gLie \oplus \aLie$ becomes a central
+  extension of $\gLie$ by $\aLie$, i.e., we have the short exact sequence
+  of Lie algebras
+  \begin{align*}
+    0 \longrightarrow \aLie
+      \overset{\iota}{\longrightarrow} \egLie_\gamma
+      \overset{\pi}{\longrightarrow} \gLie
+      \longrightarrow 0 .
+  \end{align*}
 \end{lemma}
 \begin{proof}
   % \uses{}
@@ -102,11 +110,30 @@
   Clearly
   \begin{align*}
     0 \longrightarrow \aLie
-      \overset{\iota}{\longrightarrow} \egLie
+      \overset{\iota}{\longrightarrow} \egLie_\gamma
       \overset{\pi}{\longrightarrow} \gLie
       \longrightarrow 0
   \end{align*}
   is an exact sequence of vector spaces, and it is straightforward
   to check with Definition~\ref{def:CentralExtensionOfCocycle}
   that $\iota$ and $\pi$ are Lie algebra homomorphisms.
+\end{proof}
+
+\begin{theorem}[]
+  \label{thm:CentralExtensionOfCohomologyClass}
+  \uses{def:LieTwoCohomology}
+  %\lean{}
+  %\leanok
+  Every cohomology class in $H^2(\gLie, \aLie)$ determines a well-defined
+  isomorphism class of central extensions of the Lie algebra $\gLie$
+  by $\aLie$ by the rule that the class $[\gamma] \in H^2(\gLie, \aLie)$ of
+  a cocycle $\gamma \in C^2(\gLie, \aLie)$ corresponds to the isomorphism
+  class of $\egLie_\gamma$ (Definition~\ref{def:CentralExtensionOfCocycle}).
+\end{theorem}
+\begin{proof}
+  \uses{lem:CentralExtensionOfCocycleModCoboundary}
+  %\leanok
+  %\ldots
+  This follows from Lemmas~\ref{lem:OfCocycleIsCentralExtension}
+  and~\ref{lem:CentralExtensionOfCocycleModCoboundary}.
 \end{proof}

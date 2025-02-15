@@ -124,7 +124,7 @@ be zero).
 \end{definition}
 
 \begin{definition}[Lie algebra 2-cohomology]
-  \label{LieTwoCohomology}
+  \label{def:LieTwoCohomology}
   \uses{def:LieTwoCoboundary}
   \lean{VirasoroProject.LieTwoCohomology}
   \leanok
@@ -138,7 +138,7 @@ be zero).
 
 \begin{lemma}[Cohomology of abelian Lie algebras]
   \label{LieTwoCohomology_abelian}
-  \uses{LieTwoCohomology}
+  \uses{def:LieTwoCohomology}
   \lean{VirasoroProject.LieTwoCocycle.toLieTwoCohomologyEquiv_toLinearMap}
   \leanok
   If $\gLie$ is abelian, i.e., $[\gLie,\gLie] = 0$, then
@@ -155,7 +155,7 @@ be zero).
   \leanok
   The projection is surjective by construction, so it suffices to show that it is also injective.
   The kernel of the projection is $B^2(\gLie,\aLie) = \Ima \; \partial$.
-  In view of Definition~\ref{LieTwoCoboundary},
+  In view of Definition~\ref{def:LieTwoCoboundary},
   abelianity of $\gLie$ implies $\partial \beta = 0$ for any $\beta \in C^1(\gLie,\aLie)$.
   Therefore $B^2(\gLie,\aLie) = 0$, and the kernel of the projection is trivial,
   so the projection is indeed injective.
