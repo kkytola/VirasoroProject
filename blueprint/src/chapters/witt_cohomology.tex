@@ -47,13 +47,13 @@ Definition~\ref{def:WittAlgebra}.
   \uses{lem:WittAlgebraIsLieAlgebra, def:LieTwoCocycle}
   \lean{VirasoroProject.WittAlgebra.virasoroCocycle}
   \leanok
-  The bilinear map $\gamma_\vir \colon \witt \times \witt \to \bbk$
+  The bilinear map ${\gamma}_{\vir} \colon \witt \times \witt \to \bbk$
   given on basis elements of $\witt$ by
   \begin{align*}
-    \gamma_\vir(\ell_n,\ell_m) = \frac{n^3 - n}{12} \, \delta_{n+m,0}
+    {\gamma}_{\vir}(\ell_n,\ell_m) = \frac{n^3 - n}{12} \, \delta_{n+m,0}
   \end{align*}
-  is a Lie algebra 2-cocycle, $\gamma_\vir \in C^2(\witt,\bbk)$.
-  We call $\gamma_\vir$ the \term{Virasoro cocycle}.
+  is a Lie algebra 2-cocycle, ${\gamma}_{\vir} \in C^2(\witt,\bbk)$.
+  We call ${\gamma}_{\vir}$ the \term{Virasoro cocycle}.
 \end{definition}
 
 \begin{lemma}[The Virasoro cocyle is nontrivial]
@@ -61,7 +61,7 @@ Definition~\ref{def:WittAlgebra}.
   \uses{def:VirasoroCocycle, def:LieTwoCohomology}
   \lean{VirasoroProject.WittAlgebra.cohomologyClass_virasoroCocycle_ne_zero}
   \leanok
-  The cohomology class $[\gamma_\vir] \in H^2(\witt,\bbk)$
+  The cohomology class $[{\gamma}_{\vir}] \in H^2(\witt,\bbk)$
   of the Virasoro cocycle is nonzero.
 \end{lemma}
 \begin{proof}
@@ -81,7 +81,7 @@ Definition~\ref{def:WittAlgebra}.
   a coboundary $\partial \beta$ with $\beta \in C^1(\witt,\bbk)$
   such that
   \begin{align*}
-    \gamma + \partial \beta \; = \; r \cdot \gamma_{\vir}
+    \gamma + \partial \beta \; = \; r \cdot {\gamma}_{\vir}
   \end{align*}
   for some scalar $r \in \bbk$.
 \end{lemma}
@@ -98,9 +98,9 @@ Definition~\ref{def:WittAlgebra}.
   \leanok
   The Lie algebra 2-cohomology $H^2(\witt,\bbk)$ of the Witt
   algebra $\witt$ with coefficients in $\bbk$ is one-dimensional
-  and spanned by the class of the Virasoro cocycle $\gamma_\vir$,
+  and spanned by the class of the Virasoro cocycle ${\gamma}_{\vir}$,
   \begin{align*}
-    H^2(\witt,\bbk) \; = \; \bbk \cdot [\gamma_{\vir}] .
+    H^2(\witt,\bbk) \; = \; \bbk \cdot [{\gamma}_{\vir}] .
   \end{align*}
 \end{lemma}
 \begin{proof}
