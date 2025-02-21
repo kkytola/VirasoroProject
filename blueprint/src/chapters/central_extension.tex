@@ -80,7 +80,37 @@
 \begin{proof}
   % \uses{}
   \leanok
-  Calculation.
+  The mapping $\phi_\beta \colon \egLie_1 \to \egLie_2$ given by
+  \begin{align*}
+    \phi_\beta\big((X,A)\big) := \big( X, A + \beta(X) \big)
+  \end{align*}
+  is clearly linear. It is also bijective, since the similarly defined mapping
+  $\phi_{-\beta} \colon \egLie_2 \to \egLie_1$,
+  $\phi_{-\beta}\big((X,A)\big) := \big( X, A - \beta(X) \big)$,
+  is a two-sided inverse to $\phi_\beta$.
+  So it remains to verify that this bijective linear map
+  $\phi_\beta \colon \egLie_1 \to \egLie_2$ is in fact a
+  homomorphism Lie algebras.
+
+  Let $(X, A), (Y, B) \in \gLie \oplus \aLie = \egLie_{\gamma_1}$.
+  The bracket in $\egLie_{\gamma_1}$ of these is, by definition,
+  \begin{align*}
+    [(X, A), (Y, B)]_{\gamma_1} := \big([X, Y]_{\gLie}, \gamma_1(X, Y) \big) .
+  \end{align*}
+  Applying the mapping $\phi_\beta$ to this, we get
+  \begin{align*}
+    \phi_\beta \Big([(X, A), (Y, B)]_{\gamma_1} \Big)
+      = \big([X, Y]_{\gLie}, \gamma_1(X, Y) + \beta([X, Y]_{\gLie}) \big) .
+  \end{align*}
+  On the other hand the Lie bracket in $\egLie_2$ of the images is
+  \begin{align*}
+         & \big[ \phi_\beta\big(((X, A)\big), \phi_\beta\big((Y, B)\big) \big]_{\gamma_2} \\
+    = \; & \big[ \big( X, A + \beta(X) \big), \big( Y, B + \beta(Y) \big) \big]_{\gamma_2} \\
+    = \; & \Big( [X,Y]_{\gLie} , \gamma_2(X,Y) \Big) \\
+    = \; & \Big( [X,Y]_{\gLie} , \gamma_1(X,Y) + \beta([X, Y]_{\gLie}) \Big) .
+  \end{align*}
+  From the equality of these two expressions we see that $\phi_\beta$
+  indeed is also a Lie algebra homomorphism.
 \end{proof}
 
 \begin{lemma}[Central extension determined by a cocycle is a central extension]

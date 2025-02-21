@@ -33,7 +33,36 @@ bracket is an $\infty$-dimensional Lie algebra over $\bbk$.
 \begin{proof}
   \uses{def:CyclicTripleSum}
   \leanok
-  Calculations.
+  By construction, the bracket in Definition~\ref{def:WittAlgebra} is
+  bilinear. It is antisymmetric on the basis vectors $\ell_n$, $n \in \bZ$,
+  so by bilinearity the bracket is antisymmetric.
+  It remains to check that the bracket satisfies Leibnitz rule
+  (or the Jacobi identity), i.e., that for any $X, Y, X \in \witt$ we have
+  \begin{align*}
+    \big[X, [Y, Z] \big] = \big[[X, Y] , Z \big] + \big[Y , [X, Z] \big] .
+  \end{align*}
+  This formula is trilinear in $X,Y,Z$, so it suffices to verify it on
+  basis vectors $X = \ell_n$, $Y = \ell_m$, $Z = \ell_k$.
+  Calculating, with Definition~\ref{def:WittAlgebra}, we have
+  \begin{align*}
+      \big[\ell_n, [\ell_m, \ell_k] \big]
+    = \big[\ell_n, (m-k) \ell_{m+k} \big]
+    = (m-k) \big(n-(m+k)\big) \, \ell_{n+m+k}
+  \end{align*}
+  and
+  \begin{align*}
+         & \big[[\ell_n, \ell_m] , \ell_k \big] + \big[\ell_m , [\ell_n, \ell_k] \big] \\
+    = \; & \big[(n-m) \ell_{n+m} , \ell_k \big] + \big[\ell_m , (n-k) \ell_{n+k}] \big] \\
+    = \; & (n-m) \big( n+m-k \big) \, \ell_{n+m+k}  + (n-k) \big( m-(n+k) \big) \, \ell_{m+n+k} .
+  \end{align*}
+  Noting that
+  \begin{align*}
+    (n-m) \big( n+m-k \big) + (n-k) \big( m-(n+k) \big)
+    %= n^2 - nk - m^2 + mk + nm - n^2 - nk - km + nk + k^2
+    %= - nk - m^2 + nm + k^2
+    = (m-k) \big(n-(m+k)\big) ,
+  \end{align*}
+  the Leibniz rule follows.
 \end{proof}
 
 \section{Virasoro cocycle}
@@ -52,13 +81,60 @@ Definition~\ref{def:WittAlgebra}.
   \begin{align*}
     {\gamma}_{\vir}(\ell_n,\ell_m) = \frac{n^3 - n}{12} \, \delta_{n+m,0}
   \end{align*}
-  is a Lie algebra 2-cocycle, ${\gamma}_{\vir} \in C^2(\witt,\bbk)$.
-  We call ${\gamma}_{\vir}$ the \term{Virasoro cocycle}.
+  is
+  %a Lie algebra 2-cocycle, ${\gamma}_{\vir} \in C^2(\witt,\bbk)$.
+  %We call ${\gamma}_{\vir}$
+  called the \term{Virasoro cocycle}.
 \end{definition}
+
+\begin{lemma}[The Virasoro cocycle is a 2-cocycle]
+  \label{lem:VirasoroCocycle_is_TwoCocycle}
+  \uses{def:VirasoroCocycle}
+  \lean{VirasoroProject.WittAlgebra.virasoroCocycle}
+  \leanok
+  The Virasoro cocycle is a 2-cocycle, ${\gamma}_{\vir} \in C^2(\witt,\bbk)$.
+\end{lemma}
+\begin{proof}
+  % \uses{}
+  \leanok
+  By the construction if Definition~\ref{def:VirasoroCocycle},
+  ${\gamma}_{\vir} \colon \witt \times \witt \to \bbk$ is bilinear.
+  It's antisymmetry on basis elements of the Witt algebra is easily checked,
+  so ${\gamma}_{\vir}$ is antisymmetric. It remains to prove the Leibniz
+  rule for ${\gamma}_{\vir}$, i.e., that for $X,Y,X \in \witt$, we have
+  \begin{align}\label{eq:LieTwoCocycle.leibniz}
+    {\gamma}_{\vir}(X,[Y,Z]) = \; & {\gamma}_{\vir}([X,Y],Z) + {\gamma}_{\vir}(Y,[X,Z]) .
+  \end{align}
+  This formula is trilinear in $X,Y,Z$, so it suffices to verify it for basis
+  vectors $X=\ell_n$, $Y=\ell_m$, $Z=\ell_k$. We calculate
+  \begin{align}
+    {\gamma}_{\vir}(\ell_n , [\ell_m , \ell_k])
+    = \; & {\gamma}_{\vir}\big( \ell_n , (m-k) \ell_{m+k} \big) \\
+    = \; & (m-k) \, \frac{n^3 - n}{12} \delta_{n+m+k,0} .
+  \end{align}
+  and
+  \begin{align}
+         & {\gamma}_{\vir}([\ell_n , \ell_m] , \ell_k)
+          + {\gamma}_{\vir}(\ell_m , [\ell_n , \ell_k]) \\
+    = \; & {\gamma}_{\vir}((n-m) \ell_{n+m} , \ell_k)
+          + {\gamma}_{\vir}(\ell_m , (n-k) \ell_{n+k}) \\
+    = \; & (n-m) \, \frac{(n+m)^3 - (n+m)}{12} \delta_{n+m+k,0}
+          + (n-k) \, \frac{m^3-m}{12} \delta_{n+m+k,0} .
+  \end{align}
+  Both of the above results are nonzero only if $k=-(n+m)$,
+  in which case $m-k = 2m+n$ and $n-k = 2n+m$,
+  so it suffices to note that
+  \begin{align*}
+    (2m+n) \, (n^3 - n)
+      = (n-m) \, \big( (n+m)^3 - (n+m) \big)
+        + (2 n + m) (m^3 - m)
+  \end{align*}
+  to verify the Leibniz rule for ${\gamma}_{\vir}$.
+\end{proof}
 
 \begin{lemma}[The Virasoro cocyle is nontrivial]
   \label{lem:VirasoroCocycleNontrivial}
-  \uses{def:VirasoroCocycle, def:LieTwoCohomology}
+  \uses{lem:VirasoroCocycle_is_TwoCocycle, def:LieTwoCohomology}
   \lean{VirasoroProject.WittAlgebra.cohomologyClass_virasoroCocycle_ne_zero}
   \leanok
   The cohomology class $[{\gamma}_{\vir}] \in H^2(\witt,\bbk)$
@@ -67,7 +143,24 @@ Definition~\ref{def:WittAlgebra}.
 \begin{proof}
   % \uses{}
   \leanok
-  \ldots
+  Assume, by way of contradiction, that ${\gamma}_{\vir} \in B^2(\witt,\bbk)$,
+  i.e., that ${\gamma}_{\vir} = \partial \beta$ for some $\beta \in C^1(\witt,\bbk)$.
+  Then, in particular, for every $n \in \bZ$ we would have
+  \begin{align*}
+    {\gamma}_{\vir}(\ell_n,\ell_{-n})
+      = \beta \big( [\ell_n, \ell_{-n}] \big) = 2 n \, \beta ( \ell_0 ) .
+  \end{align*}
+  By Definition~\ref{def:VirasoroCocycle}, this would imply
+  \begin{align*}
+    \frac{n^3-n}{12} = 2 n \, \beta ( \ell_0 )
+  \end{align*}
+  for all $n \in \bZ$. Considering for example $n=3$ and $n=6$, we then get
+  \begin{align*}
+    2 = 6 \, \beta (\ell_0)
+    \qquad \text{ and } \qquad
+    \frac{35}{2} = 12 \,  \beta (\ell_0) ,
+  \end{align*}
+  which obviously yield a contradiction.
 \end{proof}
 
 \section{Witt algebra 2-cohomology}
@@ -93,7 +186,7 @@ Definition~\ref{def:WittAlgebra}.
 
 \begin{lemma}[Witt algebra 2-cohomology is spanned by the Virasoro cocycle]
   \label{lem:WittTwoCohomologyIsOneDimensional}
-  \uses{def:WittAlgebra, def:LieTwoCohomology}
+  \uses{def:WittAlgebra, def:LieTwoCohomology, lem:VirasoroCocycle_is_TwoCocycle}
   \lean{VirasoroProject.WittAlgebra.rank_lieTwoCohomology_eq_one}
   \leanok
   The Lie algebra 2-cohomology $H^2(\witt,\bbk)$ of the Witt
