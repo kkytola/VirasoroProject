@@ -165,6 +165,52 @@ Definition~\ref{def:WittAlgebra}.
 
 \section{Witt algebra 2-cohomology}
 
+\begin{lemma}[Witt algebra 2-cocycle condition for basis]
+  \label{lem:WittTwoCocycleEquation}
+  \uses{lem:WittAlgebraIsLieAlgebra, def:LieTwoCocycle}
+  \lean{VirasoroProject.WittAlgebra.add_lieTwoCocycle_apply_lgen_lgen_lgen_eq_zero}
+  \leanok
+  For any Witt algebra 2-cocycle $\gamma \in C^2(\witt,\bbk)$ with coefficients
+  in $\bbk$, we have
+  \begin{align*}
+       (m-k) \, \gamma \big( \ell_n , \ell_{m+k} \big)
+     + (k-n) \, \gamma \big( \ell_{m} , \ell_{n+k} \big)
+     + (n-m) \, \gamma \big( \ell_k , \ell_{n+m} \big)
+     \; = \; 0
+  \end{align*}
+  for all $n,m,k \in \bZ$.
+\end{lemma}
+\begin{proof}
+  % \uses{}
+  \leanok
+  Direct calculation, using Definitions~\ref{def:WittAlgebra}
+  and~\ref{def:LieTwoCocycle}.
+\end{proof}
+
+\begin{lemma}[Witt algebra 2-cocycle support assuming normalization]
+  \label{lem:WittTwoCocycleSupport}
+  \uses{lem:WittAlgebraIsLieAlgebra, def:LieTwoCocycle}
+  \lean{VirasoroProject.WittAlgebra.lieTwoCocycle_apply_lgen_lgen_eq_zero_of_add_ne_zero}
+  \leanok
+  Let $\gamma \in C^2(\witt,\bbk)$ be a Witt algebra 2-cocycle such that
+  $\gamma (\ell_0 , \ell_n) = 0$ for all $n \in \bZ$.
+  Then for any $n,m \in \bZ$ with $n+m \ne 0$, we have
+  \begin{align*}
+    \gamma(\ell_n , \ell_m) = 0.
+  \end{align*}
+\end{lemma}
+\begin{proof}
+  \uses{lem:WittTwoCocycleEquation, lem:LieTwoCocycle_skew_symmetry}
+  \leanok
+  Apply Lemma~\ref{lem:WittTwoCocycleEquation} with $k=0$. The last term
+  vanishes, and by skew-symmetry of $\gamma$, the first two terms simplify to yield
+  \begin{align*}
+    (m+n) \, \gamma (\ell_n , \ell_m) = 0 ,
+  \end{align*}
+  which, assuming $n+m \ne 0$, yields the asserted equation
+  $\gamma (\ell_n , \ell_m) = 0$.
+\end{proof}
+
 \begin{lemma}[Normalization of Witt algebra 2-cocycles]
   \label{lem:WittTwoCocycleNormalization}
   \uses{def:VirasoroCocycle, def:LieTwoCoboundary}
@@ -179,10 +225,74 @@ Definition~\ref{def:WittAlgebra}.
   for some scalar $r \in \bbk$.
 \end{lemma}
 \begin{proof}
-  % \uses{}
+  \uses{lem:WittTwoCocycleSupport, lem:WittTwoCocycleEquation}
   \leanok
-  Calculation.
-\end{proof}
+  Let $\gamma \in C^2(\witt,\bbk)$ be a Witt algebra 2-cocycle.
+  Define a Witt algebra 1-cocycle $\beta \in C^1(\witt,\bbk)$ by linear extension of
+  \begin{align*}
+    \beta (\ell_n) =
+    \begin{cases}
+      -\frac{1}{2} \gamma(\ell_1, \ell_{-1}) & \text{ if } n = 0 \\
+      \frac{1}{n} \gamma(\ell_0, \ell_n) & \text{ if } n \ne 0 .
+    \end{cases}
+  \end{align*}
+
+  For any $n \ne 0$, we calculate
+  \begin{align*}
+           \big( \gamma + \partial \beta \big) (\ell_0 , \ell_n)
+    = \; & \gamma (\ell_0 , \ell_n) + \beta ([\ell_0,\ell_n]) \\
+    = \; & \gamma (\ell_0 , \ell_n) - n \, \beta (\ell_n) \\
+    = \; & \gamma (\ell_0 , \ell_n) - n \, \frac{1}{n}\gamma(\ell_0, \ell_n) = 0 .
+  \end{align*}
+  This property and Lemma~\ref{lem:WittTwoCocycleSupport} imply that
+  \begin{align*}
+    \big( \gamma + \partial \beta \big) (\ell_0 , \ell_n) = 0
+  \end{align*}
+  whenever $n+m \ne 0$.
+
+  We will show the asserted equation with
+  \begin{align*}
+    r = 2 \, \big( \gamma + \partial \beta \big) ( \ell_2, \ell_{-2}) .
+  \end{align*}
+
+  By comparison with the Virasoro cocycle~${\gamma}_{\vir}$
+  of Definition~\ref{def:VirasoroCocycle}, and using skew-symmetry,
+  it remains to show that for any $n \in \bN$ we have
+  \begin{align*}
+    \big( \gamma + \partial \beta \big) (\ell_n , \ell_{-n})
+      = r \; \frac{n^3 - n}{12} .
+  \end{align*}
+  The case $n = 0$ is a direct consequence of antisymmetry.
+  The case $n = 1$ follows
+  using the definition of $\beta$ and the calculation
+  \begin{align*}
+    \big( \gamma + \partial \beta \big) (\ell_1 , \ell_{-1})
+    = \; & \gamma (\ell_1 , \ell_{-1}) + \beta ([\ell_1,\ell_{-1}]) \\
+    = \; & \gamma (\ell_1 , \ell_{-1}) + 2 \, \beta (\ell_0) \\
+    = \; & \gamma (\ell_1 , \ell_{-1}) - 2 \, \frac{1}{2} \gamma(\ell_1, \ell_{-1}) = 0 .
+  \end{align*}
+  The case $n = 2$ follows directly by the choice of $r$.
+  We prove the equality in the cases $n \ge 3$ by induction on $n$.
+  Assume the equation for smaller values of $n$.
+  Apply Lemma~\ref{lem:WittTwoCocycleEquation} to $\gamma + \partial \beta$
+  with $m = 1-n$ and $k = -1$ to get
+  \begin{align*}
+    0 = \; & (2-n) \, \big( \gamma + \partial \beta \big) (\ell_n , \ell_{-n})
+           + (-1-n) \, \big( \gamma + \partial \beta \big) (\ell_{1-n} , \ell_{n-1})
+           + (2 n - 1) \, \big( \gamma + \partial \beta \big) (\ell_1 , \ell_{-1}) \\
+      = \; & (2-n) \, \big( \gamma + \partial \beta \big) (\ell_n , \ell_{-n})
+                  - (-1-n) \, r \frac{(n-1)^3 - (n-1)}{12} \\
+      = \; & (2-n) \, \big( \gamma + \partial \beta \big) (\ell_n , \ell_{-n})
+           + \frac{r}{12} (n+1) n (n-1) (n-2) .
+  \end{align*}
+  where in the seciond step we used the induction hypothesis. Since $2-n \ne 0$, this can
+  be solved for
+  \begin{align*}
+           \big( \gamma + \partial \beta \big) (\ell_n , \ell_{-n})
+    = \; & - \frac{r}{12} \frac{(n+1) n (n-1) (n-2)}{2-n} = r \frac{n^3 - n}{12} ,
+  \end{align*}
+  completing the induction step.
+  \end{proof}
 
 \begin{lemma}[Witt algebra 2-cohomology is spanned by the Virasoro cocycle]
   \label{lem:WittTwoCohomologyIsOneDimensional}

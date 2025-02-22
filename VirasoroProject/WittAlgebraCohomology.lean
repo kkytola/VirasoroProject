@@ -85,7 +85,8 @@ private lemma add_lieTwoCocycle_apply_lgen_lgen_lgen_eq_zero (n m k : ℤ) :
   simp only [← γ.skew (lgen 𝕜 k), key, sub_mul, mul_neg, neg_sub]
   ring
 
-private lemma lieTwoCocycle_apply_lgen_lgen_eq_zero_of_add_ne_zero {n m : ℤ} (ne_zero : n + m ≠ 0) (hγ : γ (lgen 𝕜 0) (lgen 𝕜 (n+m)) = 0) :
+private lemma lieTwoCocycle_apply_lgen_lgen_eq_zero_of_add_ne_zero {n m : ℤ} (ne_zero : n + m ≠ 0)
+    (hγ : γ (lgen 𝕜 0) (lgen 𝕜 (n+m)) = 0) :
     γ (lgen 𝕜 n) (lgen 𝕜 m) = 0 := by
   have key := add_lieTwoCocycle_apply_lgen_lgen_lgen_eq_zero γ n m 0
   simp only [hγ, ← γ.skew (lgen 𝕜 m), Int.cast_zero, mul_neg, neg_mul, sub_zero,
