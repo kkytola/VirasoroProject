@@ -110,7 +110,7 @@ def bracket : γ.CentralExtension
 @[simp] lemma bracket_apply (Z W : γ.CentralExtension) :
     γ.bracket Z W = ⟨⁅Z.fst, W.fst⁆, γ Z.fst W.fst⟩ := rfl
 
-private lemma bracket_self (Z : γ.CentralExtension) :
+lemma bracket_self (Z : γ.CentralExtension) :
     γ.bracket Z Z = 0 := by
   simp
 
