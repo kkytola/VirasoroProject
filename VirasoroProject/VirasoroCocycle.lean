@@ -69,7 +69,7 @@ lemma virasoroCocycleBilin_eq_neg_flip :
   · simp only [add_comm m n, opp, ↓reduceIte, neg_zero]
 
 /-- An auxiliary for of the Leibniz identity of the Virasoro cocycle `WittAlgebra`. -/
-private lemma virasoroCocycleBracketCyclic_eq_zero :
+ lemma virasoroCocycleBracketCyclic_eq_zero :
     cyclicTripleSumHom (bracket 𝕜) (virasoroCocycleBilin 𝕜) = 0 := by
   apply LinearMap.ext_basis (lgen _) (lgen _)
   intro n m
