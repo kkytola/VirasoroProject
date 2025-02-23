@@ -283,13 +283,13 @@ section LieTwoCoboundary
 variable {𝕜 𝓖 𝓐}
 
 /-- A Lie algebra 1-cocycle determines a bilinear map via the differential. -/
-private def LieOneCocycle.bdry' (β : LieOneCocycle 𝕜 𝓖 𝓐) : 𝓖 →ₗ[𝕜] 𝓖 →ₗ[𝕜] 𝓐 where
+def LieOneCocycle.bdry' (β : LieOneCocycle 𝕜 𝓖 𝓐) : 𝓖 →ₗ[𝕜] 𝓖 →ₗ[𝕜] 𝓐 where
   toFun := fun X ↦ β ∘ₗ LieAlgebra.bracketHom 𝕜 𝓖 X
   map_add' X₁ X₂ := by simp_all only [map_add] ; ext ; simp_all
   map_smul' c X := by simp_all only [LinearMapClass.map_smul, RingHom.id_apply] ; ext ; simp_all
 
 /-- A Lie algebra 1-cocycle linearly determines a bilinear map via the differential. -/
-private def LieOneCocycle.bdryHom' : LieOneCocycle 𝕜 𝓖 𝓐 →ₗ[𝕜] 𝓖 →ₗ[𝕜] 𝓖 →ₗ[𝕜] 𝓐 where
+def LieOneCocycle.bdryHom' : LieOneCocycle 𝕜 𝓖 𝓐 →ₗ[𝕜] 𝓖 →ₗ[𝕜] 𝓖 →ₗ[𝕜] 𝓐 where
   toFun := fun β ↦ LieOneCocycle.bdry' β
   map_add' β₁ β₂ := by dsimp ; ext X Y; rfl
   map_smul' c Z := by dsimp ; ext X Y; rfl
