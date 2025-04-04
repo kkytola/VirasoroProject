@@ -1,0 +1,162 @@
+%\section{Lie algebra cohomology in degree two}
+
+Let $\bbk$ be a field and let $\gLie$ be a Lie algebra over $\bbk$.
+Fix also a vector space $\aLie$ over $\bbk$, (interpreted, when necessary,
+as an abelian Lie algebra, i.e., all Lie brackets in $\aLie$ are taken to
+be zero).
+
+\begin{definition}[Lie algebra 1-cocycle]
+  \label{def:LieOneCocycle}
+  %\uses{}
+  \lean{VirasoroProject.LieOneCocycle}
+  \leanok
+  A \term{1-cocycle} of the Lie algebra $\gLie$ with coefficients in the vector
+  space $\aLie$ is a linear map
+  \begin{align*}
+    \beta \colon \gLie \to \aLie .
+  \end{align*}
+  The set of all such 1-cocycles is denoted by $C^1(\gLie, \aLie)$.
+  %\begin{align*}
+  %  C^1(\gLie, \aLie) .
+  %\end{align*}
+\end{definition}
+
+\begin{definition}[Lie algebra 2-cocycle]
+  \label{def:LieTwoCocycle}
+  %\uses{}
+  \lean{VirasoroProject.LieTwoCocycle}
+  \leanok
+  A \term{2-cocycle} of the Lie algebra $\gLie$ with coefficients in the vector
+  space $\aLie$ is a bilinear map
+  \begin{align*}
+    \gamma \colon \gLie \times \gLie \to \aLie
+  \end{align*}
+  such that for all $X \in \gLie$ we have the antisymmetry condition
+  \begin{align}\label{eq:LieTwoCocycle.self}
+    \gamma(X,X) = \; & 0
+  \end{align}
+  and for all $X,Y,Z \in \gLie$ we have the Leibnitz rule
+  \begin{align}\label{eq:LieTwoCocycle.leibniz}
+    \gamma(X,[Y,Z]) = \; & \gamma([X,Y],Z) + \gamma(Y,[X,Z]) .
+  \end{align}
+
+  The set of all such 2-cocycles is denoted by $C^2(\gLie, \aLie)$.
+  %\begin{align*}
+  %  C^1(\gLie, \aLie) .
+  %\end{align*}
+\end{definition}
+
+\begin{lemma}[Skew-symmetry of 2-cocycles]
+  \label{lem:LieTwoCocycle_skew_symmetry}
+  \uses{def:LieTwoCocycle}
+  \lean{VirasoroProject.LieTwoCocycle.skew}
+  \leanok
+  For any $\gamma \in C^2(\gLie,\aLie)$ and any $X,Y \in \gLie$,
+  we have the skew-symmetry property
+  \begin{align*}
+    \gamma(X,Y) = - \gamma(Y,X) .
+  \end{align*}
+\end{lemma}
+\begin{proof}
+  % \uses{}
+  \leanok
+  The Leibnitz rule \eqref{eq:LieTwoCocycle.leibniz}
+  applied to $X+Y$ gives
+  \begin{align*}
+    0 = \; & \gamma(X+Y,X+Y) \\
+      = \; & \gamma(X,X) + \gamma(X,Y) + \gamma(Y,X) + \gamma(Y,Y)
+  \end{align*}
+  by bilinearity of $\gamma$. The first and the last terms
+  in the last expression vanish by antisymmetry \eqref{eq:LieTwoCocycle.self},
+  and the asserted skew-symmetry equation follows.
+\end{proof}
+
+\begin{lemma}[Lie algebra 1-cocycles form a vector space]
+  \label{lem:LieOneCocycle_vectorSpace}
+  \uses{def:LieOneCocycle}
+  \lean{VirasoroProject.LieOneCocycle.instModule}
+  \leanok
+  The set $C^1(\gLie, \aLie)$ of 1-cocycles of $\gLie$ with
+  coefficients in $\aLie$ forms a vector space over $\bbk$.
+\end{lemma}
+\begin{proof}
+  % \uses{}
+  \leanok
+  By definition, $C^1(\gLie, \aLie)$ is the space of
+  linear maps $\gLie \to \aLie$, and such linear maps form
+  a vector space.
+\end{proof}
+
+\begin{lemma}[Lie algebra 2-cocycles form a vector space]
+  \label{lem:LieTwoCocycle_vectorSpace}
+  \uses{def:LieTwoCocycle}
+  \lean{VirasoroProject.LieTwoCocycle.instModule}
+  \leanok
+  The set $C^2(\gLie, \aLie)$ of 2-cocycles of $\gLie$ with
+  coefficients in $\aLie$ forms a vector space over $\bbk$.
+\end{lemma}
+\begin{proof}
+  % \uses{}
+  \leanok
+  The conditions defining $C^2(\gLie, \aLie)$ are linear,
+  so this is staightforward.
+\end{proof}
+
+\begin{definition}[Lie algebra 2-coboundary]
+  \label{def:LieTwoCoboundary}
+  \uses{lem:LieTwoCocycle_vectorSpace, lem:LieOneCocycle_vectorSpace}
+  \lean{VirasoroProject.LieOneCocycle.bdryHom}
+  \leanok
+  Given a 1-cocycle $\beta \in C^1(\gLie, \aLie)$, we define the
+  \term{coboundary} $\partial \beta$ of $\beta$ to be the bilinear map
+  \begin{align*}
+    \partial \beta \colon \; & \gLie \times \gLie \to \aLie \\
+  \end{align*}
+  given by
+  \begin{align*}
+    \partial \beta (X, Y) = \; & \beta ([X,Y]) .
+  \end{align*}
+  We then have $\partial \beta \in C^2(\gLie,\aLie)$.
+  The mapping $\partial \colon C^1(\gLie,\aLie) \to C^2(\gLie,\aLie)$
+  is linear. Its range is denoted $B^2(\gLie,\aLie) \subset C^2(\gLie,\aLie)$
+  and called the set of \term{2-coboundaries} of the Lie algebra $\gLie$
+  with coefficients in $\aLie$.
+\end{definition}
+
+\begin{definition}[Lie algebra 2-cohomology]
+  \label{def:LieTwoCohomology}
+  \uses{def:LieTwoCoboundary}
+  \lean{VirasoroProject.LieTwoCohomology}
+  \leanok
+  The vector space
+  \begin{align*}
+    H^2(\gLie,\aLie) := C^2(\gLie,\aLie) \, / \, B^2(\gLie,\aLie)
+  \end{align*}
+  is called the \term{Lie algebra cohomology in degree 2} of $\gLie$
+  with coefficients in $\aLie$.
+\end{definition}
+
+\begin{lemma}[Cohomology of abelian Lie algebras]
+  \label{lem:LieTwoCohomology_abelian}
+  \uses{def:LieTwoCohomology}
+  \lean{VirasoroProject.LieTwoCocycle.toLieTwoCohomologyEquiv_toLinearMap}
+  \leanok
+  If $\gLie$ is abelian, i.e., $[\gLie,\gLie] = 0$, then
+  the canonical projection
+  \begin{align*}
+    C^2(\gLie,\aLie) \to H^2(\gLie,\aLie)
+  \end{align*}
+  %mapping a 2-cocycle $\gamma$ to its equivalence class
+  %$\gamma + B^2(\gLie,\aLie)$
+  is a linear isomorphism.
+\end{lemma}
+\begin{proof}
+  % \uses{}
+  \leanok
+  The projection is surjective by construction, so it suffices to show that it is also injective.
+  The kernel of the projection is $B^2(\gLie,\aLie) = \Ima \; \partial$.
+  In view of Definition~\ref{def:LieTwoCoboundary},
+  abelianity of $\gLie$ implies $\partial \beta = 0$ for any $\beta \in C^1(\gLie,\aLie)$.
+  Therefore $B^2(\gLie,\aLie) = 0$, and the kernel of the projection is trivial,
+  so the projection is indeed injective.
+\end{proof}

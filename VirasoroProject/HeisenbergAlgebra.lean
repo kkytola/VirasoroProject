@@ -171,7 +171,7 @@ def HeisenbergAlgebra := LieTwoCocycle.CentralExtension (AbelianLieAlgebraOn.hei
 
 namespace HeisenbergAlgebra
 
-private lemma ext' {X Y : HeisenbergAlgebra 𝕜} (h₁ : X.1 = Y.1) (h₂ : X.2 = Y.2) :
+lemma ext' {X Y : HeisenbergAlgebra 𝕜} (h₁ : X.1 = Y.1) (h₂ : X.2 = Y.2) :
     X = Y :=
   LieTwoCocycle.CentralExtension.ext h₁ h₂
 
@@ -195,33 +195,33 @@ variable (𝕜)
 noncomputable def ofCentral : 𝕜 →ₗ⁅𝕜⁆ HeisenbergAlgebra 𝕜 :=
   LieTwoCocycle.CentralExtension.emb (AbelianLieAlgebraOn.heisenbergCocycle 𝕜)
 
-private lemma bracket_def' (X Y : HeisenbergAlgebra 𝕜) :
+lemma bracket_def' (X Y : HeisenbergAlgebra 𝕜) :
     ⁅X, Y⁆ = ⟨⁅toAbelianLieAlgebraOn X, toAbelianLieAlgebraOn Y⁆,
               (AbelianLieAlgebraOn.heisenbergCocycle 𝕜) (toAbelianLieAlgebraOn X) (toAbelianLieAlgebraOn Y)⟩ := by
   rfl
 
-@[simp] private lemma bracket_fst (X Y : HeisenbergAlgebra 𝕜) :
+@[simp] lemma bracket_fst (X Y : HeisenbergAlgebra 𝕜) :
     ⁅X, Y⁆.1 = 0 := rfl
 
-@[simp] private lemma bracket_snd (X Y : HeisenbergAlgebra 𝕜) :
+@[simp] lemma bracket_snd (X Y : HeisenbergAlgebra 𝕜) :
     ⁅X, Y⁆.2 = (AbelianLieAlgebraOn.heisenbergCocycle 𝕜) (toAbelianLieAlgebraOn X) (toAbelianLieAlgebraOn Y) := rfl
 
-private lemma add_def' (X Y : HeisenbergAlgebra 𝕜) :
+lemma add_def' (X Y : HeisenbergAlgebra 𝕜) :
     X + Y = ⟨X.1 + Y.1, X.2 + Y.2⟩ := rfl
 
-private lemma smul_def' (c : 𝕜) (X : HeisenbergAlgebra 𝕜) :
+lemma smul_def' (c : 𝕜) (X : HeisenbergAlgebra 𝕜) :
     c • X = ⟨c • X.1, c * X.2⟩ := rfl
 
-@[simp] private lemma add_fst (X Y : HeisenbergAlgebra 𝕜) :
+@[simp] lemma add_fst (X Y : HeisenbergAlgebra 𝕜) :
     (X + Y).1 = X.1 + Y.1 := rfl
 
-@[simp] private lemma add_snd (X Y : HeisenbergAlgebra 𝕜) :
+@[simp] lemma add_snd (X Y : HeisenbergAlgebra 𝕜) :
     (X + Y).2 = X.2 + Y.2 := rfl
 
-@[simp] private lemma smul_fst (c : 𝕜) (X : HeisenbergAlgebra 𝕜) :
+@[simp] lemma smul_fst (c : 𝕜) (X : HeisenbergAlgebra 𝕜) :
     (c • X).1 = c • X.1 := rfl
 
-@[simp] private lemma smul_snd (c : 𝕜) (X : HeisenbergAlgebra 𝕜) :
+@[simp] lemma smul_snd (c : 𝕜) (X : HeisenbergAlgebra 𝕜) :
     (c • X).2 = c * X.2 := rfl
 
 /-- The Heisenberg algebra is a central extension of the Witt algebra. -/
@@ -237,9 +237,9 @@ noncomputable def kgen : HeisenbergAlgebra 𝕜 := ofCentral 𝕜 1
 
 lemma kgen_eq_ofCentral_one : kgen 𝕜 = ofCentral 𝕜 1 := rfl
 
-private lemma kgen_eq' : kgen 𝕜 = ⟨0, 1⟩ := rfl
+lemma kgen_eq' : kgen 𝕜 = ⟨0, 1⟩ := rfl
 
-private lemma jgen_eq' (k : ℤ) : jgen 𝕜 k = ⟨.jgen 𝕜 k, 0⟩ := rfl
+lemma jgen_eq' (k : ℤ) : jgen 𝕜 k = ⟨.jgen 𝕜 k, 0⟩ := rfl
 
 lemma toAbelianLieAlgebraOn_kgen :
   toAbelianLieAlgebraOn (kgen 𝕜) = 0 := rfl

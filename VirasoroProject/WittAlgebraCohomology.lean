@@ -60,14 +60,14 @@ lemma normalizingCocycle_apply_lgen (n : ℤ) (hn : n ≠ 0) :
   rw [← aux]
   congr
 
-private lemma add_bdry_normalizingCocycle_apply_lgen_one :
+lemma add_bdry_normalizingCocycle_apply_lgen_one :
     (γ + (normalizingCocycle γ).bdry) (lgen 𝕜 1) (lgen 𝕜 (-1)) = 0 := by
   simp only [Int.reduceNeg, LieTwoCocycle.add_apply, LieOneCocycle.bdry_apply, bracket_lgen_lgen,
     Int.cast_one, Int.cast_neg, sub_neg_eq_add, add_neg_cancel, map_smul,
     normalizingCocycle_apply_lgen_zero, neg_mul, smul_eq_mul, mul_neg]
   ring
 
-private lemma add_bdry_normalizingCocycle_apply_lgen_zero (n : ℤ) (hn : n ≠ 0) :
+lemma add_bdry_normalizingCocycle_apply_lgen_zero (n : ℤ) (hn : n ≠ 0) :
     (γ + (normalizingCocycle γ).bdry) (lgen 𝕜 0) (lgen 𝕜 n) = 0 := by
   simp only [LieTwoCocycle.add_apply, LieOneCocycle.bdry_apply, bracket_lgen_lgen, Int.cast_zero,
     zero_sub, zero_add, neg_smul, map_neg, map_smul, smul_eq_mul]
@@ -77,7 +77,7 @@ private lemma add_bdry_normalizingCocycle_apply_lgen_zero (n : ℤ) (hn : n ≠ 
 
 /-- The 2-cocycle equation in the standard basis `ℓₙ` of the Witt algebra:
     `0 = (m-k) * γ(n,m+k) + (k-n) * γ(m,n+k) + (n-m) * γ(k,n+m)`. -/
-private lemma add_lieTwoCocycle_apply_lgen_lgen_lgen_eq_zero (n m k : ℤ) :
+lemma add_lieTwoCocycle_apply_lgen_lgen_lgen_eq_zero (n m k : ℤ) :
     (m - k) * γ (lgen 𝕜 n) (lgen 𝕜 (m + k)) + (k - n) * γ (lgen 𝕜 m) (lgen 𝕜 (n + k))
      + (n - m) * γ (lgen 𝕜 k) (lgen 𝕜 (n + m)) = 0 := by
   have key := γ.leibniz (X := lgen 𝕜 n) (Y := lgen 𝕜 m) (Z := lgen 𝕜 k)
@@ -85,7 +85,8 @@ private lemma add_lieTwoCocycle_apply_lgen_lgen_lgen_eq_zero (n m k : ℤ) :
   simp only [← γ.skew (lgen 𝕜 k), key, sub_mul, mul_neg, neg_sub]
   ring
 
-private lemma lieTwoCocycle_apply_lgen_lgen_eq_zero_of_add_ne_zero {n m : ℤ} (ne_zero : n + m ≠ 0) (hγ : γ (lgen 𝕜 0) (lgen 𝕜 (n+m)) = 0) :
+lemma lieTwoCocycle_apply_lgen_lgen_eq_zero_of_add_ne_zero {n m : ℤ} (ne_zero : n + m ≠ 0)
+    (hγ : γ (lgen 𝕜 0) (lgen 𝕜 (n+m)) = 0) :
     γ (lgen 𝕜 n) (lgen 𝕜 m) = 0 := by
   have key := add_lieTwoCocycle_apply_lgen_lgen_lgen_eq_zero γ n m 0
   simp only [hγ, ← γ.skew (lgen 𝕜 m), Int.cast_zero, mul_neg, neg_mul, sub_zero,

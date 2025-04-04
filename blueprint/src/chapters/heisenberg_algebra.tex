@@ -1,0 +1,46 @@
+In this section we assume that $\bbk$ is a field of characteristic zero.
+% and $\gLie$ is the vector space with basis $(j_k)_{k \in \bZ}$ over $\bbk$
+% considered as an abelian Lie algebra.
+
+\begin{definition}[Heisenberg cocycle]
+  \label{def:HeisenbergCocycle}
+  \uses{def:LieTwoCocycle}
+  \lean{VirasoroProject.AbelianLieAlgebraOn.heisenbergCocycle}
+  \leanok
+  Let $\gLie$ be the vector space with basis $(j_k)_{k \in \bZ}$ over $\bbk$,
+  considered as an abelian Lie algebra.
+  The bilinear map ${\gamma}_{\hei} \colon \gLie \times \gLie \to \bbk$
+  given on basis elements by
+  \begin{align*}
+    {\gamma}_{\hei}(j_k, j_l) = k \, \delta_{k+l,0}
+  \end{align*}
+  is a Lie algebra 2-cocycle, ${\gamma}_{\hei} \in C^2(\gLie,\bbk)$.
+  We call ${\gamma}_{\hei}$ the \term{Heisenberg cocycle}.
+\end{definition}
+
+\begin{lemma}[The Heisenberg cocyle is nontrivial]
+  \label{lem:HeisenbergCocycleNontrivial}
+  \uses{def:HeisenbergCocycle, def:LieTwoCohomology}
+  \lean{VirasoroProject.AbelianLieAlgebraOn.heisenbergCocycle_ne_zero}
+  \leanok
+  The cohomology class $[{\gamma}_{\hei}] \in H^2(\gLie,\bbk)$
+  of the Heisenberg cocycle is nonzero.
+\end{lemma}
+\begin{proof}
+  % \uses{}
+  \leanok
+  \ldots
+\end{proof}
+
+\begin{definition}[Heisenberg algebra]
+  \label{def:HeisenbergAlgebra}
+  \uses{def:HeisenbergCocycle, def:CentralExtensionOfCocycle}
+  \lean{VirasoroProject.HeisenbergAlgebra, VirasoroProject.HeisenbergAlgebra.instLieAlgebra,
+  VirasoroProject.HeisenbergAlgebra.isCentralExtension}
+  \leanok
+  Let $\bbk$ be a field of characteristic zero.
+  The \term{Heisenberg algebra} $\hei$ is the Lie algebra over $\bbk$
+  obtained as the central extension of the abelian Lie algebra $\gLie$
+  with basis $(j_k)_{k \in \bZ}$,
+  corresponding to the Heisenberg cocycle ${\gamma}_{\hei} \in C^2(\gLie,\bbk)$.
+\end{definition}
