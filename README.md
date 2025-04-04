@@ -1,4 +1,4 @@
-# Virasoro Project
+# Virasoro Project :D
 
 This project is a Lean-formalization of topics related to the Virasoro algebra. The current scope is mainly:
  * the construction of the Virasoro algebra as the (unique) 1-dimensional central extension of the Witt algebra. (`«VirasoroProject».VirasoroAlgebra`)
