@@ -145,12 +145,24 @@ instance isCentralExtension [IsLieAbelian 𝓐] (γ : LieTwoCocycle 𝕜 𝓖 �
     simp only [emb, LieHom.coe_mk, lie_def, zero_lie, map_zero, LinearMap.zero_apply]
     rfl
 
+noncomputable def stdSection [IsLieAbelian 𝓐] (γ : LieTwoCocycle 𝕜 𝓖 𝓐) :
+    𝓖 →ₗ[𝕜] γ.CentralExtension where
+  toFun X := ⟨X, 0⟩
+  map_add' X₁ X₂ := by rw [LieTwoCocycle.CentralExtension.add_def] ; simp
+  map_smul' c X := by rw [LieTwoCocycle.CentralExtension.smul_def] ; simp
+
+lemma stdSection_prop [IsLieAbelian 𝓐] (γ : LieTwoCocycle 𝕜 𝓖 𝓐) :
+    proj γ ∘ₗ stdSection γ = (1 : 𝓖 →ₗ[𝕜] 𝓖) :=
+  rfl
+
 end LieTwoCocycle.CentralExtension --namespace
 
 end LieTwoCocycle.CentralExtension -- section
 
 
 section Basis
+
+namespace LieAlgebra.IsCentralExtension
 
 universe u u'
 variable {𝕜 : Type u} [CommRing 𝕜]
@@ -159,15 +171,31 @@ variable [LieRing 𝓖] [LieAlgebra 𝕜 𝓖] [LieRing 𝓐] [LieAlgebra 𝕜 �
 
 /-- A basis of a central extension of Lie algebras constructed from a section and bases of the
 extending Lie algebras. -/
-noncomputable def LieAlgebra.IsCentralExtension.basis
+noncomputable def basis
     {i : 𝓐 →ₗ⁅𝕜⁆ 𝓔} {p : 𝓔 →ₗ⁅𝕜⁆ 𝓖} (cext : LieAlgebra.IsCentralExtension i p)
     (σ : 𝓖 →ₗ[𝕜] 𝓔) (hσ : p.toLinearMap ∘ₗ σ = 1)
-    {ιG ιA : Type u'} (basG : Basis ιG 𝕜 𝓖) (basA : Basis ιA 𝕜 𝓐) :
+    {ιA ιG  : Type u'} (basA : Basis ιA 𝕜 𝓐) (basG : Basis ιG 𝕜 𝓖) :
     Basis (ιA ⊕ ιG) 𝕜 𝓔 := by
   apply @ses_basis 𝕜 _ 𝓐 𝓔 𝓖 _ _ _ _ _ _ i.toLinearMap p.toLinearMap σ ιA ιG basA basG
   · exact (LieSubmodule.mk_eq_bot_iff.mp cext.ker_eq_bot)
   · exact congr_arg LieSubalgebra.toSubmodule cext.exact
   · exact hσ
+
+@[simp] lemma basis_eq_of_left
+    {i : 𝓐 →ₗ⁅𝕜⁆ 𝓔} {p : 𝓔 →ₗ⁅𝕜⁆ 𝓖} (cext : LieAlgebra.IsCentralExtension i p)
+    (σ : 𝓖 →ₗ[𝕜] 𝓔) (hσ : p.toLinearMap ∘ₗ σ = 1)
+    {ιA ιG  : Type u'} (basA : Basis ιA 𝕜 𝓐) (basG : Basis ιG 𝕜 𝓖) (ia : ιA):
+    basis cext σ hσ basA basG (Sum.inl ia) = i (basA ia) := by
+  simp [basis]
+
+@[simp] lemma basis_eq_of_right
+    {i : 𝓐 →ₗ⁅𝕜⁆ 𝓔} {p : 𝓔 →ₗ⁅𝕜⁆ 𝓖} (cext : LieAlgebra.IsCentralExtension i p)
+    (σ : 𝓖 →ₗ[𝕜] 𝓔) (hσ : p.toLinearMap ∘ₗ σ = 1)
+    {ιA ιG  : Type u'} (basA : Basis ιA 𝕜 𝓐) (basG : Basis ιG 𝕜 𝓖) (ig : ιG):
+    basis cext σ hσ basA basG (Sum.inr ig) = σ (basG ig) := by
+  simp [basis]
+
+end LieAlgebra.IsCentralExtension
 
 end Basis
 

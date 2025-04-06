@@ -127,7 +127,11 @@ lemma cgen_eq' : cgen 𝕜 = ⟨0, 1⟩ := rfl
 
 lemma lgen_eq' (n : ℤ) : lgen 𝕜 n = ⟨WittAlgebra.lgen 𝕜 n, 0⟩ := rfl
 
-lemma toWittAlgebra_cgen :
+@[simp] lemma ofCentral_apply (a : 𝕜) : ofCentral 𝕜 a = a • (cgen 𝕜) := by
+  change (⟨0, a⟩ : VirasoroAlgebra 𝕜) = a • ⟨0, 1⟩
+  aesop
+
+@[simp] lemma toWittAlgebra_cgen :
   toWittAlgebra (cgen 𝕜) = 0 := rfl
 
 @[simp] lemma toWittAlgebra_lgen (n : ℤ) :
@@ -156,18 +160,16 @@ lemma lgen_bracket' (n m : ℤ) :
       = (n - m : 𝕜) • lgen 𝕜 (n + m) + if n + m = 0 then ((n-1 : 𝕜)*n*(n+1)/12) • cgen 𝕜 else 0 := by
   rw [lgen_bracket] ; congr ; ring
 
-noncomputable def stdSection : WittAlgebra 𝕜 →ₗ[𝕜] VirasoroAlgebra 𝕜 where
-  toFun L := ⟨L, 0⟩
-  map_add' L₁ L₂ := by rw [LieTwoCocycle.CentralExtension.add_def] ; simp
-  map_smul' c L := by rw [LieTwoCocycle.CentralExtension.smul_def] ; simp
+noncomputable def lsection : WittAlgebra 𝕜 →ₗ[𝕜] VirasoroAlgebra 𝕜 :=
+  LieTwoCocycle.CentralExtension.stdSection (WittAlgebra.virasoroCocycle 𝕜)
 
-lemma stdSection_prop :
-    (toWittAlgebra (𝕜 := 𝕜)) ∘ₗ (stdSection 𝕜) = (1 : WittAlgebra 𝕜 →ₗ[𝕜] WittAlgebra 𝕜) :=
+@[simp] lemma lsection_lgen (n : ℤ) :
+    lsection 𝕜 (WittAlgebra.lgen 𝕜 n) = lgen 𝕜 n :=
   rfl
 
 noncomputable def basisLC : Basis (Option ℤ) 𝕜 (VirasoroAlgebra 𝕜) :=
-  ((isCentralExtension 𝕜).basis (stdSection 𝕜) (stdSection_prop 𝕜)
-          (WittAlgebra.lgen 𝕜) (Basis.singleton Unit 𝕜)).reindex
+  ((isCentralExtension 𝕜).basis (lsection 𝕜) rfl
+        (Basis.singleton Unit 𝕜) (WittAlgebra.lgen 𝕜)).reindex
     { toFun uz := match uz with
         | Sum.inl _ => none
         | Sum.inr l => some l
@@ -180,6 +182,14 @@ noncomputable def basisLC : Basis (Option ℤ) 𝕜 (VirasoroAlgebra 𝕜) :=
       right_inv oz := match oz with
         | none => rfl
         | some _ => rfl }
+
+@[simp] lemma basisLC_some (n : ℤ) :
+    basisLC 𝕜 (some n) = lgen 𝕜 n := by
+  simp [basisLC]
+
+@[simp] lemma basisLC_none :
+    basisLC 𝕜 none = cgen 𝕜 := by
+  simp [basisLC]
 
 end VirasoroAlgebra -- namespace
 

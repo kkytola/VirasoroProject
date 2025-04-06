@@ -241,6 +241,10 @@ lemma kgen_eq' : kgen 𝕜 = ⟨0, 1⟩ := rfl
 
 lemma jgen_eq' (k : ℤ) : jgen 𝕜 k = ⟨.jgen 𝕜 k, 0⟩ := rfl
 
+@[simp] lemma ofCentral_apply (a : 𝕜) : ofCentral 𝕜 a = a • (kgen 𝕜) := by
+  change (⟨0, a⟩ : HeisenbergAlgebra 𝕜) = a • ⟨0, 1⟩
+  aesop
+
 lemma toAbelianLieAlgebraOn_kgen :
   toAbelianLieAlgebraOn (kgen 𝕜) = 0 := rfl
 
@@ -262,19 +266,16 @@ lemma toAbelianLieAlgebraOn_kgen :
   · simp [h]
     apply ext' <;> simp [AbelianLieAlgebraOn.heisenbergCocycle_apply_jgen_jgen, h]
 
-noncomputable def stdSection : AbelianLieAlgebraOn ℤ 𝕜 →ₗ[𝕜] HeisenbergAlgebra 𝕜 where
-  toFun j := ⟨j, 0⟩
-  map_add' j₁ j₂ := by rw [LieTwoCocycle.CentralExtension.add_def] ; simp
-  map_smul' c j := by rw [LieTwoCocycle.CentralExtension.smul_def] ; simp
+noncomputable def jsection : AbelianLieAlgebraOn ℤ 𝕜 →ₗ[𝕜] HeisenbergAlgebra 𝕜 :=
+  LieTwoCocycle.CentralExtension.stdSection (AbelianLieAlgebraOn.heisenbergCocycle 𝕜)
 
-lemma stdSection_prop :
-    (toAbelianLieAlgebraOn (𝕜 := 𝕜)) ∘ₗ (stdSection 𝕜)
-      = (1 : AbelianLieAlgebraOn ℤ 𝕜 →ₗ[𝕜] AbelianLieAlgebraOn ℤ 𝕜) :=
+@[simp] lemma jsection_jgen (l : ℤ) :
+    jsection 𝕜 (AbelianLieAlgebraOn.jgen 𝕜 l) = jgen 𝕜 l :=
   rfl
 
 noncomputable def basisJK : Basis (Option ℤ) 𝕜 (HeisenbergAlgebra 𝕜) :=
-  ((isCentralExtension 𝕜).basis (stdSection 𝕜) (stdSection_prop 𝕜)
-          (AbelianLieAlgebraOn.jgen 𝕜) (Basis.singleton Unit 𝕜)).reindex
+  ((isCentralExtension 𝕜).basis (jsection 𝕜) rfl
+        (Basis.singleton Unit 𝕜) (AbelianLieAlgebraOn.jgen 𝕜)).reindex
     { toFun uz := match uz with
         | Sum.inl _ => none
         | Sum.inr l => some l
@@ -287,6 +288,14 @@ noncomputable def basisJK : Basis (Option ℤ) 𝕜 (HeisenbergAlgebra 𝕜) :=
       right_inv oz := match oz with
         | none => rfl
         | some _ => rfl }
+
+@[simp] lemma basisJK_some (l : ℤ) :
+    basisJK 𝕜 (some l) = jgen 𝕜 l := by
+  simp [basisJK]
+
+@[simp] lemma basisJK_none :
+    basisJK 𝕜 none = kgen 𝕜 := by
+  simp [basisJK]
 
 end HeisenbergAlgebra -- namespace
 

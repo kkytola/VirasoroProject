@@ -6,10 +6,11 @@ Authors: Kalle Kytölä
 import Mathlib.LinearAlgebra.FreeModule.Basic
 import Mathlib.Order.CompletePartialOrder
 
-section group_section
 /-!
-# A diagram chase for sections of short exact sequences
+# Sections of short exact sequences
 -/
+
+section group_section
 
 namespace MonoidHom
 
@@ -139,13 +140,6 @@ noncomputable def choose_section_prop_apply {𝕜 : Type*} [CommSemiring 𝕜] {
     {g : V →ₗ[𝕜] W} (hg : range g = ⊤) (w : W) :
     g (choose_section hg w) = w :=
   LinearMap.congr_fun (choose_section_prop hg) w
-
--- TODO: Unnecessary.
-lemma exists_section {𝕜 : Type*} [CommSemiring 𝕜] {V W : Type*}
-    [AddCommGroup V] [Module 𝕜 V] [AddCommGroup W] [Module 𝕜 W] [Module.Free 𝕜 W]
-    {g : V →ₗ[𝕜] W} (hg : range g = ⊤) :
-    ∃ (σ : W →ₗ[𝕜] V), g ∘ₗ σ = 1 :=
-  ⟨choose_section hg, choose_section_prop hg⟩
 
 variable {𝕜 : Type*} [Ring 𝕜]
 variable {U V W : Type*}
@@ -293,11 +287,13 @@ noncomputable def ses_basis (hf : ker f = ⊥) (hfg : range f = ker g) (hgσ : g
   }
   exact auxBasis.reindex (_root_.id β.symm)
 
-lemma ses_basis_eq_of_left (hf : ker f = ⊥) (hfg : range f = ker g) (hgσ : g ∘ₗ σ = 1) (iu : ιU) :
+@[simp] lemma ses_basis_eq_of_left (hf : ker f = ⊥) (hfg : range f = ker g) (hgσ : g ∘ₗ σ = 1)
+    (iu : ιU) :
     ses_basis basU basW hf hfg hgσ (Sum.inl iu) = f (basU iu) := by
   simp [ses_basis, ses_basis']
 
-lemma ses_basis_eq_of_right (hf : ker f = ⊥) (hfg : range f = ker g) (hgσ : g ∘ₗ σ = 1) (iw : ιW) :
+@[simp] lemma ses_basis_eq_of_right (hf : ker f = ⊥) (hfg : range f = ker g) (hgσ : g ∘ₗ σ = 1)
+    (iw : ιW) :
     ses_basis basU basW hf hfg hgσ (Sum.inr iw) = σ (basW iw) := by
   simp [ses_basis, ses_basis']
 
