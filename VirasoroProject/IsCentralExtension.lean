@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
 import VirasoroProject.CentralExtension
+import VirasoroProject.SectionSES
 
 /-!
 # Abstract central extensions of Lie algebras (characteristic predicate)
@@ -147,5 +148,27 @@ instance isCentralExtension [IsLieAbelian 𝓐] (γ : LieTwoCocycle 𝕜 𝓖 �
 end LieTwoCocycle.CentralExtension --namespace
 
 end LieTwoCocycle.CentralExtension -- section
+
+
+section Basis
+
+universe u u'
+variable {𝕜 : Type u} [CommRing 𝕜]
+variable {𝓖 𝓐 𝓔 : Type u}
+variable [LieRing 𝓖] [LieAlgebra 𝕜 𝓖] [LieRing 𝓐] [LieAlgebra 𝕜 𝓐] [LieRing 𝓔] [LieAlgebra 𝕜 𝓔]
+
+/-- A basis of a central extension of Lie algebras constructed from a section and bases of the
+extending Lie algebras. -/
+noncomputable def LieAlgebra.IsCentralExtension.basis
+    {i : 𝓐 →ₗ⁅𝕜⁆ 𝓔} {p : 𝓔 →ₗ⁅𝕜⁆ 𝓖} (cext : LieAlgebra.IsCentralExtension i p)
+    (σ : 𝓖 →ₗ[𝕜] 𝓔) (hσ : p.toLinearMap ∘ₗ σ = 1)
+    {ιG ιA : Type u'} (basG : Basis ιG 𝕜 𝓖) (basA : Basis ιA 𝕜 𝓐) :
+    Basis (ιA ⊕ ιG) 𝕜 𝓔 := by
+  apply @ses_basis 𝕜 _ 𝓐 𝓔 𝓖 _ _ _ _ _ _ i.toLinearMap p.toLinearMap σ ιA ιG basA basG
+  · exact (LieSubmodule.mk_eq_bot_iff.mp cext.ker_eq_bot)
+  · exact congr_arg LieSubalgebra.toSubmodule cext.exact
+  · exact hσ
+
+end Basis
 
 end VirasoroProject -- namespace

@@ -156,6 +156,31 @@ lemma lgen_bracket' (n m : ℤ) :
       = (n - m : 𝕜) • lgen 𝕜 (n + m) + if n + m = 0 then ((n-1 : 𝕜)*n*(n+1)/12) • cgen 𝕜 else 0 := by
   rw [lgen_bracket] ; congr ; ring
 
+noncomputable def stdSection : WittAlgebra 𝕜 →ₗ[𝕜] VirasoroAlgebra 𝕜 where
+  toFun L := ⟨L, 0⟩
+  map_add' L₁ L₂ := by rw [LieTwoCocycle.CentralExtension.add_def] ; simp
+  map_smul' c L := by rw [LieTwoCocycle.CentralExtension.smul_def] ; simp
+
+lemma stdSection_prop :
+    (toWittAlgebra (𝕜 := 𝕜)) ∘ₗ (stdSection 𝕜) = (1 : WittAlgebra 𝕜 →ₗ[𝕜] WittAlgebra 𝕜) :=
+  rfl
+
+noncomputable def basisLC : Basis (Option ℤ) 𝕜 (VirasoroAlgebra 𝕜) :=
+  ((isCentralExtension 𝕜).basis (stdSection 𝕜) (stdSection_prop 𝕜)
+          (WittAlgebra.lgen 𝕜) (Basis.singleton Unit 𝕜)).reindex
+    { toFun uz := match uz with
+        | Sum.inl _ => none
+        | Sum.inr l => some l
+      invFun oz := match oz with
+        | none => Sum.inl ⟨⟩
+        | some l => Sum.inr l
+      left_inv uz := match uz with
+        | Sum.inl _ => rfl
+        | Sum.inr _ => rfl
+      right_inv oz := match oz with
+        | none => rfl
+        | some _ => rfl }
+
 end VirasoroAlgebra -- namespace
 
 end VirasoroAlgebra -- section

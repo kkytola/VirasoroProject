@@ -262,6 +262,32 @@ lemma toAbelianLieAlgebraOn_kgen :
   · simp [h]
     apply ext' <;> simp [AbelianLieAlgebraOn.heisenbergCocycle_apply_jgen_jgen, h]
 
+noncomputable def stdSection : AbelianLieAlgebraOn ℤ 𝕜 →ₗ[𝕜] HeisenbergAlgebra 𝕜 where
+  toFun j := ⟨j, 0⟩
+  map_add' j₁ j₂ := by rw [LieTwoCocycle.CentralExtension.add_def] ; simp
+  map_smul' c j := by rw [LieTwoCocycle.CentralExtension.smul_def] ; simp
+
+lemma stdSection_prop :
+    (toAbelianLieAlgebraOn (𝕜 := 𝕜)) ∘ₗ (stdSection 𝕜)
+      = (1 : AbelianLieAlgebraOn ℤ 𝕜 →ₗ[𝕜] AbelianLieAlgebraOn ℤ 𝕜) :=
+  rfl
+
+noncomputable def basisJK : Basis (Option ℤ) 𝕜 (HeisenbergAlgebra 𝕜) :=
+  ((isCentralExtension 𝕜).basis (stdSection 𝕜) (stdSection_prop 𝕜)
+          (AbelianLieAlgebraOn.jgen 𝕜) (Basis.singleton Unit 𝕜)).reindex
+    { toFun uz := match uz with
+        | Sum.inl _ => none
+        | Sum.inr l => some l
+      invFun oz := match oz with
+        | none => Sum.inl ⟨⟩
+        | some l => Sum.inr l
+      left_inv uz := match uz with
+        | Sum.inl _ => rfl
+        | Sum.inr _ => rfl
+      right_inv oz := match oz with
+        | none => rfl
+        | some _ => rfl }
+
 end HeisenbergAlgebra -- namespace
 
 end HeisenbergAlgebra
