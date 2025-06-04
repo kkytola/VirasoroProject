@@ -6,6 +6,7 @@ import «VirasoroProject».HeisenbergAlgebra
 import «VirasoroProject».IsCentralExtension
 import «VirasoroProject».LieCohomologySmallDegree
 import «VirasoroProject».SectionSES
+import «VirasoroProject».Sugawara
 import «VirasoroProject».VirasoroAlgebra
 import «VirasoroProject».VirasoroCocycle
 import «VirasoroProject».WittAlgebra
