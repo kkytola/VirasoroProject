@@ -186,7 +186,7 @@ noncomputable instance : LieAlgebra 𝕜 (HeisenbergAlgebra 𝕜) :=
 variable {𝕜}
 
 /-- The projection from Heisenberg algebra to the original abelian Lie algebra. -/
-def toAbelianLieAlgebraOn : HeisenbergAlgebra 𝕜 →ₗ⁅𝕜⁆ AbelianLieAlgebraOn ℤ 𝕜 :=
+noncomputable def toAbelianLieAlgebraOn : HeisenbergAlgebra 𝕜 →ₗ⁅𝕜⁆ AbelianLieAlgebraOn ℤ 𝕜 :=
   LieTwoCocycle.CentralExtension.proj (AbelianLieAlgebraOn.heisenbergCocycle 𝕜)
 
 variable (𝕜)

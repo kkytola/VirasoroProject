@@ -209,7 +209,7 @@ def zPrimitive {R : Type*} [AddCommGroup R] (f : ℤ → R) (n : ℤ) : R :=
       simpa using Int.natAbs_add_of_nonpos (b := -1) hn (Int.toNat_eq_zero.mp rfl)
     simp only [zPrimitive_apply_of_nonpos _ hn, zPrimitive_apply_of_nonpos _ hn.le, n_natAbs,
                sum_range_succ, Int.natCast_natAbs, neg_add_rev]
-    simp only [add_comm (-(f _)), add_assoc, self_eq_add_right]
+    simp only [add_comm (-(f _)), add_assoc, left_eq_add]
     simp [show -|n + 1| - 1 = n by rw [abs_of_nonpos hn, neg_neg] ; ring]
 
 lemma eq_zPrimitive_of_eq_zero_of_forall_eq_add {R : Type*} [AddCommGroup R] {f F : ℤ → R}
@@ -229,7 +229,7 @@ lemma eq_zPrimitive_of_eq_zero_of_forall_eq_add {R : Type*} [AddCommGroup R] {f 
     · simp [h0]
     · have keyF := h1 (-(n + 1))
       have keyP := zPrimitive_succ f (-(n + 1))
-      simp only [Int.natAbs_neg, Int.natAbs_ofNat, neg_add_rev, Int.reduceNeg,
+      simp only [Int.natAbs_neg, Int.natAbs_natCast, neg_add_rev, Int.reduceNeg,
                  neg_add_cancel_comm, Nat.cast_add, Nat.cast_one] at ih keyF keyP ⊢
       rw [keyF, keyP] at ih
       exact add_right_cancel_iff.mp ih
@@ -301,7 +301,7 @@ lemma zMonomialF_eq (R : Type) [Field R] [CharZero R] (d : ℕ) :
     --have := Nat.factorial_ne_zero (d + 1)
     sorry
 
-lemma zMonomialF_zero_eq (R : Type) [Field R] [CharZero R] (d : ℕ) (n : ℤ) :
+lemma zMonomialF_zero_eq (R : Type) [Field R] [CharZero R] (n : ℤ) :
     zMonomialF R 0 n = 1 := by
   simp [zMonomialF]
 
@@ -353,7 +353,8 @@ lemma bosonic_sugawara_cc_calc (n : ℤ) :
 lemma bosonic_sugawara_cc_calc_nat (n : ℕ) :
     ∑ l ∈ Finset.range n, (l : ℚ) * (n - l) = (n^3 - n) / 6 := by
   have key := bosonic_sugawara_cc_calc n
-  simp only [Int.cast_natCast, Nat.cast_nonneg, zPrimitive_apply_of_nonneg, Int.toNat_ofNat] at key
+  simp only [Int.cast_natCast, Nat.cast_nonneg, zPrimitive_apply_of_nonneg, Int.toNat_natCast]
+    at key
   rw [← key]
 
 end central_charge_calculation

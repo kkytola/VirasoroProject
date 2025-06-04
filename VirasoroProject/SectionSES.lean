@@ -3,6 +3,7 @@ Copyright (c) 2025 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
+import Mathlib.Algebra.DirectSum.Module
 import Mathlib.LinearAlgebra.FreeModule.Basic
 import Mathlib.Order.CompletePartialOrder
 
@@ -98,8 +99,10 @@ short exact sequence `1 ⟶ U ⟶ V ⟶ W ⟶ 1`. -/
 @[to_additive] lemma correctorHom_eq_iff {σ : W →* V}
     (hf : f.ker = ⊥) (hfg : f.range = g.ker) (hgσ : g.comp σ = MonoidHom.id _)
     (v : V) (u : U) :
-    correctorHom hf hfg hgσ v = u ↔ v = σ (g v) * f u :=
-  corrector_eq_iff hf hfg (correctorHom.proof_1 hgσ) v u
+    correctorHom hf hfg hgσ v = u ↔ v = σ (g v) * f u := by
+  refine corrector_eq_iff hf hfg ?_ v u
+  ext w
+  exact congrFun (congrArg DFunLike.coe hgσ) w
 
 @[to_additive] lemma image_correctorHom_eq_self_of_mem_ker {σ : W →* V} (hf : f.ker = ⊥)
     (hfg : f.range = g.ker) (hgσ : g.comp σ = MonoidHom.id _) {v : V} (hv : v ∈ g.ker) :

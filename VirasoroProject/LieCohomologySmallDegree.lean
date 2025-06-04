@@ -111,6 +111,7 @@ instance : Module 𝕜 (LieOneCocycle 𝕜 𝓖 𝓐) where
 instance : AddCommGroup (LieOneCocycle 𝕜 𝓖 𝓐) where
   zero_add β := AddZeroClass.zero_add β
   add_zero β := AddZeroClass.add_zero β
+  nsmul := HSMul.hSMul
   nsmul_zero β := zero_nsmul β
   nsmul_succ n β := succ_nsmul β n
   neg β := (-1 : 𝕜) • β
@@ -243,6 +244,7 @@ instance [AddCommGroup 𝓖] [Module 𝕜 𝓖] [LieAlgebra 𝕜 𝓖] [AddCommG
     AddCommGroup (LieTwoCocycle 𝕜 𝓖 𝓐) where
   zero_add γ := AddZeroClass.zero_add γ
   add_zero γ := AddZeroClass.add_zero γ
+  nsmul := HSMul.hSMul
   nsmul_zero γ := zero_nsmul γ
   nsmul_succ n γ := succ_nsmul γ n
   neg γ := (-1 : 𝕜) • γ
@@ -291,8 +293,8 @@ def LieOneCocycle.bdry' (β : LieOneCocycle 𝕜 𝓖 𝓐) : 𝓖 →ₗ[𝕜] 
 /-- A Lie algebra 1-cocycle linearly determines a bilinear map via the differential. -/
 def LieOneCocycle.bdryHom' : LieOneCocycle 𝕜 𝓖 𝓐 →ₗ[𝕜] 𝓖 →ₗ[𝕜] 𝓖 →ₗ[𝕜] 𝓐 where
   toFun := fun β ↦ LieOneCocycle.bdry' β
-  map_add' β₁ β₂ := by dsimp ; ext X Y; rfl
-  map_smul' c Z := by dsimp ; ext X Y; rfl
+  map_add' β₁ β₂ := by ext X Y; rfl
+  map_smul' c Z := by ext X Y; rfl
 
 /-- The `∂` of a Lie algebra 1-cocycle as a Lie algebra 2-cocycle. -/
 def LieOneCocycle.bdry (β : LieOneCocycle 𝕜 𝓖 𝓐) : LieTwoCocycle 𝕜 𝓖 𝓐 where

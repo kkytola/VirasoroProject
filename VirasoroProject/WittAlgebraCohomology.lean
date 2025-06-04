@@ -159,13 +159,16 @@ lemma exists_add_bdry_eq_smul_virasoroCocycle :
         rw [← γ₀.skew (lgen 𝕜 (-1)), ← γ₀.skew (lgen 𝕜 (1 - j))] at eqn
         have nothing : -(γ₀ ((lgen 𝕜) 1)) ((lgen 𝕜) (-1)) = 0 := by
           simpa using hj 1 (by linarith)
-        simp only [nothing, Int.reduceNeg, mul_neg, mul_zero, add_zero] at eqn
-        rw [show (1 : 𝕜) - j + 1 = 2 - j by ring, show (1 : ℤ) - j + -1 = -j by ring] at eqn
-        rw [← neg_mul, show (-(1 : 𝕜) - j) = -(1 + j) by ring, neg_neg] at eqn
-        rw [hj', ← eqn]
-        simp only [Int.reduceNeg, add_right_inj, mul_eq_mul_left_iff, ← aux, aux']
-        left
-        congr
+        grind -- The alternative proof is below:
+        --simp only [nothing, Int.reduceNeg, mul_neg, mul_zero, add_zero] at eqn
+        --rw [show (1 : 𝕜) - j + 1 = 2 - j by ring, show (1 : ℤ) - j + -1 = -j by ring] at eqn
+        --rw [← neg_mul, show (-(1 : 𝕜) - j) = -(1 + j) by ring, neg_neg] at eqn
+        --rw [hj', ← eqn]
+        --simp only [Int.reduceNeg, add_right_inj, mul_eq_mul_left_iff, ← aux, aux']
+        --simp only [Int.reduceNeg, neg_sub]
+        --left
+        --rw [← sub_eq_add_neg]
+        --congr <;> simp_all
       rw [hj j' (by linarith), hj'] at eqn
       simp only [Int.cast_natCast] at eqn
       rw [add_eq_zero_iff_eq_neg] at eqn

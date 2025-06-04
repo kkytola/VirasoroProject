@@ -72,7 +72,7 @@ noncomputable instance : LieAlgebra 𝕜 (VirasoroAlgebra 𝕜) :=
 variable {𝕜}
 
 /-- The projection from Virasoro algebra to Witt algebra. -/
-def toWittAlgebra : VirasoroAlgebra 𝕜 →ₗ⁅𝕜⁆ WittAlgebra 𝕜 :=
+noncomputable def toWittAlgebra : VirasoroAlgebra 𝕜 →ₗ⁅𝕜⁆ WittAlgebra 𝕜 :=
   LieTwoCocycle.CentralExtension.proj (WittAlgebra.virasoroCocycle 𝕜)
 
 variable (𝕜)

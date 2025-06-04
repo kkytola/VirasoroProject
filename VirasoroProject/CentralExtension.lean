@@ -113,6 +113,7 @@ def bracket : γ.CentralExtension
 lemma bracket_self (Z : γ.CentralExtension) :
     γ.bracket Z Z = 0 := by
   simp
+  rfl
 
 lemma bracket_smul (c : 𝕜) (Z W : γ.CentralExtension) :
     γ.bracket Z (c • W) = c • γ.bracket Z W := by
