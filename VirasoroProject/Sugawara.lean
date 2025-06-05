@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
 import VirasoroProject.VirasoroAlgebra
+import Mathlib
 
 /-!
 # The bosonic Sugawara construction
@@ -134,6 +135,116 @@ lemma heiPairNO_trunc_cofinite_sub (n : ℤ) (v : V) :
   · exact hB k hk
   · exact hT k (hkBT (Int.lt_of_not_ge hk))
 
+#check tsum
+#check discreteTopology_bot
+
+open Topology
+
+#check Finset.insert_comm
+
+omit heiTrunc in
+lemma DiscreteTopology.summable_iff_eventually_zero
+    {E : Type*} [AddCommGroup E] [TopologicalSpace E] [DiscreteTopology E]
+    {ι : Type*} [DecidableEq ι] (f : ι → E) :
+    Summable f ↔ cofinite.Eventually (fun n ↦ f n = 0) := by
+  constructor
+  · intro ⟨v, hv⟩
+    obtain ⟨s, hs⟩ := mem_atTop_sets.mp <|
+      tendsto_iff_forall_eventually_mem.mp hv _ (show {v} ∈ 𝓝 v from mem_nhds_discrete.mpr rfl)
+    rw [eventually_cofinite]
+    apply s.finite_toSet.subset
+    intro i (hi : f i ≠ 0)
+    by_contra con
+    apply hi
+    have obs : ∑ b ∈ insert i s, f b = v := hs (insert i s) (by simp)
+    simpa [Finset.sum_insert con, show ∑ b ∈ s, f b = v from hs s le_rfl, add_eq_right] using obs
+  · intro ev_zero
+    exact summable_of_finite_support ev_zero
+
+variable {heiOper} in
+lemma sugawaraGenAux_summable (n : ℤ) (v : V) :
+    @Summable V ℤ _ ⊥ (fun k ↦ pairNO heiOper (n-k) k v) := by
+  let tV : TopologicalSpace V := ⊥
+  apply summable_of_finite_support
+  exact heiPairNO_trunc_cofinite_sub heiOper heiTrunc n v
+
+noncomputable def sugawaraGenAux (n : ℤ) (v : V) : V :=
+  @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v)
+
+omit heiTrunc
+lemma sugawaraGenAux_def (n : ℤ) (v : V) :
+    sugawaraGenAux heiOper n v = @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v) :=
+  rfl
+
+example {X : Type*} [TopologicalSpace X] [DiscreteTopology X] :
+    T2Space X := by
+  exact DiscreteTopology.toT2Space
+
+example {X : Type*} [TopologicalSpace X] [DiscreteTopology X] [AddCommMonoid X] :
+    ContinuousAdd X := by
+  exact continuousAdd_of_discreteTopology
+
+lemma continuousConstSMul_of_discreteTopology (𝕜 X : Type*) [TopologicalSpace X]
+    [DiscreteTopology X] [AddCommMonoid X] [SMul 𝕜 X] :
+    ContinuousConstSMul 𝕜 X := by
+  sorry
+
+variable {heiOper}
+
+include heiTrunc
+
+lemma sugawaraGenAux_add (n : ℤ) (v w : V) :
+    sugawaraGenAux heiOper n (v + w) = sugawaraGenAux heiOper n v + sugawaraGenAux heiOper n w := by
+  let tV : TopologicalSpace V := ⊥
+  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
+  --have V_T2 : T2Space V := DiscreteTopology.toT2Space
+  simp [sugawaraGenAux_def]
+  rw [Summable.tsum_add]
+  · exact sugawaraGenAux_summable heiTrunc n v
+  · exact sugawaraGenAux_summable heiTrunc n w
+
+lemma sugawaraGenAux_smul (n : ℤ) (c : 𝕜) (v : V) :
+    sugawaraGenAux heiOper n (c • v) = c • sugawaraGenAux heiOper n v := by
+  let tV : TopologicalSpace V := ⊥
+  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
+  have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
+  simp [sugawaraGenAux_def]
+  rw [Summable.tsum_const_smul]
+  exact sugawaraGenAux_summable heiTrunc n v
+
+noncomputable def sugawaraGen (n : ℤ) : V →ₗ[𝕜] V where
+  toFun := sugawaraGenAux heiOper n
+  map_add' v w := sugawaraGenAux_add heiTrunc n v w
+  map_smul' c v := sugawaraGenAux_smul heiTrunc n c v
+
+lemma sugawaraGen_apply (n : ℤ) (v : V) :
+    sugawaraGen heiTrunc n v = @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v) :=
+  rfl
+
+/-- `[L(n), J(m)] = -m • J(n+m)` -/
+lemma commutator_sugawaraGen_apply_eq_tsum_commutator_apply (n : ℤ) (A : V →ₗ[𝕜] V) :
+    commutator (sugawaraGen heiTrunc n) A v =
+      @tsum V _ ⊥ ℤ (fun k ↦ commutator (pairNO heiOper (n-k) k) A v) := by
+  let tV : TopologicalSpace V := ⊥
+  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
+  have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
+  simp only [commutator, LinearMap.sub_apply, Module.End.mul_apply]
+  simp_rw [sub_eq_add_neg]
+  rw [Summable.tsum_add]
+  · congr
+    sorry -- Yes.
+  · exact sugawaraGenAux_summable heiTrunc n (A v)
+  · sorry -- (Same as above, morally.)
+
+/-- `[L(n), J(m)] = -m • J(n+m)` -/
+lemma commutator_sugawaraGen_heiOper (n m : ℤ) :
+    commutator (sugawaraGen heiTrunc n) (heiOper m) = -m • heiOper (n + m) := by
+  ext v
+  simp [commutator]
+  sorry
+
+omit heiTrunc
+
 include heiComm
 
 /-- `[(heiOper l) ∘ (heiOper k), (heiOper m)] = -m * (δ[k+m=0] + δ[l+m=0]) • heiOper (k + l + m)` -/
@@ -259,9 +370,8 @@ lemma zPrimitive_sub {R : Type*} [AddCommGroup R] (f g : ℤ → R) :
   apply (eq_zPrimitive_of_eq_zero_of_forall_eq_add ..).symm
   · simp
   · intro n
-    --simp only [Pi.sub_apply, zPrimitive_succ, sub_sub]
-    --ac_rfl
-    sorry
+    simp only [Pi.sub_apply, zPrimitive_succ, ←sub_sub, sub_eq_add_neg, neg_add_rev, ←add_assoc]
+    ac_rfl
 
 lemma zPrimitive_mul_left {R : Type*} [Ring R] (c : R) (f : ℤ → R) :
     zPrimitive (fun n ↦ c * f n) = fun n ↦ c * zPrimitive f n := by
