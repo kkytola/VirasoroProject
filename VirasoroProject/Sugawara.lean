@@ -27,9 +27,18 @@ lemma commutator_comm (A B : V →ₗ[𝕜] V) :
     commutator A B = - commutator B A := by
   simp [commutator]
 
+lemma mul_eq_mul_add_commutator (A B : V →ₗ[𝕜] V) :
+    A * B = B * A + commutator A B := by
+  simp [commutator]
+
 /-- `[AB,C] = A[B,C] + [A,C]B` -/
 lemma commutator_pair (A B C : V →ₗ[𝕜] V) :
     commutator (A * B) C = A * (commutator B C) + (commutator A C) * B := by
+  simp [commutator, sub_mul, mul_sub, ← mul_assoc]
+
+/-- `[A,BC] = B[A,C] + [A,B]C` -/
+lemma commutator_pair' (A B C : V →ₗ[𝕜] V) :
+    commutator A (B * C) = B * (commutator A C) + (commutator A B) * C := by
   simp [commutator, sub_mul, mul_sub, ← mul_assoc]
 
 variable (heiOper : ℤ → (V →ₗ[𝕜] V))
@@ -168,13 +177,43 @@ lemma sugawaraGenAux_summable (n : ℤ) (v : V) :
   apply summable_of_finite_support
   exact heiPairNO_trunc_cofinite_sub heiOper heiTrunc n v
 
+variable {heiOper} in
+lemma comp_sugawaraGenAux_summable (A : V →ₗ[𝕜] V) (n : ℤ) (v : V) :
+    @Summable V ℤ _ ⊥ (fun k ↦ A (pairNO heiOper (n-k) k v)) := by
+  let tV : TopologicalSpace V := ⊥
+  apply summable_of_finite_support
+  apply (heiPairNO_trunc_cofinite_sub heiOper heiTrunc n v).subset
+  intro i hi
+  simp only [Function.mem_support, ne_eq, Set.mem_compl_iff, Set.mem_setOf_eq] at hi ⊢
+  intro con
+  simp [con] at hi
+
 noncomputable def sugawaraGenAux (n : ℤ) (v : V) : V :=
-  @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v)
+  (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v)
+
+omit heiTrunc in
+lemma sugawaraGenAux_def (n : ℤ) (v : V) :
+    sugawaraGenAux heiOper n v = (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v) :=
+  rfl
+
+omit heiTrunc in
+lemma sugawaraGenAux_comp_apply (A : V →ₗ[𝕜] V) (n : ℤ) (v : V) :
+    (sugawaraGenAux heiOper n (A v))
+      = (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ (pairNO heiOper (n-k) k (A v))) := by
+  rw [sugawaraGenAux_def heiOper n (A v)]
+
+variable {heiOper} in
+lemma comp_sugawaraGenAux_apply (A : V →ₗ[𝕜] V) (n : ℤ) (v : V) :
+    A (sugawaraGenAux heiOper n v)
+      = (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ A (pairNO heiOper (n-k) k v)) := by
+  let tV : TopologicalSpace V := ⊥
+  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
+  rw [sugawaraGenAux_def heiOper n v, map_smul]
+  congr 1
+  refine Summable.map_tsum ?_ A ⟨fun _ h ↦ h⟩
+  exact sugawaraGenAux_summable heiTrunc n v
 
 omit heiTrunc
-lemma sugawaraGenAux_def (n : ℤ) (v : V) :
-    sugawaraGenAux heiOper n v = @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v) :=
-  rfl
 
 example {X : Type*} [TopologicalSpace X] [DiscreteTopology X] :
     T2Space X := by
@@ -198,7 +237,8 @@ lemma sugawaraGenAux_add (n : ℤ) (v w : V) :
   let tV : TopologicalSpace V := ⊥
   have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
   --have V_T2 : T2Space V := DiscreteTopology.toT2Space
-  simp [sugawaraGenAux_def]
+  simp only [sugawaraGenAux_def, map_add, ← smul_add]
+  congr 1
   rw [Summable.tsum_add]
   · exact sugawaraGenAux_summable heiTrunc n v
   · exact sugawaraGenAux_summable heiTrunc n w
@@ -209,7 +249,7 @@ lemma sugawaraGenAux_smul (n : ℤ) (c : 𝕜) (v : V) :
   have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
   have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
   simp [sugawaraGenAux_def]
-  rw [Summable.tsum_const_smul]
+  rw [Summable.tsum_const_smul, smul_comm]
   exact sugawaraGenAux_summable heiTrunc n v
 
 noncomputable def sugawaraGen (n : ℤ) : V →ₗ[𝕜] V where
@@ -218,30 +258,23 @@ noncomputable def sugawaraGen (n : ℤ) : V →ₗ[𝕜] V where
   map_smul' c v := sugawaraGenAux_smul heiTrunc n c v
 
 lemma sugawaraGen_apply (n : ℤ) (v : V) :
-    sugawaraGen heiTrunc n v = @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v) :=
+    sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v) :=
   rfl
 
-/-- `[L(n), J(m)] = -m • J(n+m)` -/
 lemma commutator_sugawaraGen_apply_eq_tsum_commutator_apply (n : ℤ) (A : V →ₗ[𝕜] V) :
     commutator (sugawaraGen heiTrunc n) A v =
-      @tsum V _ ⊥ ℤ (fun k ↦ commutator (pairNO heiOper (n-k) k) A v) := by
+      (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ commutator (pairNO heiOper (n-k) k) A v) := by
   let tV : TopologicalSpace V := ⊥
   have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
   have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
   simp only [commutator, LinearMap.sub_apply, Module.End.mul_apply]
   simp_rw [sub_eq_add_neg]
   rw [Summable.tsum_add]
-  · congr
-    sorry -- Yes.
+  · rw [smul_add]
+    congr
+    convert comp_sugawaraGenAux_apply heiTrunc (-A) n v using 1
   · exact sugawaraGenAux_summable heiTrunc n (A v)
-  · sorry -- (Same as above, morally.)
-
-/-- `[L(n), J(m)] = -m • J(n+m)` -/
-lemma commutator_sugawaraGen_heiOper (n m : ℤ) :
-    commutator (sugawaraGen heiTrunc n) (heiOper m) = -m • heiOper (n + m) := by
-  ext v
-  simp [commutator]
-  sorry
+  · convert comp_sugawaraGenAux_summable heiTrunc (-A) n v using 1
 
 omit heiTrunc
 
@@ -265,6 +298,142 @@ lemma commutator_heiPair_heiGen (l k m : ℤ) :
     · have l_eq : l = -m := by linarith
       simp [l_eq]
     · simp [hlm]
+
+/-- `[:(heiOper l)(heiOper k):, (heiOper m)] = -m * (δ[k+m=0] + δ[l+m=0]) • heiOper (k + l + m)` -/
+lemma commutator_heiPairNO_heiGen (l k m : ℤ) :
+    commutator (pairNO heiOper l k) (heiOper m)
+      = ((-m : 𝕜) * ((if k + m = 0 then 1 else 0)
+               + (if l + m = 0 then 1 else 0))) • heiOper (k + l + m) := by
+  by_cases hlk : k ≤ l
+  · simp [pairNO, hlk]
+    have key := @commutator_heiPair_heiGen 𝕜 _ V _ _ heiOper heiComm k l m
+    simp only [neg_mul, neg_smul, Module.End.mul_eq_comp] at key ⊢
+    rw [key, neg_inj, show k + l + m = l + k + m by ring, add_comm]
+  · simp [pairNO, hlk]
+    have key := @commutator_heiPair_heiGen 𝕜 _ V _ _ heiOper heiComm l k m
+    simp only [Module.End.mul_eq_comp, neg_mul, neg_smul] at key ⊢
+    rw [key]
+
+include heiTrunc
+
+/-- `[L(n), J(m)] = -m • J(n+m)` -/
+lemma commutator_sugawaraGen_heiOper [CharZero 𝕜] (n m : ℤ) :
+    commutator (sugawaraGen heiTrunc n) (heiOper m) = -m • heiOper (n + m) := by
+  ext v
+  rw [commutator_sugawaraGen_apply_eq_tsum_commutator_apply]
+  simp_rw [commutator_heiPairNO_heiGen heiComm]
+  simp only [neg_mul, add_sub_cancel, neg_smul, LinearMap.neg_apply, LinearMap.smul_apply,
+             zsmul_eq_mul, Module.End.mul_apply, Module.End.intCast_apply]
+  let tV : TopologicalSpace V := ⊥
+  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
+  have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
+  have V_tag : IsTopologicalAddGroup V :=
+    { toContinuousAdd := continuousAdd_of_discreteTopology,
+      toContinuousNeg := continuousNeg_of_discreteTopology }
+  simp only [mul_add, mul_ite, mul_one, mul_zero, add_smul, ite_smul, zero_smul]
+  rw [tsum_neg, Summable.tsum_add]
+  · rw [@tsum_eq_single V ℤ _ ⊥ _ (-m)]
+    · simp only [neg_add_cancel, ↓reduceIte]
+      rw [tsum_eq_single (n + m)]
+      · simp only [sub_add_cancel_left, neg_add_cancel, ↓reduceIte]
+        simp only [← two_smul (R := 𝕜), ← smul_assoc, smul_eq_mul, smul_neg, ← mul_assoc, neg_inj]
+        simp [inv_mul_cancel₀ (G₀ := 𝕜) two_ne_zero, one_mul]
+        norm_cast
+      · intro j hjnm
+        simp [show n - j + m ≠ 0 by intro con ; apply hjnm ; linarith]
+    · intro j hjm
+      simp [show j + m ≠ 0 by intro con ; apply hjm ; linarith]
+  · apply summable_of_finite_support
+    apply (show Set.Finite {-m} from Set.finite_singleton (-m)).subset
+    simp only [Set.subset_singleton_iff, Function.mem_support, ne_eq, ite_eq_right_iff,
+               smul_eq_zero, Classical.not_imp, not_or, and_imp]
+    intro j hjm _ _
+    linarith
+  · apply summable_of_finite_support
+    apply (show Set.Finite {n + m} from Set.finite_singleton (n + m)).subset
+    simp only [Set.subset_singleton_iff, Function.mem_support, ne_eq, ite_eq_right_iff,
+               smul_eq_zero, Classical.not_imp, not_or, and_imp]
+    intro j hjm _ _
+    linarith
+
+/-- `[L(n), J(m-k)J(k)] = -k • J(m-k)J(n+k) - (m-k) • J(n+m-k)J(k)` -/
+lemma commutator_sugawaraGen_heiOperPair [CharZero 𝕜] (n m k : ℤ) :
+    commutator (sugawaraGen heiTrunc n) (heiOper (m-k) * heiOper k)
+      = -k • (heiOper (m-k) * heiOper (n+k)) - (m-k) • (heiOper (n+m-k) * heiOper k) := by
+  rw [commutator_pair']
+  rw [commutator_sugawaraGen_heiOper _ heiComm, commutator_sugawaraGen_heiOper _ heiComm]
+  simp only [neg_smul, zsmul_eq_mul, mul_neg, neg_sub, Int.cast_sub, sub_eq_add_neg]
+  congr 2
+  · simp only [← mul_assoc]
+    congr 1
+    exact (Int.cast_comm k _).symm
+  · simp [show n + (m + -k) = n + m + -k by ring, ← mul_assoc]
+
+/-- `[L(n), :J(m-k)J(k):] = -k • J(m-k)J(n+k) - (m-k) • J(n+m-k)J(k) + extra terms • 1` -/
+lemma commutator_sugawaraGen_heiPairNO' [CharZero 𝕜] (n m k : ℤ) :
+    commutator (sugawaraGen heiTrunc n) (pairNO' heiOper k (m-k))
+      = -k • (pairNO' heiOper (n+k) (m-k)
+        + if 0 ≤ k ∧ k < -n ∧ n + m = 0 then -(n + k) • 1 else 0
+        + if k < 0 ∧ -n ≤ k ∧ n + m = 0 then (n + k) • 1 else 0)
+        - (m-k) • (pairNO' heiOper k (n+m-k)) := by
+  by_cases hk : 0 ≤ k
+  · by_cases hnk : 0 ≤ n + k
+    · have hk' : ¬ k < 0 := by linarith
+      have hnk' : ¬ k < -n := by linarith
+      simp only [pairNO', hk, hk', hnk, hnk', ↓reduceIte, and_false, true_and, false_and, add_zero,
+                 neg_smul, zsmul_eq_mul, Int.cast_sub, ← Module.End.mul_eq_comp]
+      simp [commutator_sugawaraGen_heiOperPair heiTrunc heiComm]
+    · have hnk' : k < -n := by linarith
+      simp only [pairNO', hk, ↓reduceIte, hnk, hnk', and_true, add_zero, neg_smul, zsmul_eq_mul,
+                 Int.cast_sub, ← Module.End.mul_eq_comp]
+      rw [commutator_sugawaraGen_heiOperPair heiTrunc heiComm]
+      have aux := (heiComm (n+k) (m-k)) ▸ mul_eq_mul_add_commutator (heiOper (n+k)) (heiOper (m-k))
+      simp only [aux, show n + k + (m - k) = n + m by ring, neg_smul, zsmul_eq_mul, Int.cast_sub,
+                 Int.cast_add, true_and, Int.cast_ite, Int.cast_zero, sub_left_inj, neg_inj]
+      simp only [mul_one, neg_add_rev, mul_ite, mul_zero, mul_add (k : V →ₗ[𝕜] V),
+                 add_assoc, left_eq_add]
+      by_cases hnm : n + m = 0
+      · simp only [hnm, ↓reduceIte, Algebra.mul_smul_comm, mul_one, mul_neg]
+        simp_rw [add_smul, ← smul_eq_mul, ← add_assoc]
+        have (j : ℤ) : Int.cast (R := V →ₗ[𝕜] V) j = Int.cast (R := 𝕜) j • 1 := by norm_cast
+        simp [this]
+      · simp [hnm]
+  · have obs := commutator_sugawaraGen_heiOperPair heiTrunc heiComm n m (m-k)
+    simp only [sub_sub_cancel, neg_sub, zsmul_eq_mul, Int.cast_sub,
+               show n + m - (m - k) = n + k by ring] at obs
+    by_cases hnk : 0 ≤ n + k
+    · have hk' : k < 0 := by linarith
+      have hnk' : -n ≤ k := by linarith
+      simp only [pairNO', hk, hk', hnk, hnk', ↓reduceIte, and_false, true_and, false_and, add_zero,
+                 neg_smul, zsmul_eq_mul, Int.cast_sub, ← Module.End.mul_eq_comp]
+      simp only [obs, add_sub, Int.cast_add, mul_one, neg_add_rev, zero_add]
+      have aux := (heiComm (m-k) (n+k)) ▸ mul_eq_mul_add_commutator (heiOper (m-k)) (heiOper (n+k))
+      rw [aux, show m - k + (n + k) = n + m by ring]
+      rw [sub_eq_add_neg _ ((k : V →ₗ[𝕜] V) * _), sub_eq_add_neg _ ((m - k : V →ₗ[𝕜] V) * _)]
+      rw [add_comm _ (-_)]
+      simp only [Int.cast_add, mul_one, neg_add_rev, zero_add, neg_add, ← neg_mul]
+      simp only [mul_add (_ : V →ₗ[𝕜] V), add_assoc, add_right_inj, add_sub]
+      by_cases hnm : n + m = 0
+      · simp only [hnm, zero_sub, ↓reduceIte, Int.cast_sub, Algebra.mul_smul_comm, mul_one,
+                   smul_neg, neg_mul, neg_sub]
+        rw [show n = -m by linarith]
+        simp only [right_eq_add, sub_eq_add_neg, add_smul, mul_add, ← add_assoc,
+                   neg_add, mul_neg, neg_smul, neg_neg]
+        have (j : ℤ) : Int.cast (R := V →ₗ[𝕜] V) j = Int.cast (R := 𝕜) j • 1 := by norm_cast
+        simp [this]
+      · simp [hnm]
+    · have hk' : k < 0 := by linarith
+      have hnk' : ¬ -n ≤ k := by linarith
+      simp only [pairNO', hk, hk', hnk, hnk', ↓reduceIte, and_false, true_and, false_and, add_zero,
+                 neg_smul, zsmul_eq_mul, Int.cast_sub, ← Module.End.mul_eq_comp]
+      rw [obs]
+      rw [sub_eq_add_neg _ ((k : V →ₗ[𝕜] V) * _), sub_eq_add_neg _ ((m - k : V →ₗ[𝕜] V) * _)]
+      rw [add_comm _ (-_)]
+      simp only [Int.cast_add, mul_one, neg_add_rev, zero_add, neg_add, ← neg_mul]
+      simp only [mul_add (_ : V →ₗ[𝕜] V), add_assoc, add_right_inj, add_sub]
+      congr 1
+      simp
+
 
 end normal_ordered_pair -- section
 
