@@ -27,6 +27,32 @@ lemma sum_eq_sum_of_support_subset_of_support_subset {ι R : Type*} [AddCommMono
     (∑ i ∈ s₁, f i) = (∑ i ∈ s₂, f i) := by
   rw [sum_eq_sum_support hf hs₁, sum_eq_sum_support hf hs₂]
 
+-- NOTE: Should be in Mathlib! (Generalize to semilinear maps?)
+lemma _root_.LinearMap.map_finsum {ι 𝕜 : Type*} [Semiring 𝕜]
+    {V : Type*} [AddCommMonoid V] [Module 𝕜 V] {W : Type*} [AddCommMonoid W] [Module 𝕜 W]
+    (f : V →ₗ[𝕜] W) (a : ι → V) (ha : (Function.support a).Finite) :
+    f (∑ᶠ i, a i) = ∑ᶠ i, f (a i) := by
+  rw [finsum_eq_sum _ ha, map_sum, ← finsum_eq_sum_of_support_subset (fun i ↦ f (a i))]
+  intro i hi
+  simp only [Function.mem_support, ne_eq, Set.Finite.coe_toFinset] at hi ⊢
+  intro con
+  simp [con] at hi
+
+-- NOTE: Mathlib naming is inconsistent:
+--#check Equiv.tsum_eq
+--#check finsum_comp_equiv
+
+-- Should these just be `finsum_add` and `finsum_sub` and `finsum_neg`?
+-- Compare with `tsum_add` and `tsum_sub` and `tsum_neg` (and `finsum_smul` and `smul_finsum`).
+--#check finsum_add_distrib
+--#check finsum_sub_distrib
+#check finsum_neg_distrib
+----#check tsum_add
+----#check tsum_sub
+----#check tsum_neg
+----#check smul_finsum
+----#check finsum_smul
+
 end preliminaries
 
 
@@ -168,12 +194,23 @@ lemma finite_support_pairNO_heiOper_apply (n m : ℤ) (v : V) :
     linarith [con (by linarith)]
 
 include heiTrunc in
+omit heiComm in
+lemma finite_support_pairNO_heiOper_apply' (s : ℤ) (v : V) :
+    (Function.support fun k ↦ ((pairNO heiOper (s - k) k) v)).Finite := by
+  simpa using finite_support_pairNO_heiOper_apply heiOper heiTrunc 0 s v
+
+include heiTrunc in
 lemma finite_support_pairNO'_heiOper_apply (n m : ℤ) (v : V) :
     (Function.support fun k ↦ ((pairNO' heiOper (m - k) (n + k)) v)).Finite := by
   apply (finite_support_pairNO_heiOper_apply _ heiTrunc n m v).subset
   intro j hj
   convert hj using 2
   simp_rw [heiOper_pairNO_eq_pairNO' _ heiComm]
+
+include heiTrunc in
+lemma finite_support_pairNO'_heiOper_apply' (s : ℤ) (v : V) :
+    (Function.support fun k ↦ ((pairNO' heiOper (s - k) k) v)).Finite := by
+  simpa using finite_support_pairNO'_heiOper_apply heiOper heiTrunc heiComm 0 s v
 
 omit heiComm
 
@@ -198,16 +235,6 @@ lemma heiOper_pairNO'_symm (k l : ℤ) :
 
 omit heiComm
 include heiTrunc
-
----- Maybe this one is not the most useful; want to fix the sum of indices.
---lemma heiPairNO_trunc (k : ℤ) (v : V) :
---    atTop.Eventually (fun l ↦ pairNO heiOper k l v = 0) := by
---  obtain ⟨N, hN⟩ := eventually_atTop.mp (heiTrunc v)
---  filter_upwards [Ici_mem_atTop N] with l hl
---  rw [Set.mem_Ici] at hl
---  by_cases hlk : l ≤ k
---  · simp [pairNO, hlk, hN _ (show N ≤ k by linarith)]
---  · simp [pairNO, hlk, hN _ hl]
 
 lemma heiPairNO_trunc_atTop_sub (n : ℤ) (v : V) :
     atTop.Eventually (fun k ↦ pairNO heiOper (n-k) k v = 0) := by
@@ -276,60 +303,48 @@ lemma DiscreteTopology.summable_iff_eventually_zero
   · intro ev_zero
     exact summable_of_finite_support ev_zero
 
-variable {heiOper} in
-lemma sugawaraGenAux_summable (n : ℤ) (v : V) :
-    @Summable V ℤ _ ⊥ (fun k ↦ pairNO heiOper (n-k) k v) := by
-  let tV : TopologicalSpace V := ⊥
-  apply summable_of_finite_support
-  exact heiPairNO_trunc_cofinite_sub heiOper heiTrunc n v
+--variable {heiOper} in
+--lemma sugawaraGenAux_summable (n : ℤ) (v : V) :
+--    @Summable V ℤ _ ⊥ (fun k ↦ pairNO heiOper (n-k) k v) := by
+--  let tV : TopologicalSpace V := ⊥
+--  apply summable_of_finite_support
+--  exact heiPairNO_trunc_cofinite_sub heiOper heiTrunc n v
 
-variable {heiOper} in
-lemma comp_sugawaraGenAux_summable (A : V →ₗ[𝕜] V) (n : ℤ) (v : V) :
-    @Summable V ℤ _ ⊥ (fun k ↦ A (pairNO heiOper (n-k) k v)) := by
-  let tV : TopologicalSpace V := ⊥
-  apply summable_of_finite_support
-  apply (heiPairNO_trunc_cofinite_sub heiOper heiTrunc n v).subset
-  intro i hi
-  simp only [Function.mem_support, ne_eq, Set.mem_compl_iff, Set.mem_setOf_eq] at hi ⊢
-  intro con
-  simp [con] at hi
+--variable {heiOper} in
+--lemma comp_sugawaraGenAux_summable (A : V →ₗ[𝕜] V) (n : ℤ) (v : V) :
+--    @Summable V ℤ _ ⊥ (fun k ↦ A (pairNO heiOper (n-k) k v)) := by
+--  let tV : TopologicalSpace V := ⊥
+--  apply summable_of_finite_support
+--  apply (heiPairNO_trunc_cofinite_sub heiOper heiTrunc n v).subset
+--  intro i hi
+--  simp only [Function.mem_support, ne_eq, Set.mem_compl_iff, Set.mem_setOf_eq] at hi ⊢
+--  intro con
+--  simp [con] at hi
 
 noncomputable def sugawaraGenAux (n : ℤ) (v : V) : V :=
-  (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v)
+  (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k v
 
 omit heiTrunc in
 lemma sugawaraGenAux_def (n : ℤ) (v : V) :
-    sugawaraGenAux heiOper n v = (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v) :=
+    sugawaraGenAux heiOper n v = (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k v :=
   rfl
 
 omit heiTrunc in
 lemma sugawaraGenAux_comp_apply (A : V →ₗ[𝕜] V) (n : ℤ) (v : V) :
     (sugawaraGenAux heiOper n (A v))
-      = (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ (pairNO heiOper (n-k) k (A v))) := by
+      = (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k (A v) := by
   rw [sugawaraGenAux_def heiOper n (A v)]
 
 variable {heiOper} in
 lemma comp_sugawaraGenAux_apply (A : V →ₗ[𝕜] V) (n : ℤ) (v : V) :
-    A (sugawaraGenAux heiOper n v)
-      = (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ A (pairNO heiOper (n-k) k v)) := by
-  let tV : TopologicalSpace V := ⊥
-  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
-  rw [sugawaraGenAux_def heiOper n v, map_smul]
-  congr 1
-  refine Summable.map_tsum ?_ A ⟨fun _ h ↦ h⟩
-  exact sugawaraGenAux_summable heiTrunc n v
+    A (sugawaraGenAux heiOper n v) = (2 : 𝕜)⁻¹ • ∑ᶠ k, A (pairNO heiOper (n-k) k v) := by
+  rw [sugawaraGenAux_def heiOper n v, map_smul, A.map_finsum]
+  exact finite_support_pairNO_heiOper_apply' heiOper heiTrunc n v
 
 omit heiTrunc
 
-example {X : Type*} [TopologicalSpace X] [DiscreteTopology X] :
-    T2Space X := by
-  exact DiscreteTopology.toT2Space
-
-example {X : Type*} [TopologicalSpace X] [DiscreteTopology X] [AddCommMonoid X] :
-    ContinuousAdd X := by
-  exact continuousAdd_of_discreteTopology
-
-lemma continuousConstSMul_of_discreteTopology (𝕜 X : Type*) [TopologicalSpace X]
+-- NOTE: Should be in Mathlib?
+def continuousConstSMul_of_discreteTopology (𝕜 X : Type*) [TopologicalSpace X]
     [DiscreteTopology X] [AddCommMonoid X] [SMul 𝕜 X] :
     ContinuousConstSMul 𝕜 X :=
   ⟨fun c ↦ by continuity⟩
@@ -340,101 +355,85 @@ include heiTrunc
 
 lemma sugawaraGenAux_add (n : ℤ) (v w : V) :
     sugawaraGenAux heiOper n (v + w) = sugawaraGenAux heiOper n v + sugawaraGenAux heiOper n w := by
-  let tV : TopologicalSpace V := ⊥
-  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
-  --have V_T2 : T2Space V := DiscreteTopology.toT2Space
   simp only [sugawaraGenAux_def, map_add, ← smul_add]
   congr 1
-  rw [Summable.tsum_add]
-  · exact sugawaraGenAux_summable heiTrunc n v
-  · exact sugawaraGenAux_summable heiTrunc n w
+  rw [finsum_add_distrib]
+  · exact finite_support_pairNO_heiOper_apply' heiOper heiTrunc n v
+  · exact finite_support_pairNO_heiOper_apply' heiOper heiTrunc n w
 
+variable (heiOper) in
+omit heiTrunc in
 lemma sugawaraGenAux_smul (n : ℤ) (c : 𝕜) (v : V) :
     sugawaraGenAux heiOper n (c • v) = c • sugawaraGenAux heiOper n v := by
-  let tV : TopologicalSpace V := ⊥
-  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
-  have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
-  simp [sugawaraGenAux_def]
-  rw [Summable.tsum_const_smul, smul_comm]
-  exact sugawaraGenAux_summable heiTrunc n v
+  simp [sugawaraGenAux_def, map_smul, smul_finsum, smul_comm c]
 
 noncomputable def sugawaraGen (n : ℤ) : V →ₗ[𝕜] V where
   toFun := sugawaraGenAux heiOper n
   map_add' v w := sugawaraGenAux_add heiTrunc n v w
-  map_smul' c v := sugawaraGenAux_smul heiTrunc n c v
+  map_smul' c v := sugawaraGenAux_smul heiOper n c v
 
 lemma sugawaraGen_apply (n : ℤ) (v : V) :
-    sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v) :=
+    sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k v :=
   rfl
 
-lemma eventually_cofinite_sugawaraGen_apply_eq_half_sum [NeZero (2 : 𝕜)] (n : ℤ) (v : V) :
-    ∀ᶠ s in atTop,
-      sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • ∑ k ∈ s, pairNO heiOper (n-k) k v := by
-  let tV : TopologicalSpace V := ⊥
-  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
-  have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
-  have key := sugawaraGen_apply heiTrunc n v
-  have key' : ∑' k, (pairNO heiOper (n - k) k) v = (2 : 𝕜) • sugawaraGen heiTrunc n v := by
-    rw [key, ← smul_assoc, smul_eq_mul, mul_inv_cancel₀ two_ne_zero, one_smul]
-  have lim' := (sugawaraGenAux_summable heiTrunc n v).hasSum
-  have lim : Tendsto _ _ _ := Tendsto.const_smul lim' (2 : 𝕜)⁻¹
-  rw [DiscreteTopology.tendsto_nhds_iff_eventually_eq] at lim
-  filter_upwards [lim] with s hs using by rwa [hs]
+--lemma eventually_cofinite_sugawaraGen_apply_eq_half_sum [NeZero (2 : 𝕜)] (n : ℤ) (v : V) :
+--    ∀ᶠ s in atTop,
+--      sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • ∑ k ∈ s, pairNO heiOper (n-k) k v := by
+--  let tV : TopologicalSpace V := ⊥
+--  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
+--  have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
+--  have key := sugawaraGen_apply heiTrunc n v
+--  have key' : ∑' k, (pairNO heiOper (n - k) k) v = (2 : 𝕜) • sugawaraGen heiTrunc n v := by
+--    rw [key, ← smul_assoc, smul_eq_mul, mul_inv_cancel₀ two_ne_zero, one_smul]
+--  have lim' := (sugawaraGenAux_summable heiTrunc n v).hasSum
+--  have lim : Tendsto _ _ _ := Tendsto.const_smul lim' (2 : 𝕜)⁻¹
+--  rw [DiscreteTopology.tendsto_nhds_iff_eventually_eq] at lim
+--  filter_upwards [lim] with s hs using by rwa [hs]
 
-lemma eventually_atTop_sugawaraGen_apply_eq_half_sum_Icc [NeZero (2 : 𝕜)] (n : ℤ) (v : V) :
-    ∀ᶠ N in atTop,
-      sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • ∑ k ∈ Set.Icc (-N) N, pairNO heiOper (n-k) k v := by
-  obtain ⟨s, hs⟩ :=
-    eventually_atTop.mp <| eventually_cofinite_sugawaraGen_apply_eq_half_sum heiTrunc n v
-  set N₀ := ((s.image fun i ↦ |i|) ∪ {0}).max' (by simp)
-  apply eventually_atTop.mpr ⟨N₀, fun N hN ↦ ?_⟩
-  apply hs
-  intro i hi
-  suffices |i| ≤ N₀ by
-    simpa only [Set.toFinset_Icc, Finset.mem_Icc] using
-      ⟨(show -N ≤ -N₀ by linarith).trans (neg_le_of_abs_le this), le_trans (le_of_abs_le this) hN⟩
-  exact Finset.le_max' _ _ <| Finset.mem_union_left _ <| Finset.mem_image.mpr ⟨i, ⟨hi, rfl⟩⟩
-
-example {ι E : Type*} [AddCommMonoid E] [TopologicalSpace E] (f : ι → E) (σ : ι ≃ ι) :
-    ∑' i, f (σ i) = ∑' i, f i := by
-  exact Equiv.tsum_eq σ f
+--lemma eventually_atTop_sugawaraGen_apply_eq_half_sum_Icc [NeZero (2 : 𝕜)] (n : ℤ) (v : V) :
+--    ∀ᶠ N in atTop,
+--      sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • ∑ k ∈ Set.Icc (-N) N, pairNO heiOper (n-k) k v := by
+--  obtain ⟨s, hs⟩ :=
+--    eventually_atTop.mp <| eventually_cofinite_sugawaraGen_apply_eq_half_sum heiTrunc n v
+--  set N₀ := ((s.image fun i ↦ |i|) ∪ {0}).max' (by simp)
+--  apply eventually_atTop.mpr ⟨N₀, fun N hN ↦ ?_⟩
+--  apply hs
+--  intro i hi
+--  suffices |i| ≤ N₀ by
+--    simpa only [Set.toFinset_Icc, Finset.mem_Icc] using
+--      ⟨(show -N ≤ -N₀ by linarith).trans (neg_le_of_abs_le this), le_trans (le_of_abs_le this) hN⟩
+--  exact Finset.le_max' _ _ <| Finset.mem_union_left _ <| Finset.mem_image.mpr ⟨i, ⟨hi, rfl⟩⟩
 
 lemma sugawaraGen_apply_eq_tsum_shift (n s : ℤ) (v : V) :
     sugawaraGen heiTrunc n v
-      = (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n - (k + s)) (k + s) v) := by
+      = (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n - (k + s)) (k + s) v := by
   rw [sugawaraGen_apply]
   congr 1
   let σ : ℤ ≃ ℤ := ⟨fun n ↦ n + s, fun n ↦ n - s, fun n ↦ by simp, fun n ↦ by simp⟩
-  let tV : TopologicalSpace V := ⊥
-  rw [← σ.tsum_eq]
-  simp [σ]
+  rw [← finsum_comp_equiv σ]
+  rfl
 
 lemma commutator_sugawaraGen_apply_eq_tsum_commutator_apply (n : ℤ) (A : V →ₗ[𝕜] V) (v : V) :
     commutator (sugawaraGen heiTrunc n) A v =
-      (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ commutator (pairNO heiOper (n-k) k) A v) := by
-  let tV : TopologicalSpace V := ⊥
-  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
-  have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
+      (2 : 𝕜)⁻¹ • ∑ᶠ k, (commutator (pairNO heiOper (n - k) k) A) v := by
   simp only [commutator, LinearMap.sub_apply, Module.End.mul_apply]
   simp_rw [sub_eq_add_neg]
-  rw [Summable.tsum_add]
+  rw [finsum_add_distrib]
   · rw [smul_add]
     congr
     convert comp_sugawaraGenAux_apply heiTrunc (-A) n v using 1
-  · exact sugawaraGenAux_summable heiTrunc n (A v)
-  · convert comp_sugawaraGenAux_summable heiTrunc (-A) n v using 1
+  · exact finite_support_pairNO_heiOper_apply' heiOper heiTrunc n (A v)
+  · apply (finite_support_pairNO_heiOper_apply' heiOper heiTrunc n v).subset
+    refine Function.support_subset_iff'.mpr ?_
+    simp only [Function.mem_support, ne_eq, not_not, neg_eq_zero, ← sub_eq_add_neg]
+    intro k hk
+    simp [hk]
 
 lemma sugawaraGen_commutator_apply_eq_tsum_commutator_apply (n : ℤ) (A : V →ₗ[𝕜] V) (v : V) :
     commutator A (sugawaraGen heiTrunc n) v =
-      (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ commutator A (pairNO heiOper (n-k) k) v) := by
-  let tV : TopologicalSpace V := ⊥
-  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
-  have V_tag : IsTopologicalAddGroup V :=
-    { toContinuousAdd := continuousAdd_of_discreteTopology,
-      toContinuousNeg := continuousNeg_of_discreteTopology }
+      (2 : 𝕜)⁻¹ • ∑ᶠ k, commutator A (pairNO heiOper (n-k) k) v := by
   rw [commutator_comm, LinearMap.neg_apply]
-  rw [commutator_sugawaraGen_apply_eq_tsum_commutator_apply]
-  rw [← smul_neg, ← tsum_neg]
+  rw [commutator_sugawaraGen_apply_eq_tsum_commutator_apply, ← smul_neg, ← finsum_neg_distrib]
   congr 2
   funext j
   rw [commutator_comm, LinearMap.neg_apply, neg_neg]
@@ -450,16 +449,13 @@ lemma commutator_heiPair_heiGen (l k m : ℤ) :
                + (if l + m = 0 then 1 else 0))) • heiOper (k + l + m) := by
   simp [commutator_pair, heiComm]
   by_cases hkm : k + m = 0
-  · have k_eq : k = -m := by linarith
-    simp [k_eq]
+  · simp [show k = -m by linarith]
     by_cases hlm : l + m = 0
-    · have l_eq : l = -m := by linarith
-      simp [l_eq, mul_add, add_smul]
+    · simp [show l = -m by linarith, mul_add, add_smul]
     · simp [hlm]
   · simp [hkm]
     by_cases hlm : l + m = 0
-    · have l_eq : l = -m := by linarith
-      simp [l_eq]
+    · simp [show l = -m by linarith]
     · simp [hlm]
 
 /-- `[:(heiOper l)(heiOper k):, (heiOper m)] = -m * (δ[k+m=0] + δ[l+m=0]) • heiOper (k + l + m)` -/
@@ -487,17 +483,11 @@ lemma commutator_sugawaraGen_heiOper [CharZero 𝕜] (n m : ℤ) :
   simp_rw [commutator_heiPairNO_heiGen heiComm]
   simp only [neg_mul, add_sub_cancel, neg_smul, LinearMap.neg_apply, LinearMap.smul_apply,
              zsmul_eq_mul, Module.End.mul_apply, Module.End.intCast_apply]
-  let tV : TopologicalSpace V := ⊥
-  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
-  have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
-  have V_tag : IsTopologicalAddGroup V :=
-    { toContinuousAdd := continuousAdd_of_discreteTopology,
-      toContinuousNeg := continuousNeg_of_discreteTopology }
   simp only [mul_add, mul_ite, mul_one, mul_zero, add_smul, ite_smul, zero_smul]
-  rw [tsum_neg, Summable.tsum_add]
-  · rw [@tsum_eq_single V ℤ _ ⊥ _ (-m)]
+  rw [finsum_neg_distrib, finsum_add_distrib]
+  · rw [finsum_eq_single _ (-m)]
     · simp only [neg_add_cancel, ↓reduceIte]
-      rw [tsum_eq_single (n + m)]
+      rw [finsum_eq_single _ (n + m)]
       · simp only [sub_add_cancel_left, neg_add_cancel, ↓reduceIte]
         simp only [← two_smul (R := 𝕜), ← smul_assoc, smul_eq_mul, smul_neg, ← mul_assoc, neg_inj]
         simp [inv_mul_cancel₀ (G₀ := 𝕜) two_ne_zero, one_mul]
@@ -506,14 +496,12 @@ lemma commutator_sugawaraGen_heiOper [CharZero 𝕜] (n m : ℤ) :
         simp [show n - j + m ≠ 0 by intro con ; apply hjnm ; linarith]
     · intro j hjm
       simp [show j + m ≠ 0 by intro con ; apply hjm ; linarith]
-  · apply summable_of_finite_support
-    apply (show Set.Finite {-m} from Set.finite_singleton (-m)).subset
+  · apply (show Set.Finite {-m} from Set.finite_singleton (-m)).subset
     simp only [Set.subset_singleton_iff, Function.mem_support, ne_eq, ite_eq_right_iff,
                smul_eq_zero, Classical.not_imp, not_or, and_imp]
     intro j hjm _ _
     linarith
-  · apply summable_of_finite_support
-    apply (show Set.Finite {n + m} from Set.finite_singleton (n + m)).subset
+  · apply (show Set.Finite {n + m} from Set.finite_singleton (n + m)).subset
     simp only [Set.subset_singleton_iff, Function.mem_support, ne_eq, ite_eq_right_iff,
                smul_eq_zero, Classical.not_imp, not_or, and_imp]
     intro j hjm _ _
@@ -618,35 +606,49 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
     commutator (sugawaraGen heiTrunc n) (sugawaraGen heiTrunc m)
       = (n-m) • (sugawaraGen heiTrunc (n+m))
         + if n + m = 0 then ((n ^ 3 - n : 𝕜) / (12 : 𝕜)) • (1 : V →ₗ[𝕜] V) else 0 := by
-  let tV : TopologicalSpace V := ⊥
-  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
-  have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
-  have V_tag : IsTopologicalAddGroup V :=
-    { toContinuousAdd := continuousAdd_of_discreteTopology,
-      toContinuousNeg := continuousNeg_of_discreteTopology }
   ext v
   rw [sugawaraGen_commutator_apply_eq_tsum_commutator_apply]
   simp only [heiOper_pairNO_eq_pairNO' heiOper heiComm]
-  --simp only [commutator_sugawaraGen_heiPairNO'_apply heiTrunc heiComm ]
   have aux_commutator (k : ℤ) :=
     commutator_sugawaraGen_heiPairNO'_apply heiTrunc heiComm n m (m-k) v
   simp only [show ∀ k, m - (m-k) = k by intro k; ring] at aux_commutator
   simp_rw [aux_commutator, sub_eq_add_neg, smul_add, ← add_assoc]
-  rw [Summable.tsum_add]
+  rw [finsum_add_distrib]
   · simp only [neg_add_rev, neg_neg, le_add_neg_iff_add_le, zero_add, add_neg_lt_iff_lt_add,
-        lt_neg_add_iff_add_lt, neg_add_le_iff_le_add, smul_ite, smul_zero, smul_add, zsmul_eq_mul,
-        Int.cast_add, Int.cast_neg, LinearMap.add_apply, Module.End.mul_apply,
-        Module.End.intCast_apply, LinearMap.neg_apply]
-    rw [Summable.tsum_add]
-    · --simp only [smul_add]
-
-      sorry
+          lt_neg_add_iff_add_lt, neg_add_le_iff_le_add, smul_ite, smul_zero, smul_add, zsmul_eq_mul,
+          Int.cast_add, Int.cast_neg, LinearMap.add_apply, Module.End.mul_apply,
+          Module.End.intCast_apply, LinearMap.neg_apply]
+    rw [finsum_add_distrib]
+    · simp only [smul_add]
+      rw [add_comm, ← add_assoc]
+      congr 1
+      · -- The dummy index reshuffling.
+        rw [← finsum_comp_equiv ⟨fun k ↦ k - n, fun k ↦ k + n, fun _ ↦ by simp, fun _ ↦ by simp⟩]
+        dsimp
+        rw [← smul_add]
+        rw [← finsum_add_distrib]
+        · --have : ∀ k, m + -(k - n) = n + m - k := by intro k; ring
+          simp only [neg_sub, add_sub_assoc', ← add_assoc]
+          simp_rw [show ∀ k, n + m + k - n + -m = k by intro k; ring]
+          simp_rw [show ∀ k, m + n - k = n + m - k by intro k; ring]
+          simp_rw [add_smul, sub_smul, ← add_assoc, neg_sub, sub_eq_add_neg]
+          simp_rw [neg_add_cancel_right]
+          rw [finsum_add_distrib]
+          · simp_rw [(Int.cast_smul_eq_zsmul 𝕜 _ _).symm, ← smul_finsum]
+            rw [smul_add]
+            congr 1 <;>
+            · rw [smul_comm]
+              simp [← sub_eq_add_neg, heiOper_pairNO_eq_pairNO' heiOper heiComm, sugawaraGen_apply]
+          · sorry
+          · sorry
+        · sorry
+        · sorry
+      · -- The central charge calculation.
+        sorry
     · sorry
     · sorry
-  · apply summable_of_finite_support
-    sorry
-  · apply summable_of_finite_support
-    apply (finite_support_pairNO'_heiOper_apply heiOper heiTrunc heiComm n m v).subset
+  · sorry
+  · apply (finite_support_pairNO'_heiOper_apply heiOper heiTrunc heiComm n m v).subset
     intro k hk
     simp only [neg_add_rev, neg_neg, Function.support_neg, Function.mem_support, ne_eq] at hk ⊢
     intro con
