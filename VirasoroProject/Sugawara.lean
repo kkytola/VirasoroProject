@@ -12,6 +12,25 @@ import Mathlib
 
 namespace VirasoroProject
 
+
+
+section preliminaries
+
+lemma sum_eq_sum_support {ι R : Type*} [AddCommMonoid R] {s : Finset ι} {f : ι → R}
+    (hf : (Function.support f).Finite) (hs : Function.support f ⊆ (s : Set ι)) :
+    ∑ i ∈ s, f i = ∑ i ∈ hf.toFinset, f i := by
+  simpa [← finsum_eq_sum_of_support_subset f hs] using finsum_eq_sum f hf
+
+lemma sum_eq_sum_of_support_subset_of_support_subset {ι R : Type*} [AddCommMonoid R]
+    {s₁ s₂ : Finset ι} {f : ι → R} (hf : (Function.support f).Finite)
+    (hs₁ : Function.support f ⊆ (s₁ : Set ι)) (hs₂ : Function.support f ⊆ (s₂ : Set ι)) :
+    (∑ i ∈ s₁, f i) = (∑ i ∈ s₂, f i) := by
+  rw [sum_eq_sum_support hf hs₁, sum_eq_sum_support hf hs₂]
+
+end preliminaries
+
+
+
 section Sugawara_boson
 
 open Filter
@@ -92,32 +111,69 @@ lemma heiOper_pairNO_eq_pairNO' (k l : ℤ) :
     apply heiComm_of_add_ne_zero _ heiComm
     exact ne_of_lt (by linarith)
 
+/-
 include heiTrunc in
-lemma finite_support_pairNO_heiOper_apply (n m : ℤ) (v : V) :
-    (Function.support fun k => ((pairNO heiOper (m - k) (n + k)) v)).Finite := by
+omit heiComm in
+lemma finite_support_smul_pairNO_heiOper_apply (n m : ℤ) (a : ℤ → 𝕜) (v : V) :
+    (Function.support fun k ↦ a k • ((pairNO heiOper (m - k) (n + k)) v)).Finite := by
   obtain ⟨N, hN⟩ := eventually_atTop.mp <| heiTrunc v
   apply (Set.finite_Ioo (m - N) (N - n)).subset
   simp only [Function.support_subset_iff, ne_eq, Set.mem_Icc, tsub_le_iff_right]
   intro k hk
   by_contra con
   apply hk
-  apply pairNO_apply_eq_zero _ hN
+  rw [pairNO_apply_eq_zero heiOper hN ?_, smul_zero]
   by_cases h : N ≤ n + k
   · exact le_sup_of_le_right h
   · apply le_sup_of_le_left
     simp only [Set.mem_Ioo, not_and, not_lt, tsub_le_iff_right] at con
     by_contra con'
-    specialize con (by linarith)
-    linarith
+    linarith [con (by linarith)]
+
+include heiTrunc in
+omit heiComm in
+lemma finite_support_pairNO_heiOper_apply (n m : ℤ) (v : V) :
+    (Function.support fun k ↦ ((pairNO heiOper (m - k) (n + k)) v)).Finite := by
+  apply (finite_support_smul_pairNO_heiOper_apply heiOper heiTrunc n m  (fun _ ↦ 1) v).subset
+  intro k hk
+  simp only [Function.mem_support, ne_eq, one_smul] at hk ⊢
+  intro con
+  simp [hk] at con
+
+include heiTrunc in
+lemma finite_support_smul_pairNO'_heiOper_apply (n m : ℤ) (a : ℤ → 𝕜) (v : V) :
+    (Function.support fun k ↦ a k • ((pairNO' heiOper (m - k) (n + k)) v)).Finite := by
+  apply (finite_support_smul_pairNO_heiOper_apply _ heiTrunc n m a v).subset
+  intro j hj
+  convert hj using 2
+  simp_rw [heiOper_pairNO_eq_pairNO' _ heiComm]
+-/
+
+include heiTrunc in
+omit heiComm in
+lemma finite_support_pairNO_heiOper_apply (n m : ℤ) (v : V) :
+    (Function.support fun k ↦ ((pairNO heiOper (m - k) (n + k)) v)).Finite := by
+  obtain ⟨N, hN⟩ := eventually_atTop.mp <| heiTrunc v
+  apply (Set.finite_Ioo (m - N) (N - n)).subset
+  simp only [Function.support_subset_iff, ne_eq, Set.mem_Icc, tsub_le_iff_right]
+  intro k hk
+  by_contra con
+  apply hk
+  rw [pairNO_apply_eq_zero heiOper hN ?_]
+  by_cases h : N ≤ n + k
+  · exact le_sup_of_le_right h
+  · apply le_sup_of_le_left
+    simp only [Set.mem_Ioo, not_and, not_lt, tsub_le_iff_right] at con
+    by_contra con'
+    linarith [con (by linarith)]
 
 include heiTrunc in
 lemma finite_support_pairNO'_heiOper_apply (n m : ℤ) (v : V) :
-    (Function.support fun k => ((pairNO' heiOper (m - k) (n + k)) v)).Finite := by
-  apply (finite_support_pairNO_heiOper_apply _ heiTrunc heiComm n m v).subset
+    (Function.support fun k ↦ ((pairNO' heiOper (m - k) (n + k)) v)).Finite := by
+  apply (finite_support_pairNO_heiOper_apply _ heiTrunc n m v).subset
   intro j hj
   convert hj using 2
-  funext k
-  rw [heiOper_pairNO_eq_pairNO' _ heiComm]
+  simp_rw [heiOper_pairNO_eq_pairNO' _ heiComm]
 
 omit heiComm
 
@@ -135,6 +191,7 @@ lemma heiOper_pairNO_symm (k l : ℤ) :
 
 include heiComm
 
+/-- `pairNO' k l` is symmetric in `k` and `l`. -/
 lemma heiOper_pairNO'_symm (k l : ℤ) :
     pairNO' heiOper k l = pairNO' heiOper l k := by
   simpa [← heiOper_pairNO_eq_pairNO' _ heiComm] using heiOper_pairNO_symm heiOper k l
@@ -142,15 +199,15 @@ lemma heiOper_pairNO'_symm (k l : ℤ) :
 omit heiComm
 include heiTrunc
 
--- Maybe this one is not the most useful; want to fix the sum of indices.
-lemma heiPairNO_trunc (k : ℤ) (v : V) :
-    atTop.Eventually (fun l ↦ pairNO heiOper k l v = 0) := by
-  obtain ⟨N, hN⟩ := eventually_atTop.mp (heiTrunc v)
-  filter_upwards [Ici_mem_atTop N] with l hl
-  rw [Set.mem_Ici] at hl
-  by_cases hlk : l ≤ k
-  · simp [pairNO, hlk, hN _ (show N ≤ k by linarith)]
-  · simp [pairNO, hlk, hN _ hl]
+---- Maybe this one is not the most useful; want to fix the sum of indices.
+--lemma heiPairNO_trunc (k : ℤ) (v : V) :
+--    atTop.Eventually (fun l ↦ pairNO heiOper k l v = 0) := by
+--  obtain ⟨N, hN⟩ := eventually_atTop.mp (heiTrunc v)
+--  filter_upwards [Ici_mem_atTop N] with l hl
+--  rw [Set.mem_Ici] at hl
+--  by_cases hlk : l ≤ k
+--  · simp [pairNO, hlk, hN _ (show N ≤ k by linarith)]
+--  · simp [pairNO, hlk, hN _ hl]
 
 lemma heiPairNO_trunc_atTop_sub (n : ℤ) (v : V) :
     atTop.Eventually (fun k ↦ pairNO heiOper (n-k) k v = 0) := by
@@ -182,13 +239,24 @@ lemma heiPairNO_trunc_cofinite_sub (n : ℤ) (v : V) :
   · exact hB k hk
   · exact hT k (hkBT (Int.lt_of_not_ge hk))
 
-#check tsum
-#check discreteTopology_bot
-
 open Topology
 
-#check Finset.insert_comm
+-- NOTE: I'd expect this to be in Mathlib.
+omit heiTrunc in
+lemma DiscreteTopology.tendsto_nhds_iff_eventually_eq
+    {X : Type*} [TopologicalSpace X] [DiscreteTopology X] {ι : Type*} {F : Filter ι}
+    (f : ι → X) (x : X) :
+    F.Tendsto f (𝓝 x) ↔ F.Eventually (fun i ↦ f i = x) := by
+  constructor
+  · intro lim_f
+    filter_upwards [tendsto_iff_forall_eventually_mem.mp lim_f _ <|
+                    show {x} ∈ 𝓝 x from mem_nhds_discrete.mpr rfl] with i hi
+    simpa using hi
+  · intro ev_eq
+    refine Tendsto.congr' ?_ tendsto_const_nhds
+    filter_upwards [ev_eq] with i hi using hi.symm
 
+-- NOTE: I'd expect this to be in Mathlib.
 omit heiTrunc in
 lemma DiscreteTopology.summable_iff_eventually_zero
     {E : Type*} [AddCommGroup E] [TopologicalSpace E] [DiscreteTopology E]
@@ -298,6 +366,34 @@ noncomputable def sugawaraGen (n : ℤ) : V →ₗ[𝕜] V where
 lemma sugawaraGen_apply (n : ℤ) (v : V) :
     sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • @tsum V _ ⊥ ℤ (fun k ↦ pairNO heiOper (n-k) k v) :=
   rfl
+
+lemma eventually_cofinite_sugawaraGen_apply_eq_half_sum [NeZero (2 : 𝕜)] (n : ℤ) (v : V) :
+    ∀ᶠ s in atTop,
+      sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • ∑ k ∈ s, pairNO heiOper (n-k) k v := by
+  let tV : TopologicalSpace V := ⊥
+  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
+  have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
+  have key := sugawaraGen_apply heiTrunc n v
+  have key' : ∑' k, (pairNO heiOper (n - k) k) v = (2 : 𝕜) • sugawaraGen heiTrunc n v := by
+    rw [key, ← smul_assoc, smul_eq_mul, mul_inv_cancel₀ two_ne_zero, one_smul]
+  have lim' := (sugawaraGenAux_summable heiTrunc n v).hasSum
+  have lim : Tendsto _ _ _ := Tendsto.const_smul lim' (2 : 𝕜)⁻¹
+  rw [DiscreteTopology.tendsto_nhds_iff_eventually_eq] at lim
+  filter_upwards [lim] with s hs using by rwa [hs]
+
+lemma eventually_atTop_sugawaraGen_apply_eq_half_sum_Icc [NeZero (2 : 𝕜)] (n : ℤ) (v : V) :
+    ∀ᶠ N in atTop,
+      sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • ∑ k ∈ Set.Icc (-N) N, pairNO heiOper (n-k) k v := by
+  obtain ⟨s, hs⟩ :=
+    eventually_atTop.mp <| eventually_cofinite_sugawaraGen_apply_eq_half_sum heiTrunc n v
+  set N₀ := ((s.image fun i ↦ |i|) ∪ {0}).max' (by simp)
+  apply eventually_atTop.mpr ⟨N₀, fun N hN ↦ ?_⟩
+  apply hs
+  intro i hi
+  suffices |i| ≤ N₀ by
+    simpa only [Set.toFinset_Icc, Finset.mem_Icc] using
+      ⟨(show -N ≤ -N₀ by linarith).trans (neg_le_of_abs_le this), le_trans (le_of_abs_le this) hN⟩
+  exact Finset.le_max' _ _ <| Finset.mem_union_left _ <| Finset.mem_image.mpr ⟨i, ⟨hi, rfl⟩⟩
 
 example {ι E : Type*} [AddCommMonoid E] [TopologicalSpace E] (f : ι → E) (σ : ι ≃ ι) :
     ∑' i, f (σ i) = ∑' i, f i := by
@@ -532,9 +628,10 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
   rw [sugawaraGen_commutator_apply_eq_tsum_commutator_apply]
   simp only [heiOper_pairNO_eq_pairNO' heiOper heiComm]
   --simp only [commutator_sugawaraGen_heiPairNO'_apply heiTrunc heiComm ]
-  have (k : ℤ) := commutator_sugawaraGen_heiPairNO'_apply heiTrunc heiComm n m (m-k) v
-  simp only [show ∀ k, m - (m-k) = k by intro k; ring] at this
-  simp_rw [this, sub_eq_add_neg, smul_add, ← add_assoc]
+  have aux_commutator (k : ℤ) :=
+    commutator_sugawaraGen_heiPairNO'_apply heiTrunc heiComm n m (m-k) v
+  simp only [show ∀ k, m - (m-k) = k by intro k; ring] at aux_commutator
+  simp_rw [aux_commutator, sub_eq_add_neg, smul_add, ← add_assoc]
   rw [Summable.tsum_add]
   · simp only [neg_add_rev, neg_neg, le_add_neg_iff_add_le, zero_add, add_neg_lt_iff_lt_add,
         lt_neg_add_iff_add_lt, neg_add_le_iff_le_add, smul_ite, smul_zero, smul_add, zsmul_eq_mul,
