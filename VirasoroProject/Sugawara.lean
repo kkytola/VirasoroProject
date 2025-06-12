@@ -601,61 +601,9 @@ lemma commutator_sugawaraGen_heiPairNO'_apply [CharZero 𝕜] (n m k : ℤ) (v :
   rw [add_left_inj]
   split_ifs <;> simp [add_smul]
 
-/-- `[L(n), L(m)] = (n-m) • L(n+m) + extra terms • 1` -/
-lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
-    commutator (sugawaraGen heiTrunc n) (sugawaraGen heiTrunc m)
-      = (n-m) • (sugawaraGen heiTrunc (n+m))
-        + if n + m = 0 then ((n ^ 3 - n : 𝕜) / (12 : 𝕜)) • (1 : V →ₗ[𝕜] V) else 0 := by
-  ext v
-  rw [sugawaraGen_commutator_apply_eq_tsum_commutator_apply]
-  simp only [heiOper_pairNO_eq_pairNO' heiOper heiComm]
-  have aux_commutator (k : ℤ) :=
-    commutator_sugawaraGen_heiPairNO'_apply heiTrunc heiComm n m (m-k) v
-  simp only [show ∀ k, m - (m-k) = k by intro k; ring] at aux_commutator
-  simp_rw [aux_commutator, sub_eq_add_neg, smul_add, ← add_assoc]
-  rw [finsum_add_distrib]
-  · simp only [neg_add_rev, neg_neg, le_add_neg_iff_add_le, zero_add, add_neg_lt_iff_lt_add,
-          lt_neg_add_iff_add_lt, neg_add_le_iff_le_add, smul_ite, smul_zero, smul_add, zsmul_eq_mul,
-          Int.cast_add, Int.cast_neg, LinearMap.add_apply, Module.End.mul_apply,
-          Module.End.intCast_apply, LinearMap.neg_apply]
-    rw [finsum_add_distrib]
-    · simp only [smul_add]
-      rw [add_comm, ← add_assoc]
-      congr 1
-      · -- The dummy index reshuffling.
-        rw [← finsum_comp_equiv ⟨fun k ↦ k - n, fun k ↦ k + n, fun _ ↦ by simp, fun _ ↦ by simp⟩]
-        dsimp
-        rw [← smul_add]
-        rw [← finsum_add_distrib]
-        · --have : ∀ k, m + -(k - n) = n + m - k := by intro k; ring
-          simp only [neg_sub, add_sub_assoc', ← add_assoc]
-          simp_rw [show ∀ k, n + m + k - n + -m = k by intro k; ring]
-          simp_rw [show ∀ k, m + n - k = n + m - k by intro k; ring]
-          simp_rw [add_smul, sub_smul, ← add_assoc, neg_sub, sub_eq_add_neg]
-          simp_rw [neg_add_cancel_right]
-          rw [finsum_add_distrib]
-          · simp_rw [(Int.cast_smul_eq_zsmul 𝕜 _ _).symm, ← smul_finsum]
-            rw [smul_add]
-            congr 1 <;>
-            · rw [smul_comm]
-              simp [← sub_eq_add_neg, heiOper_pairNO_eq_pairNO' heiOper heiComm, sugawaraGen_apply]
-          · sorry
-          · sorry
-        · sorry
-        · sorry
-      · -- The central charge calculation.
-        sorry
-    · sorry
-    · sorry
-  · sorry
-  · apply (finite_support_pairNO'_heiOper_apply heiOper heiTrunc heiComm n m v).subset
-    intro k hk
-    simp only [neg_add_rev, neg_neg, Function.support_neg, Function.mem_support, ne_eq] at hk ⊢
-    intro con
-    apply hk
-    simp [← sub_eq_add_neg, con]
-
 end normal_ordered_pair -- section
+
+
 
 section central_charge_calculation
 
@@ -780,7 +728,7 @@ def zMonomialF (R : Type*) [AddCommGroup R] [One R] (d : ℕ) : ℤ → R := mat
   | 0 => fun _ ↦ 1
   | d + 1 => zPrimitive (zMonomialF R d)
 
-lemma zMonomialF_eq (R : Type) [Field R] [CharZero R] (d : ℕ) :
+lemma zMonomialF_eq (R : Type*) [Field R] [CharZero R] (d : ℕ) :
     (zMonomialF R d) = (fun (n : ℤ) ↦ ((∏ j in range d, (n - j : R)) / (Nat.factorial d : R))) := by
   induction' d with d ihd
   · funext n
@@ -795,49 +743,58 @@ lemma zMonomialF_eq (R : Type) [Field R] [CharZero R] (d : ℕ) :
   · intro n
     simp only [Int.cast_add, Int.cast_one] at *
     simp [ihd]
-    rw [prod_range_succ, prod_range_succ]
-    --have := Nat.factorial_ne_zero d
-    --have := Nat.factorial_ne_zero (d + 1)
-    sorry
+    simp only [Nat.factorial_succ, Nat.cast_mul, Nat.cast_add, Nat.cast_one]
+    have aux₀ : (d.factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
+    have aux₁: ((d+1).factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
+    have aux' : ((d+1) : R) ≠ 0 := by norm_cast
+    field_simp
+    simp only [← mul_assoc, mul_eq_mul_right_iff, aux₀, or_false]
+    simp only [← add_mul, ← mul_add]
+    simp only [mul_assoc, mul_comm _ (d.factorial : R)]
+    rw [mul_right_inj' aux₀]
+    simp only [← mul_assoc, mul_left_inj' aux']
+    rw [prod_range_succ (fun a ↦ (n : R) - a), ← mul_add]
+    rw [show (n - d + (d + 1) : R) = n + 1 by ring]
+    simp [prod_range_succ']
 
-lemma zMonomialF_zero_eq (R : Type) [Field R] [CharZero R] (n : ℤ) :
+lemma zMonomialF_zero_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
     zMonomialF R 0 n = 1 := by
   simp [zMonomialF]
 
-lemma zMonomialF_one_eq (R : Type) [Field R] [CharZero R] (n : ℤ) :
+lemma zMonomialF_one_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
     zMonomialF R 1 n = n := by
   simp [zMonomialF_eq]
 
-lemma zMonomialF_two_eq (R : Type) [Field R] [CharZero R] (n : ℤ) :
+lemma zMonomialF_two_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
     zMonomialF R 2 n = n * (n - 1) / 2 := by
   simp [zMonomialF_eq, prod_range_succ]
 
-lemma zMonomialF_three_eq (R : Type) [Field R] [CharZero R] (n : ℤ) :
+lemma zMonomialF_three_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
     zMonomialF R 3 n = n * (n - 1) * (n - 2) / 6 := by
   simp [zMonomialF_eq, prod_range_succ, show Nat.factorial 3 = 6 from rfl]
 
-lemma zMonomialF_four_eq (R : Type) [Field R] [CharZero R] (n : ℤ) :
+lemma zMonomialF_four_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
     zMonomialF R 4 n = n * (n - 1) * (n - 2) * (n - 3) / 24 := by
   simp [zMonomialF_eq, prod_range_succ, show Nat.factorial 4 = 24 from rfl]
 
-lemma zMonomialF_five_eq (R : Type) [Field R] [CharZero R] (n : ℤ) :
+lemma zMonomialF_five_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
     zMonomialF R 5 n = n * (n - 1) * (n - 2) * (n - 3) * (n - 4) / 120 := by
   simp [zMonomialF_eq, prod_range_succ, show Nat.factorial 5 = 120 from rfl]
 
-lemma zMonomialF_apply_eq_zero_of_of_nonneg_lt (R : Type) [Field R] [CharZero R]
+lemma zMonomialF_apply_eq_zero_of_of_nonneg_lt (R : Type*) [Field R] [CharZero R]
     (d : ℕ) {n : ℕ} (n_lt : n < d) :
     zMonomialF R d n = 0 := by
   simp only [zMonomialF_eq R d, Int.cast_natCast, div_eq_zero_iff, Nat.cast_eq_zero]
   exact Or.inl <| prod_eq_zero_iff.mpr ⟨n, ⟨mem_range.mpr n_lt, by simp⟩⟩
 
-lemma bosonic_sugawara_cc_calc (n : ℤ) :
-    zPrimitive (fun l ↦ (l : ℚ) * (n - l)) n = (n^3 - n) / 6 := by
-  have obs : (n^3 - n) / 6 = (n - 1 : ℚ) * zMonomialF ℚ 2 n - 2 * zMonomialF ℚ 3 n := by
+lemma bosonic_sugawara_cc_calc (R : Type*) [Field R] [CharZero R] (n : ℤ) :
+    zPrimitive (fun l ↦ (l : R) * (n - l)) n = (n^3 - n) / 6 := by
+  have obs : (n^3 - n) / 6 = (n - 1 : R) * zMonomialF R 2 n - 2 * zMonomialF R 3 n := by
     rw [zMonomialF_two_eq, zMonomialF_three_eq]
     field_simp
     ring
-  have key : (zPrimitive fun l ↦ (n - 1 : ℚ) * l) - (zPrimitive fun l ↦ 2 * zMonomialF ℚ 2 l)
-              = zPrimitive ((fun (l : ℤ) ↦ (l : ℚ) * (n - l))) := by
+  have key : (zPrimitive fun l ↦ (n - 1 : R) * l) - (zPrimitive fun l ↦ 2 * zMonomialF R 2 l)
+              = zPrimitive ((fun (l : ℤ) ↦ (l : R) * (n - l))) := by
     rw [← zPrimitive_sub]
     apply congr_arg zPrimitive
     ext l
@@ -849,14 +806,142 @@ lemma bosonic_sugawara_cc_calc (n : ℤ) :
   ext m
   rw [zMonomialF_one_eq]
 
-lemma bosonic_sugawara_cc_calc_nat (n : ℕ) :
+lemma bosonic_sugawara_cc_calc_nonneg (n : ℕ) :
     ∑ l ∈ Finset.range n, (l : ℚ) * (n - l) = (n^3 - n) / 6 := by
-  have key := bosonic_sugawara_cc_calc n
+  have key := bosonic_sugawara_cc_calc ℚ n
   simp only [Int.cast_natCast, Nat.cast_nonneg, zPrimitive_apply_of_nonneg, Int.toNat_natCast]
     at key
   rw [← key]
 
 end central_charge_calculation
+
+
+
+section finalizing_Sugawara
+
+--variable {𝕜 : Type*} [Field 𝕜]
+--variable {V : Type*} [AddCommGroup V] [Module 𝕜 V]
+--variable (heiOper : ℤ → (V →ₗ[𝕜] V))
+--variable (heiTrunc : ∀ v, atTop.Eventually (fun l ↦ (heiOper l) v = 0))
+--variable (heiComm : ∀ k l,
+--  commutator (heiOper k) (heiOper l) = if k + l = 0 then (k : 𝕜) • 1 else 0)
+
+include heiComm in
+/-- `[L(n), L(m)] = (n-m) • L(n+m) + extra terms • 1` -/
+lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
+    commutator (sugawaraGen heiTrunc n) (sugawaraGen heiTrunc m)
+      = (n-m) • (sugawaraGen heiTrunc (n+m))
+        + if n + m = 0 then ((n ^ 3 - n : 𝕜) / (12 : 𝕜)) • (1 : V →ₗ[𝕜] V) else 0 := by
+  ext v
+  rw [sugawaraGen_commutator_apply_eq_tsum_commutator_apply]
+  simp only [heiOper_pairNO_eq_pairNO' heiOper heiComm]
+  have aux_commutator (k : ℤ) :=
+    commutator_sugawaraGen_heiPairNO'_apply heiTrunc heiComm n m (m-k) v
+  simp only [show ∀ k, m - (m-k) = k by intro k; ring] at aux_commutator
+  simp_rw [aux_commutator, sub_eq_add_neg, smul_add, ← add_assoc]
+  rw [finsum_add_distrib]
+  · simp only [neg_add_rev, neg_neg, le_add_neg_iff_add_le, zero_add, add_neg_lt_iff_lt_add,
+          lt_neg_add_iff_add_lt, neg_add_le_iff_le_add, smul_ite, smul_zero, smul_add, zsmul_eq_mul,
+          Int.cast_add, Int.cast_neg, LinearMap.add_apply, Module.End.mul_apply,
+          Module.End.intCast_apply, LinearMap.neg_apply]
+    rw [finsum_add_distrib]
+    · simp only [smul_add]
+      rw [add_comm, ← add_assoc]
+      congr 1
+      · -- The dummy index reshuffling.
+        rw [← finsum_comp_equiv ⟨fun k ↦ k - n, fun k ↦ k + n, fun _ ↦ by simp, fun _ ↦ by simp⟩]
+        dsimp
+        rw [← smul_add]
+        rw [← finsum_add_distrib]
+        · --have : ∀ k, m + -(k - n) = n + m - k := by intro k; ring
+          simp only [neg_sub, add_sub_assoc', ← add_assoc]
+          simp_rw [show ∀ k, n + m + k - n + -m = k by intro k; ring]
+          simp_rw [show ∀ k, m + n - k = n + m - k by intro k; ring]
+          simp_rw [add_smul, sub_smul, ← add_assoc, neg_sub, sub_eq_add_neg]
+          simp_rw [neg_add_cancel_right]
+          rw [finsum_add_distrib]
+          · simp_rw [(Int.cast_smul_eq_zsmul 𝕜 _ _).symm, ← smul_finsum]
+            rw [smul_add]
+            congr 1 <;>
+            · rw [smul_comm]
+              simp [← sub_eq_add_neg, heiOper_pairNO_eq_pairNO' heiOper heiComm, sugawaraGen_apply]
+          · sorry
+          · sorry
+        · sorry
+        · sorry
+      · -- The central charge calculation.
+        by_cases hnm : n + m = 0
+        · have m_eq_neg_n : m = -n := by linarith
+          simp only [m_eq_neg_n, add_neg_cancel, and_true, neg_neg, add_zero, zero_add, neg_smul,
+                     smul_neg, ↓reduceIte, LinearMap.smul_apply, Module.End.one_apply]
+          by_cases hn : 0 ≤ n
+          · have obs (i : ℤ) : ¬ (i ≤ -n ∧ 0 < i) := by intro maybe ; linarith
+            simp only [obs, ↓reduceIte]
+            -- Just like the other half below?
+            sorry
+          · have obs (i : ℤ) : ¬ (-n < i ∧ i ≤ 0) := by intro maybe ; linarith
+            simp only [obs, ↓reduceIte]
+            rw [finsum_eq_sum_of_support_subset _ (s := Finset.Ioc 0 (-n)) ?_]
+            · rw [Finset.sum_congr rfl (g := fun i ↦ (i + n) • i • v)]
+              · simp only [← smul_assoc]
+                rw [← Finset.sum_smul]
+                suffices ((2⁻¹ : 𝕜) * (∑ i ∈ Finset.Ioc 0 (-n), (i + n) * i)) • v
+                            = (((n : 𝕜) ^ 3 + (-n : 𝕜)) / 12) • v by
+                  rw [← this, ← smul_eq_mul, smul_assoc]
+                  congr 1
+                  norm_cast
+                congr 1
+                have key' := bosonic_sugawara_cc_calc 𝕜 n
+                rw [zPrimitive_apply_of_nonpos _ (by linarith)] at key'
+                field_simp at key' ⊢
+                rw [← sub_eq_add_neg, ← key']
+                have aux (k : 𝕜) : (-k-1) = - (k+1) := by ring
+                simp only [aux, neg_mul, sub_neg_eq_add, neg_mul, mul_assoc,
+                           Finset.sum_neg_distrib, neg_mul, neg_neg]
+                norm_num
+                have n_natAbs : -n = n.natAbs := by
+                    simpa [hn] using (abs_of_neg <| not_le.mp hn).symm
+                rw [@Finset.sum_of_injOn ℕ ℤ 𝕜 _ (Finset.range n.natAbs) (Finset.Ioc 0 (-n))
+                          (fun x ↦ (↑x + 1) * (n + (x + 1))) (fun x ↦ (↑x + ↑n) * x)
+                          (fun i ↦ i + 1) ?_ ?_ ?_ ?_]
+                · intro i _ j _ hij
+                  simpa using hij
+                · intro i hi
+                  simp only [Finset.coe_range, Set.mem_Iio, Finset.coe_Ioc, Set.mem_Ioc,
+                             Int.succ_ofNat_pos, true_and, n_natAbs] at hi ⊢
+                  exact Int.toNat_le.mp hi
+                · intro k hk hk'
+                  exfalso
+                  simp only [n_natAbs, Finset.mem_Ioc, Finset.coe_range,
+                             Set.mem_image, Set.mem_Iio, not_exists, not_and] at hk hk'
+                  apply hk' (k-1).toNat
+                  · simp only [Int.pred_toNat]
+                    exact (Nat.pred_lt (by simpa using hk.1)).trans_le (by simpa using hk.2)
+                  · simp only [Int.pred_toNat]
+                    norm_cast
+                    rw [Nat.sub_add_eq_max, max_eq_left]
+                    · exact Int.toNat_of_nonneg (by linarith)
+                    · exact (Int.le_toNat (by linarith)).mpr (show 1 ≤ k by linarith)
+                · intro k _
+                  simp ; ring
+              · intro i hi
+                simp [(Finset.mem_Ioc.mp hi).symm]
+            · refine Function.support_subset_iff'.mpr ?_
+              intro k hk
+              simp only [Finset.coe_Ioc, Set.mem_Ioc, and_comm] at hk
+              simp [hk]
+        · simp [hnm]
+    · sorry
+    · sorry
+  · sorry
+  · apply (finite_support_pairNO'_heiOper_apply heiOper heiTrunc heiComm n m v).subset
+    intro k hk
+    simp only [neg_add_rev, neg_neg, Function.support_neg, Function.mem_support, ne_eq] at hk ⊢
+    intro con
+    apply hk
+    simp [← sub_eq_add_neg, con]
+
+end finalizing_Sugawara
 
 end Sugawara_boson -- section
 
