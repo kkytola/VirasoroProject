@@ -13,7 +13,6 @@ import Mathlib
 namespace VirasoroProject
 
 
-
 section preliminaries
 
 lemma sum_eq_sum_support {ι R : Type*} [AddCommMonoid R] {s : Finset ι} {f : ι → R}
@@ -46,7 +45,7 @@ lemma _root_.LinearMap.map_finsum {ι 𝕜 : Type*} [Semiring 𝕜]
 -- Compare with `tsum_add` and `tsum_sub` and `tsum_neg` (and `finsum_smul` and `smul_finsum`).
 --#check finsum_add_distrib
 --#check finsum_sub_distrib
-#check finsum_neg_distrib
+--#check finsum_neg_distrib
 ----#check tsum_add
 ----#check tsum_sub
 ----#check tsum_neg
@@ -123,6 +122,8 @@ lemma heiComm_of_add_ne_zero {k l : ℤ} (hkl : k + l ≠ 0) :
     (heiOper k) ∘ₗ (heiOper l) = (heiOper l) ∘ₗ (heiOper k) := by
   simpa [hkl, sub_eq_zero, commutator] using heiComm k l
 
+variable {heiOper}
+
 /-- The two definitions of normal ordered pairs coincide. -/
 lemma heiOper_pairNO_eq_pairNO' (k l : ℤ) :
     pairNO heiOper k l = pairNO' heiOper k l := by
@@ -137,10 +138,10 @@ lemma heiOper_pairNO_eq_pairNO' (k l : ℤ) :
     apply heiComm_of_add_ne_zero _ heiComm
     exact ne_of_lt (by linarith)
 
-/-
 include heiTrunc in
 omit heiComm in
-lemma finite_support_smul_pairNO_heiOper_apply (n m : ℤ) (a : ℤ → 𝕜) (v : V) :
+lemma finite_support_smul_pairNO_heiOper_apply {𝕂 : Type*} [SMulZeroClass 𝕂 V]
+    (n m : ℤ) (a : ℤ → 𝕂) (v : V) :
     (Function.support fun k ↦ a k • ((pairNO heiOper (m - k) (n + k)) v)).Finite := by
   obtain ⟨N, hN⟩ := eventually_atTop.mp <| heiTrunc v
   apply (Set.finite_Ioo (m - N) (N - n)).subset
@@ -160,57 +161,76 @@ include heiTrunc in
 omit heiComm in
 lemma finite_support_pairNO_heiOper_apply (n m : ℤ) (v : V) :
     (Function.support fun k ↦ ((pairNO heiOper (m - k) (n + k)) v)).Finite := by
-  apply (finite_support_smul_pairNO_heiOper_apply heiOper heiTrunc n m  (fun _ ↦ 1) v).subset
+  apply (finite_support_smul_pairNO_heiOper_apply heiTrunc n m  (fun _ ↦ 1) v).subset
   intro k hk
   simp only [Function.mem_support, ne_eq, one_smul] at hk ⊢
   intro con
   simp [hk] at con
 
 include heiTrunc in
-lemma finite_support_smul_pairNO'_heiOper_apply (n m : ℤ) (a : ℤ → 𝕜) (v : V) :
+lemma finite_support_smul_pairNO'_heiOper_apply {𝕂 : Type*} [SMulZeroClass 𝕂 V]
+    (n m : ℤ) (a : ℤ → 𝕂) (v : V) :
     (Function.support fun k ↦ a k • ((pairNO' heiOper (m - k) (n + k)) v)).Finite := by
-  apply (finite_support_smul_pairNO_heiOper_apply _ heiTrunc n m a v).subset
+  apply (finite_support_smul_pairNO_heiOper_apply heiTrunc n m a v).subset
   intro j hj
   convert hj using 2
-  simp_rw [heiOper_pairNO_eq_pairNO' _ heiComm]
--/
+  simp_rw [heiOper_pairNO_eq_pairNO' heiComm]
+
+--include heiTrunc in
+--omit heiComm in
+--lemma finite_support_pairNO_heiOper_apply (n m : ℤ) (v : V) :
+--    (Function.support fun k ↦ ((pairNO heiOper (m - k) (n + k)) v)).Finite := by
+--  obtain ⟨N, hN⟩ := eventually_atTop.mp <| heiTrunc v
+--  apply (Set.finite_Ioo (m - N) (N - n)).subset
+--  simp only [Function.support_subset_iff, ne_eq, Set.mem_Icc, tsub_le_iff_right]
+--  intro k hk
+--  by_contra con
+--  apply hk
+--  rw [pairNO_apply_eq_zero heiOper hN ?_]
+--  by_cases h : N ≤ n + k
+--  · exact le_sup_of_le_right h
+--  · apply le_sup_of_le_left
+--    simp only [Set.mem_Ioo, not_and, not_lt, tsub_le_iff_right] at con
+--    by_contra con'
+--    linarith [con (by linarith)]
+--
+--variable {heiOper} in
+
+-- {𝕂 : Type*} [SMulZeroClass 𝕂 V]
 
 include heiTrunc in
 omit heiComm in
-lemma finite_support_pairNO_heiOper_apply (n m : ℤ) (v : V) :
-    (Function.support fun k ↦ ((pairNO heiOper (m - k) (n + k)) v)).Finite := by
-  obtain ⟨N, hN⟩ := eventually_atTop.mp <| heiTrunc v
-  apply (Set.finite_Ioo (m - N) (N - n)).subset
-  simp only [Function.support_subset_iff, ne_eq, Set.mem_Icc, tsub_le_iff_right]
-  intro k hk
-  by_contra con
-  apply hk
-  rw [pairNO_apply_eq_zero heiOper hN ?_]
-  by_cases h : N ≤ n + k
-  · exact le_sup_of_le_right h
-  · apply le_sup_of_le_left
-    simp only [Set.mem_Ioo, not_and, not_lt, tsub_le_iff_right] at con
-    by_contra con'
-    linarith [con (by linarith)]
+lemma finite_support_smul_pairNO_heiOper_apply₀ {𝕂 : Type*} [SMulZeroClass 𝕂 V]
+    (s : ℤ) (a : ℤ → 𝕂) (v : V) :
+    (Function.support fun k ↦ (a k • (pairNO heiOper (s - k) k) v)).Finite := by
+  simpa using finite_support_smul_pairNO_heiOper_apply heiTrunc 0 s a v
 
 include heiTrunc in
 omit heiComm in
-lemma finite_support_pairNO_heiOper_apply' (s : ℤ) (v : V) :
+lemma finite_support_pairNO_heiOper_apply₀ (s : ℤ) (v : V) :
     (Function.support fun k ↦ ((pairNO heiOper (s - k) k) v)).Finite := by
-  simpa using finite_support_pairNO_heiOper_apply heiOper heiTrunc 0 s v
+  simpa using finite_support_pairNO_heiOper_apply heiTrunc 0 s v
 
 include heiTrunc in
 lemma finite_support_pairNO'_heiOper_apply (n m : ℤ) (v : V) :
     (Function.support fun k ↦ ((pairNO' heiOper (m - k) (n + k)) v)).Finite := by
-  apply (finite_support_pairNO_heiOper_apply _ heiTrunc n m v).subset
+  apply (finite_support_pairNO_heiOper_apply heiTrunc n m v).subset
   intro j hj
   convert hj using 2
-  simp_rw [heiOper_pairNO_eq_pairNO' _ heiComm]
+  simp_rw [heiOper_pairNO_eq_pairNO' heiComm]
 
 include heiTrunc in
-lemma finite_support_pairNO'_heiOper_apply' (s : ℤ) (v : V) :
+lemma finite_support_smul_pairNO'_heiOper_apply₀ {𝕂 : Type*} [SMulZeroClass 𝕂 V]
+    (s : ℤ) (a : ℤ → 𝕂) (v : V) :
+    (Function.support fun k ↦ (a k • (pairNO' heiOper (s - k) k) v)).Finite := by
+  simpa using finite_support_smul_pairNO'_heiOper_apply heiTrunc heiComm 0 s a v
+
+include heiTrunc in
+lemma finite_support_pairNO'_heiOper_apply₀ (s : ℤ) (v : V) :
     (Function.support fun k ↦ ((pairNO' heiOper (s - k) k) v)).Finite := by
-  simpa using finite_support_pairNO'_heiOper_apply heiOper heiTrunc heiComm 0 s v
+  simpa using finite_support_pairNO'_heiOper_apply heiTrunc heiComm 0 s v
+
+variable (heiOper)
 
 omit heiComm
 
@@ -218,20 +238,21 @@ omit heiComm
 lemma heiOper_pairNO_symm (k l : ℤ) :
     pairNO heiOper k l = pairNO heiOper l k := by
   unfold pairNO
-  by_cases heq : l = k
-  · rw [heq]
-  by_cases hlk : l ≤ k
-  · have hkl : ¬ k ≤ l := by linarith [lt_of_le_of_ne hlk heq]
-    simp [hlk, hkl]
-  · have hkl : k ≤ l := by linarith
-    simp [hlk, hkl]
+  grind
+  --by_cases heq : l = k
+  --· rw [heq]
+  --by_cases hlk : l ≤ k
+  --· have hkl : ¬ k ≤ l := by linarith [lt_of_le_of_ne hlk heq]
+  --  simp [hlk, hkl]
+  --· have hkl : k ≤ l := by linarith
+  --  simp [hlk, hkl]
 
 include heiComm
 
 /-- `pairNO' k l` is symmetric in `k` and `l`. -/
 lemma heiOper_pairNO'_symm (k l : ℤ) :
     pairNO' heiOper k l = pairNO' heiOper l k := by
-  simpa [← heiOper_pairNO_eq_pairNO' _ heiComm] using heiOper_pairNO_symm heiOper k l
+  simpa [← heiOper_pairNO_eq_pairNO' heiComm] using heiOper_pairNO_symm heiOper k l
 
 omit heiComm
 include heiTrunc
@@ -339,7 +360,7 @@ variable {heiOper} in
 lemma comp_sugawaraGenAux_apply (A : V →ₗ[𝕜] V) (n : ℤ) (v : V) :
     A (sugawaraGenAux heiOper n v) = (2 : 𝕜)⁻¹ • ∑ᶠ k, A (pairNO heiOper (n-k) k v) := by
   rw [sugawaraGenAux_def heiOper n v, map_smul, A.map_finsum]
-  exact finite_support_pairNO_heiOper_apply' heiOper heiTrunc n v
+  exact finite_support_pairNO_heiOper_apply₀ heiTrunc n v
 
 omit heiTrunc
 
@@ -358,8 +379,8 @@ lemma sugawaraGenAux_add (n : ℤ) (v w : V) :
   simp only [sugawaraGenAux_def, map_add, ← smul_add]
   congr 1
   rw [finsum_add_distrib]
-  · exact finite_support_pairNO_heiOper_apply' heiOper heiTrunc n v
-  · exact finite_support_pairNO_heiOper_apply' heiOper heiTrunc n w
+  · exact finite_support_pairNO_heiOper_apply₀ heiTrunc n v
+  · exact finite_support_pairNO_heiOper_apply₀ heiTrunc n w
 
 variable (heiOper) in
 omit heiTrunc in
@@ -422,8 +443,8 @@ lemma commutator_sugawaraGen_apply_eq_tsum_commutator_apply (n : ℤ) (A : V →
   · rw [smul_add]
     congr
     convert comp_sugawaraGenAux_apply heiTrunc (-A) n v using 1
-  · exact finite_support_pairNO_heiOper_apply' heiOper heiTrunc n (A v)
-  · apply (finite_support_pairNO_heiOper_apply' heiOper heiTrunc n v).subset
+  · exact finite_support_pairNO_heiOper_apply₀ heiTrunc n (A v)
+  · apply (finite_support_pairNO_heiOper_apply₀ heiTrunc n v).subset
     refine Function.support_subset_iff'.mpr ?_
     simp only [Function.mem_support, ne_eq, not_not, neg_eq_zero, ← sub_eq_add_neg]
     intro k hk
@@ -834,7 +855,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
         + if n + m = 0 then ((n ^ 3 - n : 𝕜) / (12 : 𝕜)) • (1 : V →ₗ[𝕜] V) else 0 := by
   ext v
   rw [sugawaraGen_commutator_apply_eq_tsum_commutator_apply]
-  simp only [heiOper_pairNO_eq_pairNO' heiOper heiComm]
+  simp only [heiOper_pairNO_eq_pairNO' heiComm]
   have aux_commutator (k : ℤ) :=
     commutator_sugawaraGen_heiPairNO'_apply heiTrunc heiComm n m (m-k) v
   simp only [show ∀ k, m - (m-k) = k by intro k; ring] at aux_commutator
@@ -850,11 +871,9 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
       congr 1
       · -- The dummy index reshuffling.
         rw [← finsum_comp_equiv ⟨fun k ↦ k - n, fun k ↦ k + n, fun _ ↦ by simp, fun _ ↦ by simp⟩]
-        dsimp
-        rw [← smul_add]
-        rw [← finsum_add_distrib]
-        · --have : ∀ k, m + -(k - n) = n + m - k := by intro k; ring
-          simp only [neg_sub, add_sub_assoc', ← add_assoc]
+        dsimp only [Equiv.coe_fn_mk]
+        rw [← smul_add, ← finsum_add_distrib]
+        · simp only [neg_sub, add_sub_assoc', ← add_assoc]
           simp_rw [show ∀ k, n + m + k - n + -m = k by intro k; ring]
           simp_rw [show ∀ k, m + n - k = n + m - k by intro k; ring]
           simp_rw [add_smul, sub_smul, ← add_assoc, neg_sub, sub_eq_add_neg]
@@ -864,11 +883,16 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
             rw [smul_add]
             congr 1 <;>
             · rw [smul_comm]
-              simp [← sub_eq_add_neg, heiOper_pairNO_eq_pairNO' heiOper heiComm, sugawaraGen_apply]
-          · sorry
-          · sorry
-        · sorry
-        · sorry
+              simp [← sub_eq_add_neg, heiOper_pairNO_eq_pairNO' heiComm, sugawaraGen_apply]
+          · simp_rw [← sub_eq_add_neg]
+            exact finite_support_smul_pairNO'_heiOper_apply₀ heiTrunc heiComm ..
+          · simp_rw [← sub_eq_add_neg]
+            exact finite_support_smul_pairNO'_heiOper_apply₀ heiTrunc heiComm ..
+        · have (k : ℤ) : n + m + k - n - m = k := by ring
+          simpa [← sub_eq_add_neg, add_sub_assoc', this] using
+            finite_support_smul_pairNO'_heiOper_apply₀ heiTrunc heiComm ..
+        · simp_rw [← sub_eq_add_neg]
+          exact finite_support_smul_pairNO'_heiOper_apply₀ heiTrunc heiComm ..
       · -- The central charge calculation.
         by_cases hnm : n + m = 0
         · have m_eq_neg_n : m = -n := by linarith
@@ -878,7 +902,44 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
           · have obs (i : ℤ) : ¬ (i ≤ -n ∧ 0 < i) := by intro maybe ; linarith
             simp only [obs, ↓reduceIte]
             -- Just like the other half below?
-            sorry
+            rw [finsum_eq_sum_of_support_subset _ (s := Finset.Ioc (-n) 0) ?_]
+            · rw [Finset.sum_congr rfl (g := fun i ↦ -(i + n) • i • v)]
+              · simp only [← smul_assoc]
+                rw [← Finset.sum_smul]
+                suffices ((2⁻¹ : 𝕜) * (∑ i ∈ Finset.Ioc (-n) 0, -(i + n) * i)) • v
+                            = (((n : 𝕜) ^ 3 + (-n : 𝕜)) / 12) • v by
+                  rw [← this, ← smul_eq_mul, smul_assoc]
+                  congr 1
+                  norm_cast
+                congr 1
+                have key := bosonic_sugawara_cc_calc 𝕜 n
+                rw [zPrimitive_apply_of_nonneg _ (by linarith)] at key
+                field_simp at key ⊢
+                rw [← sub_eq_add_neg, ← key]
+                simp only [mul_assoc]
+                norm_num
+                rw [@Finset.sum_of_injOn ℕ ℤ 𝕜 _ (Finset.range n.toNat) (Finset.Ioc (-n) 0)
+                          (fun x ↦ ↑x * (n - x)) (fun x ↦ (-↑n + -↑x) * x)
+                          (fun i ↦ -i) ?_ ?_ ?_ ?_]
+                · intro i _ j _ hij
+                  simpa using hij
+                · intro i hi
+                  simpa using hi
+                · intro k hk hk'
+                  exfalso
+                  simp only [Finset.mem_Ioc, Finset.coe_range, Set.mem_image, Set.mem_Iio,
+                             Int.lt_toNat, not_exists, not_and] at hk hk'
+                  apply hk' (-k).toNat ?_
+                  · simp [hk.2]
+                  · exact (le_of_eq (by simp [hk.2])).trans_lt (show -k < n by linarith)
+                · intro k _
+                  simp ; ring
+              · intro i hi
+                simp only [Finset.mem_Ioc.mp hi, and_self, ↓reduceIte, neg_smul]
+            · refine Function.support_subset_iff'.mpr ?_
+              intro k hk
+              simp only [Finset.coe_Ioc, Set.mem_Ioc, and_comm] at hk
+              simp [hk]
           · have obs (i : ℤ) : ¬ (-n < i ∧ i ≤ 0) := by intro maybe ; linarith
             simp only [obs, ↓reduceIte]
             rw [finsum_eq_sum_of_support_subset _ (s := Finset.Ioc 0 (-n)) ?_]
@@ -895,12 +956,12 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
                 rw [zPrimitive_apply_of_nonpos _ (by linarith)] at key'
                 field_simp at key' ⊢
                 rw [← sub_eq_add_neg, ← key']
-                have aux (k : 𝕜) : (-k-1) = - (k+1) := by ring
+                have aux (k : 𝕜) : (-k - 1) = -(k + 1) := by ring
                 simp only [aux, neg_mul, sub_neg_eq_add, neg_mul, mul_assoc,
                            Finset.sum_neg_distrib, neg_mul, neg_neg]
                 norm_num
                 have n_natAbs : -n = n.natAbs := by
-                    simpa [hn] using (abs_of_neg <| not_le.mp hn).symm
+                  simpa [hn] using (abs_of_neg <| not_le.mp hn).symm
                 rw [@Finset.sum_of_injOn ℕ ℤ 𝕜 _ (Finset.range n.natAbs) (Finset.Ioc 0 (-n))
                           (fun x ↦ (↑x + 1) * (n + (x + 1))) (fun x ↦ (↑x + ↑n) * x)
                           (fun i ↦ i + 1) ?_ ?_ ?_ ?_]
@@ -914,14 +975,14 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
                   exfalso
                   simp only [n_natAbs, Finset.mem_Ioc, Finset.coe_range,
                              Set.mem_image, Set.mem_Iio, not_exists, not_and] at hk hk'
-                  apply hk' (k-1).toNat
+                  apply hk' (k - 1).toNat
                   · simp only [Int.pred_toNat]
                     exact (Nat.pred_lt (by simpa using hk.1)).trans_le (by simpa using hk.2)
                   · simp only [Int.pred_toNat]
                     norm_cast
-                    rw [Nat.sub_add_eq_max, max_eq_left]
-                    · exact Int.toNat_of_nonneg (by linarith)
-                    · exact (Int.le_toNat (by linarith)).mpr (show 1 ≤ k by linarith)
+                    rw [Nat.sub_add_eq_max,
+                        max_eq_left <| (Int.le_toNat (by linarith)).mpr (show 1 ≤ k by linarith)]
+                    exact Int.toNat_of_nonneg (by linarith)
                 · intro k _
                   simp ; ring
               · intro i hi
@@ -931,15 +992,34 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
               simp only [Finset.coe_Ioc, Set.mem_Ioc, and_comm] at hk
               simp [hk]
         · simp [hnm]
-    · sorry
-    · sorry
-  · sorry
-  · apply (finite_support_pairNO'_heiOper_apply heiOper heiTrunc heiComm n m v).subset
+    · simpa [← sub_eq_add_neg] using
+        finite_support_smul_pairNO'_heiOper_apply₀ heiTrunc heiComm ..
+    · apply ((Set.finite_Ioc (n+m) m).union (Set.finite_Ioc m (n+m))).subset
+      refine Function.support_subset_iff'.mpr ?_
+      intro k hk
+      simp only [Set.Ioc_union_Ioc_symm, Set.mem_Ioc, inf_lt_iff, le_sup_iff, not_le] at hk
+      have hk₂' : ¬ ((k ≤ m) ∧ (n + m < k) ∧ n + m = 0) := by grind
+      have hk₃' : ¬ (m < k ∧ k ≤ n + m ∧ n + m = 0) := by grind
+      simp [hk₂', hk₃']
+  · have aux₀ := finite_support_pairNO'_heiOper_apply heiTrunc heiComm 0 (n + m) v
+    simp only [sub_eq_add_neg, zero_add] at aux₀
+    --have aux₁ : (Set.Ioc (m+n) m).Finite := Set.finite_Ioc (m+n) m
+    --have aux₂ : (Set.Ioc m (m+n)).Finite := Set.finite_Ioc m (m+n)
+    apply ((aux₀.union (Set.finite_Ioc (m+n) m)).union (Set.finite_Ioc m (m+n))).subset
+    refine Function.support_subset_iff'.mpr ?_
     intro k hk
-    simp only [neg_add_rev, neg_neg, Function.support_neg, Function.mem_support, ne_eq] at hk ⊢
-    intro con
-    apply hk
-    simp [← sub_eq_add_neg, con]
+    simp only [Set.mem_union, Function.mem_support, ne_eq, Set.mem_Ioc, not_or, not_not, not_and,
+               not_le] at hk
+    rcases hk with ⟨⟨hk₁, hk₂⟩, hk₃⟩
+    have hk₂' : ¬ ((0 ≤ m + -k) ∧ (m + -k < -n) ∧ n + m = 0) := by grind
+    have hk₃' : ¬ (m + -k < 0 ∧ -n ≤ m + -k ∧ n + m = 0) := by grind
+    simp_rw [hk₂', hk₃']
+    simp [hk₁]
+  · have (k : ℤ) : n + m - (m - k) = n + k := by ring
+    simp_rw [← sub_eq_add_neg, this, Function.support_neg]
+    exact finite_support_smul_pairNO'_heiOper_apply heiTrunc heiComm ..
+
+#print axioms commutator_sugawaraGen
 
 end finalizing_Sugawara
 
