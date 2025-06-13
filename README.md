@@ -1,4 +1,4 @@
-# Virasoro Project :D
+# Virasoro Project
 
 [link to docs and blueprint](https://kkytola.github.io/VirasoroProject)
 
