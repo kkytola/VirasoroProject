@@ -250,7 +250,7 @@ noncomputable def equiv_of_lieTwoCoboundary {γ' : LieTwoCocycle 𝕜 𝓖 𝓐}
       LieOneCocycle.bdryHom, add_neg_cancel, LieHom.comp_apply, LieHom.coe_mk]
     ext
     · rfl
-    · simp only [self_eq_add_right]
+    · simp only [left_eq_add]
       rfl
   · convert LieTwoCocycle.CentralExtension.hom_of_coboundary_add γ' γ γ' (-β) β obs' obs
     ext1 Z
@@ -258,7 +258,7 @@ noncomputable def equiv_of_lieTwoCoboundary {γ' : LieTwoCocycle 𝕜 𝓖 𝓐}
       LieOneCocycle.bdryHom, add_neg_cancel, LieHom.comp_apply, LieHom.coe_mk]
     ext
     · rfl
-    · simp only [neg_add_cancel, self_eq_add_right]
+    · simp only [neg_add_cancel, left_eq_add]
       rfl
 
 end CentralExtension -- namespace

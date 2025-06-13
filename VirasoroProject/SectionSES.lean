@@ -52,7 +52,7 @@ short exact sequence `1 ⟶ U ⟶ V ⟶ W ⟶ 1`. -/
     corrector hfg hgσ v = u ↔ v = σ (g v) * f u :=
   ⟨fun h ↦ h ▸ corrector_spec hfg hgσ v, unique_corrector hf v _ _ (corrector_spec hfg hgσ v)⟩
 
-@[to_additive] lemma image_corrector_eq_self_of_mem_ker {σ : W →* V} (hf : f.ker = ⊥) (hfg : f.range = g.ker)
+@[to_additive] lemma image_corrector_eq_self_of_mem_ker {σ : W →* V} (hfg : f.range = g.ker)
     (hgσ : g ∘ σ = _root_.id) {v : V} (hv : v ∈ g.ker) :
     f (corrector hfg hgσ v) = v := by
   rw [mem_ker] at hv
@@ -107,7 +107,7 @@ short exact sequence `1 ⟶ U ⟶ V ⟶ W ⟶ 1`. -/
 @[to_additive] lemma image_correctorHom_eq_self_of_mem_ker {σ : W →* V} (hf : f.ker = ⊥)
     (hfg : f.range = g.ker) (hgσ : g.comp σ = MonoidHom.id _) {v : V} (hv : v ∈ g.ker) :
     f (correctorHom hf hfg hgσ v) = v := by
-  apply image_corrector_eq_self_of_mem_ker hf hfg ?_ hv
+  apply image_corrector_eq_self_of_mem_ker hfg ?_ hv
   ext w ; convert congrFun (congrArg DFunLike.coe hgσ) w
 
 end MonoidHom

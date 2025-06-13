@@ -220,8 +220,8 @@ instance : AddCommMonoid (LieTwoCocycle 𝕜 𝓖 𝓐) where
     ext1
     simp only [LieTwoCocycle.toBilin_add]
     exact add_assoc _ _ _
-  zero_add γ := by ext1 ; simp only [LieTwoCocycle.toBilin_add, add_left_eq_self] ; rfl
-  add_zero γ := by ext1 ; simp only [LieTwoCocycle.toBilin_add, add_right_eq_self] ; rfl
+  zero_add γ := by ext1 ; simp only [LieTwoCocycle.toBilin_add, add_eq_right] ; rfl
+  add_zero γ := by ext1 ; simp only [LieTwoCocycle.toBilin_add, add_eq_left] ; rfl
   add_comm γ γ' := by ext1 ; simp only [LieTwoCocycle.toBilin_add] ; exact AddCommMagma.add_comm _ _
   nsmul n γ :=
     { toBilin := n • γ.toBilin
@@ -364,7 +364,7 @@ def cohomologyClass (γ : LieTwoCocycle 𝕜 𝓖 𝓐) : LieTwoCohomology 𝕜 
 /-- Adding a coboundary does not change the cohomology class. -/
 lemma cohomologyClass_add_bdry (γ : LieTwoCocycle 𝕜 𝓖 𝓐) (β : LieOneCocycle 𝕜 𝓖 𝓐) :
     (γ + β.bdry).cohomologyClass = γ.cohomologyClass := by
-  simp only [cohomologyClass, map_add, add_right_eq_self]
+  simp only [cohomologyClass, map_add, add_eq_left]
   apply (Submodule.Quotient.mk_eq_zero _).mpr <| LinearMap.mem_range.mpr ⟨β, rfl⟩
 
 /-- A cocycle representing a trivial cohomology class is a coboundary. -/

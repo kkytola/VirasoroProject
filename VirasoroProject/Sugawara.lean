@@ -568,14 +568,14 @@ def nPrimitive {R : Type*} [AddCommMonoid R] (f : ℕ → R) (n : ℕ) : R := ma
   rfl
 
 lemma nPrimitive_eq_sum {R : Type*} [AddCommMonoid R] (f : ℕ → R) (n : ℕ) :
-    nPrimitive f n = ∑ j in range n, f j := by
+    nPrimitive f n = ∑ j ∈ range n, f j := by
   induction' n with n ih
   · simp
   · simp [nPrimitive_succ, sum_range_succ, ih]
 
 /-- A discrete integral of a function on `ℤ`. -/
 def zPrimitive {R : Type*} [AddCommGroup R] (f : ℤ → R) (n : ℤ) : R :=
-  if 0 ≤ n then ∑ j in range (Int.toNat n), f j else -(∑ j in range (Int.natAbs n), f (-j-1))
+  if 0 ≤ n then ∑ j ∈ range (Int.toNat n), f j else -(∑ j ∈ range (Int.natAbs n), f (-j-1))
 
 @[simp] lemma zPrimitive_zero {R : Type*} [AddCommGroup R] (f : ℤ → R) :
     zPrimitive f 0 = 0 :=
@@ -583,12 +583,12 @@ def zPrimitive {R : Type*} [AddCommGroup R] (f : ℤ → R) (n : ℤ) : R :=
 
 @[simp] lemma zPrimitive_apply_of_nonneg {R : Type*} [AddCommGroup R] (f : ℤ → R)
     {n : ℤ} (hn : 0 ≤ n) :
-    zPrimitive f n = ∑ j in range (Int.toNat n), f j := by
+    zPrimitive f n = ∑ j ∈ range (Int.toNat n), f j := by
   simp [zPrimitive, hn]
 
 @[simp] lemma zPrimitive_apply_of_nonpos {R : Type*} [AddCommGroup R] (f : ℤ → R)
     {n : ℤ} (hn : n ≤ 0) :
-    zPrimitive f n = -(∑ j in range (Int.natAbs n), f (-j-1)) := by
+    zPrimitive f n = -(∑ j ∈ range (Int.natAbs n), f (-j-1)) := by
   by_cases hn' : n = 0
   · simp [hn']
   · simp [zPrimitive, lt_of_le_of_ne hn hn']
@@ -674,7 +674,7 @@ def zMonomialF (R : Type*) [AddCommGroup R] [One R] (d : ℕ) : ℤ → R := mat
   | d + 1 => zPrimitive (zMonomialF R d)
 
 lemma zMonomialF_eq (R : Type*) [Field R] [CharZero R] (d : ℕ) :
-    (zMonomialF R d) = (fun (n : ℤ) ↦ ((∏ j in range d, (n - j : R)) / (Nat.factorial d : R))) := by
+    (zMonomialF R d) = (fun (n : ℤ) ↦ ((∏ j ∈ range d, (n - j : R)) / (Nat.factorial d : R))) := by
   induction' d with d ihd
   · funext n
     simp [zMonomialF]
