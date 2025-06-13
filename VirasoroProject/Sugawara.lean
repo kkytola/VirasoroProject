@@ -176,28 +176,6 @@ lemma finite_support_smul_pairNO'_heiOper_apply {𝕂 : Type*} [SMulZeroClass �
   convert hj using 2
   simp_rw [heiOper_pairNO_eq_pairNO' heiComm]
 
---include heiTrunc in
---omit heiComm in
---lemma finite_support_pairNO_heiOper_apply (n m : ℤ) (v : V) :
---    (Function.support fun k ↦ ((pairNO heiOper (m - k) (n + k)) v)).Finite := by
---  obtain ⟨N, hN⟩ := eventually_atTop.mp <| heiTrunc v
---  apply (Set.finite_Ioo (m - N) (N - n)).subset
---  simp only [Function.support_subset_iff, ne_eq, Set.mem_Icc, tsub_le_iff_right]
---  intro k hk
---  by_contra con
---  apply hk
---  rw [pairNO_apply_eq_zero heiOper hN ?_]
---  by_cases h : N ≤ n + k
---  · exact le_sup_of_le_right h
---  · apply le_sup_of_le_left
---    simp only [Set.mem_Ioo, not_and, not_lt, tsub_le_iff_right] at con
---    by_contra con'
---    linarith [con (by linarith)]
---
---variable {heiOper} in
-
--- {𝕂 : Type*} [SMulZeroClass 𝕂 V]
-
 include heiTrunc in
 omit heiComm in
 lemma finite_support_smul_pairNO_heiOper_apply₀ {𝕂 : Type*} [SMulZeroClass 𝕂 V]
@@ -237,15 +215,7 @@ omit heiComm
 /-- `pairNO k l` is symmetric in `k` and `l`. -/
 lemma heiOper_pairNO_symm (k l : ℤ) :
     pairNO heiOper k l = pairNO heiOper l k := by
-  unfold pairNO
-  grind
-  --by_cases heq : l = k
-  --· rw [heq]
-  --by_cases hlk : l ≤ k
-  --· have hkl : ¬ k ≤ l := by linarith [lt_of_le_of_ne hlk heq]
-  --  simp [hlk, hkl]
-  --· have hkl : k ≤ l := by linarith
-  --  simp [hlk, hkl]
+  unfold pairNO ; grind
 
 include heiComm
 
@@ -324,24 +294,6 @@ lemma DiscreteTopology.summable_iff_eventually_zero
   · intro ev_zero
     exact summable_of_finite_support ev_zero
 
---variable {heiOper} in
---lemma sugawaraGenAux_summable (n : ℤ) (v : V) :
---    @Summable V ℤ _ ⊥ (fun k ↦ pairNO heiOper (n-k) k v) := by
---  let tV : TopologicalSpace V := ⊥
---  apply summable_of_finite_support
---  exact heiPairNO_trunc_cofinite_sub heiOper heiTrunc n v
-
---variable {heiOper} in
---lemma comp_sugawaraGenAux_summable (A : V →ₗ[𝕜] V) (n : ℤ) (v : V) :
---    @Summable V ℤ _ ⊥ (fun k ↦ A (pairNO heiOper (n-k) k v)) := by
---  let tV : TopologicalSpace V := ⊥
---  apply summable_of_finite_support
---  apply (heiPairNO_trunc_cofinite_sub heiOper heiTrunc n v).subset
---  intro i hi
---  simp only [Function.mem_support, ne_eq, Set.mem_compl_iff, Set.mem_setOf_eq] at hi ⊢
---  intro con
---  simp [con] at hi
-
 noncomputable def sugawaraGenAux (n : ℤ) (v : V) : V :=
   (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k v
 
@@ -396,34 +348,6 @@ noncomputable def sugawaraGen (n : ℤ) : V →ₗ[𝕜] V where
 lemma sugawaraGen_apply (n : ℤ) (v : V) :
     sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k v :=
   rfl
-
---lemma eventually_cofinite_sugawaraGen_apply_eq_half_sum [NeZero (2 : 𝕜)] (n : ℤ) (v : V) :
---    ∀ᶠ s in atTop,
---      sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • ∑ k ∈ s, pairNO heiOper (n-k) k v := by
---  let tV : TopologicalSpace V := ⊥
---  have V_discr : DiscreteTopology V := forall_open_iff_discrete.mp fun _ ↦ trivial
---  have V_smul_cont := continuousConstSMul_of_discreteTopology 𝕜 V
---  have key := sugawaraGen_apply heiTrunc n v
---  have key' : ∑' k, (pairNO heiOper (n - k) k) v = (2 : 𝕜) • sugawaraGen heiTrunc n v := by
---    rw [key, ← smul_assoc, smul_eq_mul, mul_inv_cancel₀ two_ne_zero, one_smul]
---  have lim' := (sugawaraGenAux_summable heiTrunc n v).hasSum
---  have lim : Tendsto _ _ _ := Tendsto.const_smul lim' (2 : 𝕜)⁻¹
---  rw [DiscreteTopology.tendsto_nhds_iff_eventually_eq] at lim
---  filter_upwards [lim] with s hs using by rwa [hs]
-
---lemma eventually_atTop_sugawaraGen_apply_eq_half_sum_Icc [NeZero (2 : 𝕜)] (n : ℤ) (v : V) :
---    ∀ᶠ N in atTop,
---      sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • ∑ k ∈ Set.Icc (-N) N, pairNO heiOper (n-k) k v := by
---  obtain ⟨s, hs⟩ :=
---    eventually_atTop.mp <| eventually_cofinite_sugawaraGen_apply_eq_half_sum heiTrunc n v
---  set N₀ := ((s.image fun i ↦ |i|) ∪ {0}).max' (by simp)
---  apply eventually_atTop.mpr ⟨N₀, fun N hN ↦ ?_⟩
---  apply hs
---  intro i hi
---  suffices |i| ≤ N₀ by
---    simpa only [Set.toFinset_Icc, Finset.mem_Icc] using
---      ⟨(show -N ≤ -N₀ by linarith).trans (neg_le_of_abs_le this), le_trans (le_of_abs_le this) hN⟩
---  exact Finset.le_max' _ _ <| Finset.mem_union_left _ <| Finset.mem_image.mpr ⟨i, ⟨hi, rfl⟩⟩
 
 lemma sugawaraGen_apply_eq_tsum_shift (n s : ℤ) (v : V) :
     sugawaraGen heiTrunc n v
@@ -838,17 +762,10 @@ end central_charge_calculation
 
 
 
-section finalizing_Sugawara
-
---variable {𝕜 : Type*} [Field 𝕜]
---variable {V : Type*} [AddCommGroup V] [Module 𝕜 V]
---variable (heiOper : ℤ → (V →ₗ[𝕜] V))
---variable (heiTrunc : ∀ v, atTop.Eventually (fun l ↦ (heiOper l) v = 0))
---variable (heiComm : ∀ k l,
---  commutator (heiOper k) (heiOper l) = if k + l = 0 then (k : 𝕜) • 1 else 0)
+section commutator_sugawaraGen
 
 include heiComm in
-/-- `[L(n), L(m)] = (n-m) • L(n+m) + extra terms • 1` -/
+/-- `[L(n), L(m)] = (n-m) • L(n+m) + (n^3 - n) / 12 * δ[n+m,0] • 1` -/
 lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
     commutator (sugawaraGen heiTrunc n) (sugawaraGen heiTrunc m)
       = (n-m) • (sugawaraGen heiTrunc (n+m))
@@ -901,7 +818,6 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
           by_cases hn : 0 ≤ n
           · have obs (i : ℤ) : ¬ (i ≤ -n ∧ 0 < i) := by intro maybe ; linarith
             simp only [obs, ↓reduceIte]
-            -- Just like the other half below?
             rw [finsum_eq_sum_of_support_subset _ (s := Finset.Ioc (-n) 0) ?_]
             · rw [Finset.sum_congr rfl (g := fun i ↦ -(i + n) • i • v)]
               · simp only [← smul_assoc]
@@ -1003,8 +919,6 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
       simp [hk₂', hk₃']
   · have aux₀ := finite_support_pairNO'_heiOper_apply heiTrunc heiComm 0 (n + m) v
     simp only [sub_eq_add_neg, zero_add] at aux₀
-    --have aux₁ : (Set.Ioc (m+n) m).Finite := Set.finite_Ioc (m+n) m
-    --have aux₂ : (Set.Ioc m (m+n)).Finite := Set.finite_Ioc m (m+n)
     apply ((aux₀.union (Set.finite_Ioc (m+n) m)).union (Set.finite_Ioc m (m+n))).subset
     refine Function.support_subset_iff'.mpr ?_
     intro k hk
@@ -1019,9 +933,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
     simp_rw [← sub_eq_add_neg, this, Function.support_neg]
     exact finite_support_smul_pairNO'_heiOper_apply heiTrunc heiComm ..
 
-#print axioms commutator_sugawaraGen
-
-end finalizing_Sugawara
+end commutator_sugawaraGen
 
 end Sugawara_boson -- section
 
