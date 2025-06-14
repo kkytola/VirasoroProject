@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
 import VirasoroProject.VirasoroAlgebra
+import VirasoroProject.ToMathlib.Topology.Algebra.Module.LinearMap.Defs
 import Mathlib
 
 /-!
@@ -11,48 +12,6 @@ import Mathlib
 -/
 
 namespace VirasoroProject
-
-
-section preliminaries
-
-lemma sum_eq_sum_support {ι R : Type*} [AddCommMonoid R] {s : Finset ι} {f : ι → R}
-    (hf : (Function.support f).Finite) (hs : Function.support f ⊆ (s : Set ι)) :
-    ∑ i ∈ s, f i = ∑ i ∈ hf.toFinset, f i := by
-  simpa [← finsum_eq_sum_of_support_subset f hs] using finsum_eq_sum f hf
-
-lemma sum_eq_sum_of_support_subset_of_support_subset {ι R : Type*} [AddCommMonoid R]
-    {s₁ s₂ : Finset ι} {f : ι → R} (hf : (Function.support f).Finite)
-    (hs₁ : Function.support f ⊆ (s₁ : Set ι)) (hs₂ : Function.support f ⊆ (s₂ : Set ι)) :
-    (∑ i ∈ s₁, f i) = (∑ i ∈ s₂, f i) := by
-  rw [sum_eq_sum_support hf hs₁, sum_eq_sum_support hf hs₂]
-
--- NOTE: Should be in Mathlib! (Generalize to semilinear maps?)
-lemma _root_.LinearMap.map_finsum {ι 𝕜 : Type*} [Semiring 𝕜]
-    {V : Type*} [AddCommMonoid V] [Module 𝕜 V] {W : Type*} [AddCommMonoid W] [Module 𝕜 W]
-    (f : V →ₗ[𝕜] W) (a : ι → V) (ha : (Function.support a).Finite) :
-    f (∑ᶠ i, a i) = ∑ᶠ i, f (a i) := by
-  rw [finsum_eq_sum _ ha, map_sum, ← finsum_eq_sum_of_support_subset (fun i ↦ f (a i))]
-  intro i hi
-  simp only [Function.mem_support, ne_eq, Set.Finite.coe_toFinset] at hi ⊢
-  intro con
-  simp [con] at hi
-
--- NOTE: Mathlib naming is inconsistent:
---#check Equiv.tsum_eq
---#check finsum_comp_equiv
-
--- Should these just be `finsum_add` and `finsum_sub` and `finsum_neg`?
--- Compare with `tsum_add` and `tsum_sub` and `tsum_neg` (and `finsum_smul` and `smul_finsum`).
---#check finsum_add_distrib
---#check finsum_sub_distrib
---#check finsum_neg_distrib
-----#check tsum_add
-----#check tsum_sub
-----#check tsum_neg
-----#check smul_finsum
-----#check finsum_smul
-
-end preliminaries
 
 
 
@@ -64,31 +23,31 @@ variable {𝕜 : Type*} [Field 𝕜]
 variable {V : Type*} [AddCommGroup V] [Module 𝕜 V]
 
 /-- Commutator `[A,B] := AB-BA` of two linear operators `A`, `B`. -/
-def commutator (A B : V →ₗ[𝕜] V) : V →ₗ[𝕜] V := A * B - B * A
+def _root_.LinearMap.commutator (A B : V →ₗ[𝕜] V) : V →ₗ[𝕜] V := A * B - B * A
 
 /-- `[A,B] = -[B,A]` -/
-lemma commutator_comm (A B : V →ₗ[𝕜] V) :
-    commutator A B = - commutator B A := by
-  simp [commutator]
+lemma _root_.LinearMap.commutator_comm (A B : V →ₗ[𝕜] V) :
+    A.commutator B = - B.commutator A := by
+  simp [LinearMap.commutator]
 
 lemma mul_eq_mul_add_commutator (A B : V →ₗ[𝕜] V) :
-    A * B = B * A + commutator A B := by
-  simp [commutator]
+    A * B = B * A + A.commutator B := by
+  simp [LinearMap.commutator]
 
 /-- `[AB,C] = A[B,C] + [A,C]B` -/
 lemma commutator_pair (A B C : V →ₗ[𝕜] V) :
-    commutator (A * B) C = A * (commutator B C) + (commutator A C) * B := by
-  simp [commutator, sub_mul, mul_sub, ← mul_assoc]
+    (A * B).commutator C = A * B.commutator C + A.commutator C * B := by
+  simp [LinearMap.commutator, sub_mul, mul_sub, ← mul_assoc]
 
 /-- `[A,BC] = B[A,C] + [A,B]C` -/
 lemma commutator_pair' (A B C : V →ₗ[𝕜] V) :
-    commutator A (B * C) = B * (commutator A C) + (commutator A B) * C := by
-  simp [commutator, sub_mul, mul_sub, ← mul_assoc]
+    A.commutator (B * C) = B * A.commutator C + A.commutator B * C := by
+  simp [LinearMap.commutator, sub_mul, mul_sub, ← mul_assoc]
 
 variable (heiOper : ℤ → (V →ₗ[𝕜] V))
 variable (heiTrunc : ∀ v, atTop.Eventually (fun l ↦ (heiOper l) v = 0))
 variable (heiComm : ∀ k l,
-  commutator (heiOper k) (heiOper l) = if k + l = 0 then (k : 𝕜) • 1 else 0)
+  (heiOper k).commutator (heiOper l) = if k + l = 0 then (k : 𝕜) • 1 else 0)
 
 section normal_ordered_pair
 
@@ -120,7 +79,7 @@ include heiComm
 /-- `heiOper k` and `heiOper l` commute unless `k = l`. -/
 lemma heiComm_of_add_ne_zero {k l : ℤ} (hkl : k + l ≠ 0) :
     (heiOper k) ∘ₗ (heiOper l) = (heiOper l) ∘ₗ (heiOper k) := by
-  simpa [hkl, sub_eq_zero, commutator] using heiComm k l
+  simpa [hkl, sub_eq_zero, LinearMap.commutator] using heiComm k l
 
 variable {heiOper}
 
@@ -259,41 +218,6 @@ lemma heiPairNO_trunc_cofinite_sub (n : ℤ) (v : V) :
 
 open Topology
 
--- NOTE: I'd expect this to be in Mathlib.
-omit heiTrunc in
-lemma DiscreteTopology.tendsto_nhds_iff_eventually_eq
-    {X : Type*} [TopologicalSpace X] [DiscreteTopology X] {ι : Type*} {F : Filter ι}
-    (f : ι → X) (x : X) :
-    F.Tendsto f (𝓝 x) ↔ F.Eventually (fun i ↦ f i = x) := by
-  constructor
-  · intro lim_f
-    filter_upwards [tendsto_iff_forall_eventually_mem.mp lim_f _ <|
-                    show {x} ∈ 𝓝 x from mem_nhds_discrete.mpr rfl] with i hi
-    simpa using hi
-  · intro ev_eq
-    refine Tendsto.congr' ?_ tendsto_const_nhds
-    filter_upwards [ev_eq] with i hi using hi.symm
-
--- NOTE: I'd expect this to be in Mathlib.
-omit heiTrunc in
-lemma DiscreteTopology.summable_iff_eventually_zero
-    {E : Type*} [AddCommGroup E] [TopologicalSpace E] [DiscreteTopology E]
-    {ι : Type*} [DecidableEq ι] (f : ι → E) :
-    Summable f ↔ cofinite.Eventually (fun n ↦ f n = 0) := by
-  constructor
-  · intro ⟨v, hv⟩
-    obtain ⟨s, hs⟩ := mem_atTop_sets.mp <|
-      tendsto_iff_forall_eventually_mem.mp hv _ (show {v} ∈ 𝓝 v from mem_nhds_discrete.mpr rfl)
-    rw [eventually_cofinite]
-    apply s.finite_toSet.subset
-    intro i (hi : f i ≠ 0)
-    by_contra con
-    apply hi
-    have obs : ∑ b ∈ insert i s, f b = v := hs (insert i s) (by simp)
-    simpa [Finset.sum_insert con, show ∑ b ∈ s, f b = v from hs s le_rfl, add_eq_right] using obs
-  · intro ev_zero
-    exact summable_of_finite_support ev_zero
-
 noncomputable def sugawaraGenAux (n : ℤ) (v : V) : V :=
   (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k v
 
@@ -359,9 +283,9 @@ lemma sugawaraGen_apply_eq_tsum_shift (n s : ℤ) (v : V) :
   rfl
 
 lemma commutator_sugawaraGen_apply_eq_tsum_commutator_apply (n : ℤ) (A : V →ₗ[𝕜] V) (v : V) :
-    commutator (sugawaraGen heiTrunc n) A v =
-      (2 : 𝕜)⁻¹ • ∑ᶠ k, (commutator (pairNO heiOper (n - k) k) A) v := by
-  simp only [commutator, LinearMap.sub_apply, Module.End.mul_apply]
+    (sugawaraGen heiTrunc n).commutator A v =
+      (2 : 𝕜)⁻¹ • ∑ᶠ k, ((pairNO heiOper (n - k) k).commutator A) v := by
+  simp only [LinearMap.commutator, LinearMap.sub_apply, Module.End.mul_apply]
   simp_rw [sub_eq_add_neg]
   rw [finsum_add_distrib]
   · rw [smul_add]
@@ -375,13 +299,13 @@ lemma commutator_sugawaraGen_apply_eq_tsum_commutator_apply (n : ℤ) (A : V →
     simp [hk]
 
 lemma sugawaraGen_commutator_apply_eq_tsum_commutator_apply (n : ℤ) (A : V →ₗ[𝕜] V) (v : V) :
-    commutator A (sugawaraGen heiTrunc n) v =
-      (2 : 𝕜)⁻¹ • ∑ᶠ k, commutator A (pairNO heiOper (n-k) k) v := by
-  rw [commutator_comm, LinearMap.neg_apply]
+    A.commutator (sugawaraGen heiTrunc n) v =
+      (2 : 𝕜)⁻¹ • ∑ᶠ k, A.commutator (pairNO heiOper (n-k) k) v := by
+  rw [LinearMap.commutator_comm, LinearMap.neg_apply]
   rw [commutator_sugawaraGen_apply_eq_tsum_commutator_apply, ← smul_neg, ← finsum_neg_distrib]
   congr 2
   funext j
-  rw [commutator_comm, LinearMap.neg_apply, neg_neg]
+  rw [LinearMap.commutator_comm, LinearMap.neg_apply, neg_neg]
 
 omit heiTrunc
 
@@ -389,7 +313,7 @@ include heiComm
 
 /-- `[(heiOper l) ∘ (heiOper k), (heiOper m)] = -m * (δ[k+m=0] + δ[l+m=0]) • heiOper (k + l + m)` -/
 lemma commutator_heiPair_heiGen (l k m : ℤ) :
-    commutator ((heiOper l) * (heiOper k)) (heiOper m)
+    ((heiOper l) * (heiOper k)).commutator (heiOper m)
       = ((-m : 𝕜) * ((if k + m = 0 then 1 else 0)
                + (if l + m = 0 then 1 else 0))) • heiOper (k + l + m) := by
   simp [commutator_pair, heiComm]
@@ -405,7 +329,7 @@ lemma commutator_heiPair_heiGen (l k m : ℤ) :
 
 /-- `[:(heiOper l)(heiOper k):, (heiOper m)] = -m * (δ[k+m=0] + δ[l+m=0]) • heiOper (k + l + m)` -/
 lemma commutator_heiPairNO_heiGen (l k m : ℤ) :
-    commutator (pairNO heiOper l k) (heiOper m)
+    (pairNO heiOper l k).commutator (heiOper m)
       = ((-m : 𝕜) * ((if k + m = 0 then 1 else 0)
                + (if l + m = 0 then 1 else 0))) • heiOper (k + l + m) := by
   by_cases hlk : k ≤ l
@@ -422,7 +346,7 @@ include heiTrunc
 
 /-- `[L(n), J(m)] = -m • J(n+m)` -/
 lemma commutator_sugawaraGen_heiOper [CharZero 𝕜] (n m : ℤ) :
-    commutator (sugawaraGen heiTrunc n) (heiOper m) = -m • heiOper (n + m) := by
+    (sugawaraGen heiTrunc n).commutator (heiOper m) = -m • heiOper (n + m) := by
   ext v
   rw [commutator_sugawaraGen_apply_eq_tsum_commutator_apply]
   simp_rw [commutator_heiPairNO_heiGen heiComm]
@@ -454,7 +378,7 @@ lemma commutator_sugawaraGen_heiOper [CharZero 𝕜] (n m : ℤ) :
 
 /-- `[L(n), J(m-k)J(k)] = -k • J(m-k)J(n+k) - (m-k) • J(n+m-k)J(k)` -/
 lemma commutator_sugawaraGen_heiOperPair [CharZero 𝕜] (n m k : ℤ) :
-    commutator (sugawaraGen heiTrunc n) (heiOper (m-k) * heiOper k)
+    (sugawaraGen heiTrunc n).commutator (heiOper (m-k) * heiOper k)
       = -k • (heiOper (m-k) * heiOper (n+k)) - (m-k) • (heiOper (n+m-k) * heiOper k) := by
   rw [commutator_pair']
   rw [commutator_sugawaraGen_heiOper _ heiComm, commutator_sugawaraGen_heiOper _ heiComm]
@@ -467,7 +391,7 @@ lemma commutator_sugawaraGen_heiOperPair [CharZero 𝕜] (n m k : ℤ) :
 
 /-- `[L(n), :J(m-k)J(k):] = -k • :J(m-k)J(n+k): - (m-k) • :J(n+m-k)J(k): + extra terms • 1` -/
 lemma commutator_sugawaraGen_heiPairNO' [CharZero 𝕜] (n m k : ℤ) :
-    commutator (sugawaraGen heiTrunc n) (pairNO' heiOper k (m-k))
+    (sugawaraGen heiTrunc n).commutator (pairNO' heiOper k (m-k))
       = -k • (pairNO' heiOper (n+k) (m-k)
         + if 0 ≤ k ∧ k < -n ∧ n + m = 0 then -(n + k) • 1 else 0
         + if k < 0 ∧ -n ≤ k ∧ n + m = 0 then (n + k) • 1 else 0)
@@ -532,7 +456,7 @@ lemma commutator_sugawaraGen_heiPairNO' [CharZero 𝕜] (n m k : ℤ) :
 
 /-- `[L(n), :J(m-k)J(k):] v = -k • :J(m-k)J(n+k): v - (m-k) • :J(n+m-k)J(k): v + extra terms • v` -/
 lemma commutator_sugawaraGen_heiPairNO'_apply [CharZero 𝕜] (n m k : ℤ) (v : V) :
-    commutator (sugawaraGen heiTrunc n) (pairNO' heiOper k (m-k)) v
+    (sugawaraGen heiTrunc n).commutator (pairNO' heiOper k (m-k)) v
       = -k • ((pairNO' heiOper (n+k) (m-k) v)
         + if 0 ≤ k ∧ k < -n ∧ n + m = 0 then -(n + k) • v else 0
         + if k < 0 ∧ -n ≤ k ∧ n + m = 0 then (n + k) • v else 0)
@@ -767,7 +691,7 @@ section commutator_sugawaraGen
 include heiComm in
 /-- `[L(n), L(m)] = (n-m) • L(n+m) + (n^3 - n) / 12 * δ[n+m,0] • 1` -/
 lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
-    commutator (sugawaraGen heiTrunc n) (sugawaraGen heiTrunc m)
+    (sugawaraGen heiTrunc n).commutator (sugawaraGen heiTrunc m)
       = (n-m) • (sugawaraGen heiTrunc (n+m))
         + if n + m = 0 then ((n ^ 3 - n : 𝕜) / (12 : 𝕜)) • (1 : V →ₗ[𝕜] V) else 0 := by
   ext v
