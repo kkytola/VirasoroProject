@@ -4,7 +4,7 @@ universe u
 variable (𝕜 : Type*) [CommRing 𝕜]
 variable (𝓖 𝓐 : Type u) [LieRing 𝓖] [AddCommGroup 𝓐] [LieAlgebra 𝕜 𝓖] [Module 𝕜 𝓐]
 
-/-- Lie bracket `⁅·,·⁆` as a bilinear map. -/
+/--  `⁅·,·⁆` as a bilinear map. -/
 def LieAlgebra.bracketHom : 𝓖 →ₗ[𝕜] 𝓖 →ₗ[𝕜] 𝓖 where
   toFun := fun X ↦ {
     toFun := fun Y ↦ ⁅X, Y⁆

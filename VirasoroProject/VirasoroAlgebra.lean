@@ -141,6 +141,10 @@ lemma lgen_eq' (n : ℤ) : lgen 𝕜 n = ⟨WittAlgebra.lgen 𝕜 n, 0⟩ := rfl
     ⁅cgen 𝕜, Z⁆ = 0 :=
   (isCentralExtension 𝕜).central 1 Z
 
+@[simp] lemma bracket_cgen (Z : VirasoroAlgebra 𝕜) :
+    ⁅Z, cgen 𝕜⁆ = 0 := by
+  simp [← lie_skew Z (cgen 𝕜)]
+
 @[simp] lemma lgen_bracket (n m : ℤ) :
     ⁅lgen 𝕜 n, lgen 𝕜 m⁆
       = (n - m : 𝕜) • lgen 𝕜 (n + m) + if n + m = 0 then ((n^3 - n : 𝕜)/12) • cgen 𝕜 else 0 := by

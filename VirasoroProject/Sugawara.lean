@@ -30,17 +30,38 @@ lemma _root_.LinearMap.commutator_comm (A B : V →ₗ[𝕜] V) :
     A.commutator B = - B.commutator A := by
   simp [LinearMap.commutator]
 
-lemma mul_eq_mul_add_commutator (A B : V →ₗ[𝕜] V) :
+variable (V) in
+/-- Commutator `[⬝,⬝]` as a bilinear map on the space of linear maps. -/
+noncomputable def _root_.LinearMap.commutatorBilin :
+    (V →ₗ[𝕜] V) →ₗ[𝕜] (V →ₗ[𝕜] V) →ₗ[𝕜] (V →ₗ[𝕜] V) where
+  toFun A :=
+    { toFun := fun B ↦ A.commutator B
+      map_add' B₁ B₂ := by
+        simp [LinearMap.commutator, mul_add, add_mul, sub_eq_add_neg]
+        ac_rfl
+      map_smul' c B := by simp [LinearMap.commutator, smul_sub] }
+  map_add' A₁ A₂ := by
+    ext1 B
+    simp [LinearMap.commutator, add_mul, mul_add, sub_eq_add_neg]
+    ac_rfl
+  map_smul' c A := by
+    ext1 B
+    simp [LinearMap.commutator, smul_sub]
+
+@[simp] lemma _root_.LinearMap.commutatorBilin_apply₂ (A B : V →ₗ[𝕜] V) :
+    LinearMap.commutatorBilin V A B = A.commutator B := rfl
+
+lemma _root_.LinearMap.mul_eq_mul_add_commutator (A B : V →ₗ[𝕜] V) :
     A * B = B * A + A.commutator B := by
   simp [LinearMap.commutator]
 
 /-- `[AB,C] = A[B,C] + [A,C]B` -/
-lemma commutator_pair (A B C : V →ₗ[𝕜] V) :
+lemma _root_.LinearMap.commutator_pair (A B C : V →ₗ[𝕜] V) :
     (A * B).commutator C = A * B.commutator C + A.commutator C * B := by
   simp [LinearMap.commutator, sub_mul, mul_sub, ← mul_assoc]
 
 /-- `[A,BC] = B[A,C] + [A,B]C` -/
-lemma commutator_pair' (A B C : V →ₗ[𝕜] V) :
+lemma _root_.LinearMap.commutator_pair' (A B C : V →ₗ[𝕜] V) :
     A.commutator (B * C) = B * A.commutator C + A.commutator B * C := by
   simp [LinearMap.commutator, sub_mul, mul_sub, ← mul_assoc]
 
@@ -316,7 +337,7 @@ lemma commutator_heiPair_heiGen (l k m : ℤ) :
     ((heiOper l) * (heiOper k)).commutator (heiOper m)
       = ((-m : 𝕜) * ((if k + m = 0 then 1 else 0)
                + (if l + m = 0 then 1 else 0))) • heiOper (k + l + m) := by
-  simp [commutator_pair, heiComm]
+  simp [LinearMap.commutator_pair, heiComm]
   by_cases hkm : k + m = 0
   · simp [show k = -m by linarith]
     by_cases hlm : l + m = 0
@@ -380,7 +401,7 @@ lemma commutator_sugawaraGen_heiOper [CharZero 𝕜] (n m : ℤ) :
 lemma commutator_sugawaraGen_heiOperPair [CharZero 𝕜] (n m k : ℤ) :
     (sugawaraGen heiTrunc n).commutator (heiOper (m-k) * heiOper k)
       = -k • (heiOper (m-k) * heiOper (n+k)) - (m-k) • (heiOper (n+m-k) * heiOper k) := by
-  rw [commutator_pair']
+  rw [LinearMap.commutator_pair']
   rw [commutator_sugawaraGen_heiOper _ heiComm, commutator_sugawaraGen_heiOper _ heiComm]
   simp only [neg_smul, zsmul_eq_mul, mul_neg, neg_sub, Int.cast_sub, sub_eq_add_neg]
   congr 2
@@ -407,7 +428,8 @@ lemma commutator_sugawaraGen_heiPairNO' [CharZero 𝕜] (n m k : ℤ) :
       simp only [pairNO', hk, ↓reduceIte, hnk, hnk', and_true, add_zero, neg_smul, zsmul_eq_mul,
                  Int.cast_sub, ← Module.End.mul_eq_comp]
       rw [commutator_sugawaraGen_heiOperPair heiTrunc heiComm]
-      have aux := (heiComm (n+k) (m-k)) ▸ mul_eq_mul_add_commutator (heiOper (n+k)) (heiOper (m-k))
+      have aux := (heiComm (n+k) (m-k)) ▸
+                  LinearMap.mul_eq_mul_add_commutator (heiOper (n+k)) (heiOper (m-k))
       simp only [aux, show n + k + (m - k) = n + m by ring, neg_smul, zsmul_eq_mul, Int.cast_sub,
                  Int.cast_add, true_and, Int.cast_ite, Int.cast_zero, sub_left_inj, neg_inj]
       simp only [mul_one, neg_add_rev, mul_ite, mul_zero, mul_add (k : V →ₗ[𝕜] V),
@@ -427,7 +449,8 @@ lemma commutator_sugawaraGen_heiPairNO' [CharZero 𝕜] (n m k : ℤ) :
       simp only [pairNO', hk, hk', hnk, hnk', ↓reduceIte, and_false, true_and, false_and, add_zero,
                  neg_smul, zsmul_eq_mul, Int.cast_sub, ← Module.End.mul_eq_comp]
       simp only [obs, add_sub, Int.cast_add, mul_one, neg_add_rev, zero_add]
-      have aux := (heiComm (m-k) (n+k)) ▸ mul_eq_mul_add_commutator (heiOper (m-k)) (heiOper (n+k))
+      have aux := (heiComm (m-k) (n+k)) ▸
+                  LinearMap.mul_eq_mul_add_commutator (heiOper (m-k)) (heiOper (n+k))
       rw [aux, show m - k + (n + k) = n + m by ring]
       rw [sub_eq_add_neg _ ((k : V →ₗ[𝕜] V) * _), sub_eq_add_neg _ ((m - k : V →ₗ[𝕜] V) * _)]
       rw [add_comm _ (-_)]
@@ -858,6 +881,151 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
     exact finite_support_smul_pairNO'_heiOper_apply heiTrunc heiComm ..
 
 end commutator_sugawaraGen
+
+
+
+section representation
+
+noncomputable def _root_.LieAlgebra.representationOfBasisAux
+    {𝕂 : Type*} [Field 𝕂] {V : Type*} [AddCommGroup V] [Module 𝕂 V]
+    {𝓖 : Type*} [LieRing 𝓖] [LieAlgebra 𝕂 𝓖] {ι : Type*} (B : Basis ι 𝕂 𝓖)
+    (genOper : ι → (V →ₗ[𝕂] V)) :
+    𝓖 →ₗ[𝕂] (V →ₗ[𝕂] V) :=
+  B.constr 𝕂 <| fun i ↦ genOper i
+
+@[simp] lemma _root_.LieAlgebra.representationOfBasisAux_apply_basis
+    {𝕂 : Type*} [Field 𝕂] {V : Type*} [AddCommGroup V] [Module 𝕂 V]
+    {𝓖 : Type*} [LieRing 𝓖] [LieAlgebra 𝕂 𝓖] {ι : Type*} (B : Basis ι 𝕂 𝓖)
+    (genOper : ι → (V →ₗ[𝕂] V)) (i : ι) :
+    LieAlgebra.representationOfBasisAux B genOper (B i) = genOper i := by
+  simp [LieAlgebra.representationOfBasisAux]
+
+lemma _root_.LieAlgebra.representationOfBasisAux_property
+    {𝕂 : Type*} [Field 𝕂] {V : Type*} [AddCommGroup V] [Module 𝕂 V]
+    {𝓖 : Type*} [LieRing 𝓖] [LieAlgebra 𝕂 𝓖] {ι : Type*} (B : Basis ι 𝕂 𝓖)
+    {genOper : ι → (V →ₗ[𝕂] V)}
+    (genComm : ∀ i j, (genOper i).commutator (genOper j)
+      = LieAlgebra.representationOfBasisAux B genOper ⁅B i, B j⁆) :
+    (LieAlgebra.representationOfBasisAux B genOper).compRight.comp (LieAlgebra.bracketHom 𝕂 𝓖)
+      = (LinearMap.commutatorBilin V).compl₁₂
+          (LieAlgebra.representationOfBasisAux B genOper)
+          (LieAlgebra.representationOfBasisAux B genOper) :=
+  B.ext fun i ↦ B.ext fun j ↦ by simp [genComm i j]
+
+noncomputable def _root_.LieAlgebra.representationOfBasis
+    {𝕂 : Type*} [Field 𝕂] {V : Type*} [AddCommGroup V] [Module 𝕂 V]
+    {𝓖 : Type*} [LieRing 𝓖] [LieAlgebra 𝕂 𝓖] {ι : Type*} (B : Basis ι 𝕂 𝓖)
+    {genOper : ι → (V →ₗ[𝕂] V)}
+    (genComm : ∀ i j, (genOper i).commutator (genOper j)
+      = LieAlgebra.representationOfBasisAux B genOper ⁅B i, B j⁆) :
+    𝓖 →ₗ⁅𝕂⁆ (V →ₗ[𝕂] V) where
+  toFun := LieAlgebra.representationOfBasisAux B genOper
+  map_add' := by simp
+  map_smul' := by simp
+  map_lie' := by
+    intro X Y
+    have key := LieAlgebra.representationOfBasisAux_property B genComm
+    exact LinearMap.congr_fun (LinearMap.congr_fun key X) Y
+
+lemma commutator_smul_one (A : V →ₗ[𝕜] V) (c : 𝕜) :
+    A.commutator (c • 1) = 0 := by
+  simp [LinearMap.commutator]
+
+lemma smul_one_commutator (A : V →ₗ[𝕜] V) (c : 𝕜) :
+    (c • 1 : V →ₗ[𝕜] V).commutator A = 0 := by
+  simp [LinearMap.commutator]
+
+/-- Construct a representation of Virasoro algebra from a central charge value `c` and a
+collection `(Lₙ)`, `n ∈ ℤ`, of operators satisfying the commutation relations of Virasoro
+generators with that central charge. -/
+noncomputable def VirasoroAlgebra.representationOfCentralChangeOfL
+    {𝕂 : Type*} [Field 𝕂] [CharZero 𝕂]
+    {V : Type*} [AddCommGroup V] [Module 𝕂 V] (c : 𝕂) {lOper : ℤ → (V →ₗ[𝕂] V)}
+    (lComm : ∀ n m, (lOper n).commutator (lOper m)
+      = (n-m) • lOper (n+m) + if n + m = 0 then (c / 12 * (n^3 - n)) • (1 : V →ₗ[𝕂] V) else 0) :
+    VirasoroAlgebra 𝕂 →ₗ⁅𝕂⁆ (V →ₗ[𝕂] V) := by
+  let ops : Option ℤ → (V →ₗ[𝕂] V) := fun n' ↦ match n' with
+    | none => c • 1
+    | some n => lOper n
+  apply LieAlgebra.representationOfBasis (VirasoroAlgebra.basisLC 𝕂) (genOper := ops)
+  intro n' m'
+  match n' with
+  | none => simpa [ops] using smul_one_commutator ..
+  | some n => match m' with
+    | none => simpa [ops] using commutator_smul_one ..
+    | some m =>
+      simp only [ops, lComm, basisLC_some, lgen_bracket, map_add, map_smul]
+      congr 1
+      · have obs (k : ℤ) : lgen 𝕂 k = (VirasoroAlgebra.basisLC 𝕂) (some k) := by simp
+        rw [obs]
+        simp only [LieAlgebra.representationOfBasisAux_apply_basis, ops]
+        ext v
+        simp only [Module.End.mul_apply, LinearMap.sub_apply, Module.End.intCast_apply, sub_smul,
+                   LinearMap.smul_apply]
+        congr 1 <;> rw [Int.cast_smul_eq_zsmul]
+      · by_cases hnm : n + m = 0
+        · have obs : cgen 𝕂 = (VirasoroAlgebra.basisLC 𝕂) none := by simp
+          simp only [hnm, ↓reduceIte, map_smul, ops]
+          simp only [obs, LieAlgebra.representationOfBasisAux_apply_basis]
+          simp only [← smul_assoc, smul_eq_mul]
+          congr 1
+          field_simp
+          rw [mul_comm]
+        · simp [hnm]
+
+lemma VirasoroAlgebra.representationOfCentralChangeOfL_cgen
+    {𝕂 : Type*} [Field 𝕂] [CharZero 𝕂]
+    {V : Type*} [AddCommGroup V] [Module 𝕂 V] (c : 𝕂) {lOper : ℤ → (V →ₗ[𝕂] V)}
+    (lComm : ∀ n m, (lOper n).commutator (lOper m)
+      = (n-m) • lOper (n+m) + if n + m = 0 then (c / 12 * (n^3 - n)) • (1 : V →ₗ[𝕂] V) else 0) :
+    (representationOfCentralChangeOfL c lComm) (cgen 𝕂) = c • 1 := by
+  convert LieAlgebra.representationOfBasisAux_apply_basis (VirasoroAlgebra.basisLC 𝕂) _ none
+  simp
+
+lemma VirasoroAlgebra.representationOfCentralChangeOfL_lgen
+    {𝕂 : Type*} [Field 𝕂] [CharZero 𝕂]
+    {V : Type*} [AddCommGroup V] [Module 𝕂 V] (c : 𝕂) {lOper : ℤ → (V →ₗ[𝕂] V)}
+    (lComm : ∀ n m, (lOper n).commutator (lOper m)
+      = (n-m) • lOper (n+m) + if n + m = 0 then (c / 12 * (n^3 - n)) • (1 : V →ₗ[𝕂] V) else 0)
+    (n : ℤ) :
+    (representationOfCentralChangeOfL c lComm) (lgen 𝕂 n) = lOper n := by
+  convert LieAlgebra.representationOfBasisAux_apply_basis (VirasoroAlgebra.basisLC 𝕂) _ (some n)
+  simp
+
+variable {heiOper} in
+/-- **The basic bosonic Sugawara representation of Virasoro algebra (c=1)**:
+On a vector space with a representation of the Heisenberg algebra that acts locally truncatedly,
+we get a representation of the Virasoro algebra with central charge 1 by the Sugawara
+construction. -/
+noncomputable def VirasoroAlgebra.sugawaraRepresentation [CharZero 𝕜] :
+    VirasoroAlgebra 𝕜 →ₗ⁅𝕜⁆ (V →ₗ[𝕜] V) := by
+  apply VirasoroAlgebra.representationOfCentralChangeOfL 1 (lOper := sugawaraGen heiTrunc)
+  intro n m
+  simp only [commutator_sugawaraGen heiOper heiTrunc heiComm n m, zsmul_eq_mul, Int.cast_sub,
+             one_div, add_right_inj]
+  by_cases hnm : n + m = 0
+  · simp [hnm]
+    congr 1
+    field_simp
+  · simp [hnm]
+
+/-- The central element `C` of the Virasoro algebra acts as `1` on the representation obtained
+by the basic bosonic Sugawara construction. -/
+lemma VirasoroAlgebra.sugawaraRepresentation_cgen [CharZero 𝕜] :
+    VirasoroAlgebra.sugawaraRepresentation heiTrunc heiComm (cgen 𝕜) = 1 := by
+  convert VirasoroAlgebra.representationOfCentralChangeOfL_cgen ..
+  simp
+
+/-- The formula for the action of the Virasoro generator `Lₙ` on the representation obtained
+by the basic bosonic Sugawara construction. -/
+lemma VirasoroAlgebra.sugawaraRepresentation_lgen [CharZero 𝕜] (n : ℤ) (v : V) :
+    VirasoroAlgebra.sugawaraRepresentation heiTrunc heiComm (lgen 𝕜 n) v =
+      (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k v := by
+  rw [← sugawaraGen_apply heiTrunc]
+  apply LinearMap.congr_fun _ v
+  convert VirasoroAlgebra.representationOfCentralChangeOfL_lgen ..
+
+end representation
 
 end Sugawara_boson -- section
 
