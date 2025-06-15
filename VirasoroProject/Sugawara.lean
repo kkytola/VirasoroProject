@@ -4,6 +4,9 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
 import VirasoroProject.VirasoroAlgebra
+import VirasoroProject.CentralChargeCalc
+import VirasoroProject.Commutator
+import VirasoroProject.LieAlgebraRepresentationOfBasis
 import VirasoroProject.ToMathlib.Topology.Algebra.Module.LinearMap.Defs
 import Mathlib
 
@@ -19,51 +22,7 @@ section Sugawara_boson
 
 open Filter
 
-variable {𝕜 : Type*} [Field 𝕜]
-variable {V : Type*} [AddCommGroup V] [Module 𝕜 V]
-
-/-- Commutator `[A,B] := AB-BA` of two linear operators `A`, `B`. -/
-def _root_.LinearMap.commutator (A B : V →ₗ[𝕜] V) : V →ₗ[𝕜] V := A * B - B * A
-
-/-- `[A,B] = -[B,A]` -/
-lemma _root_.LinearMap.commutator_comm (A B : V →ₗ[𝕜] V) :
-    A.commutator B = - B.commutator A := by
-  simp [LinearMap.commutator]
-
-variable (V) in
-/-- Commutator `[⬝,⬝]` as a bilinear map on the space of linear maps. -/
-noncomputable def _root_.LinearMap.commutatorBilin :
-    (V →ₗ[𝕜] V) →ₗ[𝕜] (V →ₗ[𝕜] V) →ₗ[𝕜] (V →ₗ[𝕜] V) where
-  toFun A :=
-    { toFun := fun B ↦ A.commutator B
-      map_add' B₁ B₂ := by
-        simp [LinearMap.commutator, mul_add, add_mul, sub_eq_add_neg]
-        ac_rfl
-      map_smul' c B := by simp [LinearMap.commutator, smul_sub] }
-  map_add' A₁ A₂ := by
-    ext1 B
-    simp [LinearMap.commutator, add_mul, mul_add, sub_eq_add_neg]
-    ac_rfl
-  map_smul' c A := by
-    ext1 B
-    simp [LinearMap.commutator, smul_sub]
-
-@[simp] lemma _root_.LinearMap.commutatorBilin_apply₂ (A B : V →ₗ[𝕜] V) :
-    LinearMap.commutatorBilin V A B = A.commutator B := rfl
-
-lemma _root_.LinearMap.mul_eq_mul_add_commutator (A B : V →ₗ[𝕜] V) :
-    A * B = B * A + A.commutator B := by
-  simp [LinearMap.commutator]
-
-/-- `[AB,C] = A[B,C] + [A,C]B` -/
-lemma _root_.LinearMap.commutator_pair (A B C : V →ₗ[𝕜] V) :
-    (A * B).commutator C = A * B.commutator C + A.commutator C * B := by
-  simp [LinearMap.commutator, sub_mul, mul_sub, ← mul_assoc]
-
-/-- `[A,BC] = B[A,C] + [A,B]C` -/
-lemma _root_.LinearMap.commutator_pair' (A B C : V →ₗ[𝕜] V) :
-    A.commutator (B * C) = B * A.commutator C + A.commutator B * C := by
-  simp [LinearMap.commutator, sub_mul, mul_sub, ← mul_assoc]
+variable {𝕜 : Type*} [Field 𝕜] {V : Type*} [AddCommGroup V] [Module 𝕜 V]
 
 variable (heiOper : ℤ → (V →ₗ[𝕜] V))
 variable (heiTrunc : ∀ v, atTop.Eventually (fun l ↦ (heiOper l) v = 0))
@@ -253,23 +212,12 @@ lemma sugawaraGenAux_comp_apply (A : V →ₗ[𝕜] V) (n : ℤ) (v : V) :
       = (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k (A v) := by
   rw [sugawaraGenAux_def heiOper n (A v)]
 
-variable {heiOper} in
+variable {heiOper}
+
 lemma comp_sugawaraGenAux_apply (A : V →ₗ[𝕜] V) (n : ℤ) (v : V) :
     A (sugawaraGenAux heiOper n v) = (2 : 𝕜)⁻¹ • ∑ᶠ k, A (pairNO heiOper (n-k) k v) := by
   rw [sugawaraGenAux_def heiOper n v, map_smul, A.map_finsum]
   exact finite_support_pairNO_heiOper_apply₀ heiTrunc n v
-
-omit heiTrunc
-
--- NOTE: Should be in Mathlib?
-def continuousConstSMul_of_discreteTopology (𝕜 X : Type*) [TopologicalSpace X]
-    [DiscreteTopology X] [AddCommMonoid X] [SMul 𝕜 X] :
-    ContinuousConstSMul 𝕜 X :=
-  ⟨fun c ↦ by continuity⟩
-
-variable {heiOper}
-
-include heiTrunc
 
 lemma sugawaraGenAux_add (n : ℤ) (v w : V) :
     sugawaraGenAux heiOper n (v + w) = sugawaraGenAux heiOper n v + sugawaraGenAux heiOper n w := by
@@ -294,7 +242,7 @@ lemma sugawaraGen_apply (n : ℤ) (v : V) :
     sugawaraGen heiTrunc n v = (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k v :=
   rfl
 
-lemma sugawaraGen_apply_eq_tsum_shift (n s : ℤ) (v : V) :
+lemma sugawaraGen_apply_eq_finsum_shift (n s : ℤ) (v : V) :
     sugawaraGen heiTrunc n v
       = (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n - (k + s)) (k + s) v := by
   rw [sugawaraGen_apply]
@@ -303,7 +251,7 @@ lemma sugawaraGen_apply_eq_tsum_shift (n s : ℤ) (v : V) :
   rw [← finsum_comp_equiv σ]
   rfl
 
-lemma commutator_sugawaraGen_apply_eq_tsum_commutator_apply (n : ℤ) (A : V →ₗ[𝕜] V) (v : V) :
+lemma commutator_sugawaraGen_apply_eq_finsum_commutator_apply (n : ℤ) (A : V →ₗ[𝕜] V) (v : V) :
     (sugawaraGen heiTrunc n).commutator A v =
       (2 : 𝕜)⁻¹ • ∑ᶠ k, ((pairNO heiOper (n - k) k).commutator A) v := by
   simp only [LinearMap.commutator, LinearMap.sub_apply, Module.End.mul_apply]
@@ -323,7 +271,7 @@ lemma sugawaraGen_commutator_apply_eq_tsum_commutator_apply (n : ℤ) (A : V →
     A.commutator (sugawaraGen heiTrunc n) v =
       (2 : 𝕜)⁻¹ • ∑ᶠ k, A.commutator (pairNO heiOper (n-k) k) v := by
   rw [LinearMap.commutator_comm, LinearMap.neg_apply]
-  rw [commutator_sugawaraGen_apply_eq_tsum_commutator_apply, ← smul_neg, ← finsum_neg_distrib]
+  rw [commutator_sugawaraGen_apply_eq_finsum_commutator_apply, ← smul_neg, ← finsum_neg_distrib]
   congr 2
   funext j
   rw [LinearMap.commutator_comm, LinearMap.neg_apply, neg_neg]
@@ -369,7 +317,7 @@ include heiTrunc
 lemma commutator_sugawaraGen_heiOper [CharZero 𝕜] (n m : ℤ) :
     (sugawaraGen heiTrunc n).commutator (heiOper m) = -m • heiOper (n + m) := by
   ext v
-  rw [commutator_sugawaraGen_apply_eq_tsum_commutator_apply]
+  rw [commutator_sugawaraGen_apply_eq_finsum_commutator_apply]
   simp_rw [commutator_heiPairNO_heiGen heiComm]
   simp only [neg_mul, add_sub_cancel, neg_smul, LinearMap.neg_apply, LinearMap.smul_apply,
              zsmul_eq_mul, Module.End.mul_apply, Module.End.intCast_apply]
@@ -494,218 +442,6 @@ lemma commutator_sugawaraGen_heiPairNO'_apply [CharZero 𝕜] (n m k : ℤ) (v :
   split_ifs <;> simp [add_smul]
 
 end normal_ordered_pair -- section
-
-
-
-section central_charge_calculation
-
-open Finset
-
-/-- A discrete integral of a function on `ℕ`. -/
-def nPrimitive {R : Type*} [AddCommMonoid R] (f : ℕ → R) (n : ℕ) : R := match n with
-  | 0 => (0 : R)
-  | n + 1 => nPrimitive f n + f n
-
-@[simp] lemma nPrimitive_zero {R : Type*} [AddCommMonoid R] (f : ℕ → R) :
-    nPrimitive f 0 = 0 :=
-  rfl
-
-@[simp] lemma nPrimitive_succ {R : Type*} [AddCommMonoid R] (f : ℕ → R) (n : ℕ) :
-    nPrimitive f (n + 1) = nPrimitive f n + f n :=
-  rfl
-
-lemma nPrimitive_eq_sum {R : Type*} [AddCommMonoid R] (f : ℕ → R) (n : ℕ) :
-    nPrimitive f n = ∑ j ∈ range n, f j := by
-  induction' n with n ih
-  · simp
-  · simp [nPrimitive_succ, sum_range_succ, ih]
-
-/-- A discrete integral of a function on `ℤ`. -/
-def zPrimitive {R : Type*} [AddCommGroup R] (f : ℤ → R) (n : ℤ) : R :=
-  if 0 ≤ n then ∑ j ∈ range (Int.toNat n), f j else -(∑ j ∈ range (Int.natAbs n), f (-j-1))
-
-@[simp] lemma zPrimitive_zero {R : Type*} [AddCommGroup R] (f : ℤ → R) :
-    zPrimitive f 0 = 0 :=
-  rfl
-
-@[simp] lemma zPrimitive_apply_of_nonneg {R : Type*} [AddCommGroup R] (f : ℤ → R)
-    {n : ℤ} (hn : 0 ≤ n) :
-    zPrimitive f n = ∑ j ∈ range (Int.toNat n), f j := by
-  simp [zPrimitive, hn]
-
-@[simp] lemma zPrimitive_apply_of_nonpos {R : Type*} [AddCommGroup R] (f : ℤ → R)
-    {n : ℤ} (hn : n ≤ 0) :
-    zPrimitive f n = -(∑ j ∈ range (Int.natAbs n), f (-j-1)) := by
-  by_cases hn' : n = 0
-  · simp [hn']
-  · simp [zPrimitive, lt_of_le_of_ne hn hn']
-
-@[simp] lemma zPrimitive_succ {R : Type*} [AddCommGroup R] (f : ℤ → R) (n : ℤ) :
-    zPrimitive f (n + 1) = zPrimitive f n + f n := by
-  by_cases hn : 0 ≤ n
-  · simp [zPrimitive, hn, Int.le_add_one hn, Int.toNat_add hn zero_le_one, sum_range_succ]
-  · simp only [not_le] at hn
-    have n_natAbs : n.natAbs = (n+1).natAbs + 1 := by
-      simpa using Int.natAbs_add_of_nonpos (b := -1) hn (Int.toNat_eq_zero.mp rfl)
-    simp only [zPrimitive_apply_of_nonpos _ hn, zPrimitive_apply_of_nonpos _ hn.le, n_natAbs,
-               sum_range_succ, Int.natCast_natAbs, neg_add_rev]
-    simp only [add_comm (-(f _)), add_assoc, left_eq_add]
-    simp [show -|n + 1| - 1 = n by rw [abs_of_nonpos hn, neg_neg] ; ring]
-
-lemma eq_zPrimitive_of_eq_zero_of_forall_eq_add {R : Type*} [AddCommGroup R] {f F : ℤ → R}
-    (h0 : F 0 = 0) (h1 : ∀ n, F (n + 1) = F n + f n) :
-    F = zPrimitive f := by
-  have obsP : ∀ (n : ℕ), F n = zPrimitive f n := by
-    intro n
-    induction' n with n ih
-    · simp [h0]
-    · have keyF := h1 n
-      have keyP := zPrimitive_succ f n
-      norm_cast at *
-      rw [keyF, ih, ← keyP]
-  have obsM : ∀ (n : ℕ), F (-n) = zPrimitive f (-n) := by
-    intro n
-    induction' n with n ih
-    · simp [h0]
-    · have keyF := h1 (-(n + 1))
-      have keyP := zPrimitive_succ f (-(n + 1))
-      simp only [Int.natAbs_neg, Int.natAbs_natCast, neg_add_rev, Int.reduceNeg,
-                 neg_add_cancel_comm, Nat.cast_add, Nat.cast_one] at ih keyF keyP ⊢
-      rw [keyF, keyP] at ih
-      exact add_right_cancel_iff.mp ih
-  ext m
-  by_cases hm : 0 ≤ m
-  · rw [(Int.toNat_of_nonneg hm).symm]
-    exact obsP m.toNat
-  · have hm' : m < 0 := Int.lt_of_not_ge hm
-    rw [show m = -m.natAbs from Int.eq_neg_comm.mp (by simpa [hm'] using hm'.le)]
-    exact obsM m.natAbs
-
-lemma zPrimitive_add {R : Type*} [AddCommGroup R] (f g : ℤ → R) :
-    zPrimitive (f + g) = zPrimitive f + zPrimitive g  := by
-  apply (eq_zPrimitive_of_eq_zero_of_forall_eq_add ..).symm
-  · simp
-  · intro n
-    simp only [Pi.add_apply, zPrimitive_succ]
-    ac_rfl
-
-lemma zPrimitive_smul {R S : Type*} [AddCommGroup R] [DistribSMul S R]
-    (c : S) (f : ℤ → R) :
-    zPrimitive (c • f) = c • (zPrimitive f) := by
-  apply (eq_zPrimitive_of_eq_zero_of_forall_eq_add ..).symm <;> simp
-
-lemma zPrimitive_sub {R : Type*} [AddCommGroup R] (f g : ℤ → R) :
-    zPrimitive (f - g) = zPrimitive f - zPrimitive g  := by
-  apply (eq_zPrimitive_of_eq_zero_of_forall_eq_add ..).symm
-  · simp
-  · intro n
-    simp only [Pi.sub_apply, zPrimitive_succ, ←sub_sub, sub_eq_add_neg, neg_add_rev, ←add_assoc]
-    ac_rfl
-
-lemma zPrimitive_mul_left {R : Type*} [Ring R] (c : R) (f : ℤ → R) :
-    zPrimitive (fun n ↦ c * f n) = fun n ↦ c * zPrimitive f n := by
-  apply (eq_zPrimitive_of_eq_zero_of_forall_eq_add ..).symm
-  · simp
-  · intro n
-    simp [mul_add]
-
-lemma zPrimitive_mul_right {R : Type*} [Ring R] (c : R) (f : ℤ → R) :
-    zPrimitive (fun n ↦ f n * c) = fun n ↦ zPrimitive f n * c := by
-  apply (eq_zPrimitive_of_eq_zero_of_forall_eq_add ..).symm
-  · simp
-  · intro n
-    simp [add_mul]
-
-def zMonomialF (R : Type*) [AddCommGroup R] [One R] (d : ℕ) : ℤ → R := match d with
-  | 0 => fun _ ↦ 1
-  | d + 1 => zPrimitive (zMonomialF R d)
-
-lemma zMonomialF_eq (R : Type*) [Field R] [CharZero R] (d : ℕ) :
-    (zMonomialF R d) = (fun (n : ℤ) ↦ ((∏ j ∈ range d, (n - j : R)) / (Nat.factorial d : R))) := by
-  induction' d with d ihd
-  · funext n
-    simp [zMonomialF]
-  rw [zMonomialF, Eq.comm]
-  apply eq_zPrimitive_of_eq_zero_of_forall_eq_add
-  · simp only [Int.cast_zero, zero_sub, prod_div_distrib, prod_const, card_range, div_eq_zero_iff,
-               ne_eq, AddLeftCancelMonoid.add_eq_zero, one_ne_zero, and_false, not_false_eq_true,
-               pow_eq_zero_iff, Nat.cast_eq_zero]
-    left
-    exact prod_eq_zero_iff.mpr ⟨0, by simp, by simp⟩
-  · intro n
-    simp only [Int.cast_add, Int.cast_one] at *
-    simp [ihd]
-    simp only [Nat.factorial_succ, Nat.cast_mul, Nat.cast_add, Nat.cast_one]
-    have aux₀ : (d.factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
-    have aux₁: ((d+1).factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
-    have aux' : ((d+1) : R) ≠ 0 := by norm_cast
-    field_simp
-    simp only [← mul_assoc, mul_eq_mul_right_iff, aux₀, or_false]
-    simp only [← add_mul, ← mul_add]
-    simp only [mul_assoc, mul_comm _ (d.factorial : R)]
-    rw [mul_right_inj' aux₀]
-    simp only [← mul_assoc, mul_left_inj' aux']
-    rw [prod_range_succ (fun a ↦ (n : R) - a), ← mul_add]
-    rw [show (n - d + (d + 1) : R) = n + 1 by ring]
-    simp [prod_range_succ']
-
-lemma zMonomialF_zero_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zMonomialF R 0 n = 1 := by
-  simp [zMonomialF]
-
-lemma zMonomialF_one_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zMonomialF R 1 n = n := by
-  simp [zMonomialF_eq]
-
-lemma zMonomialF_two_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zMonomialF R 2 n = n * (n - 1) / 2 := by
-  simp [zMonomialF_eq, prod_range_succ]
-
-lemma zMonomialF_three_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zMonomialF R 3 n = n * (n - 1) * (n - 2) / 6 := by
-  simp [zMonomialF_eq, prod_range_succ, show Nat.factorial 3 = 6 from rfl]
-
-lemma zMonomialF_four_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zMonomialF R 4 n = n * (n - 1) * (n - 2) * (n - 3) / 24 := by
-  simp [zMonomialF_eq, prod_range_succ, show Nat.factorial 4 = 24 from rfl]
-
-lemma zMonomialF_five_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zMonomialF R 5 n = n * (n - 1) * (n - 2) * (n - 3) * (n - 4) / 120 := by
-  simp [zMonomialF_eq, prod_range_succ, show Nat.factorial 5 = 120 from rfl]
-
-lemma zMonomialF_apply_eq_zero_of_of_nonneg_lt (R : Type*) [Field R] [CharZero R]
-    (d : ℕ) {n : ℕ} (n_lt : n < d) :
-    zMonomialF R d n = 0 := by
-  simp only [zMonomialF_eq R d, Int.cast_natCast, div_eq_zero_iff, Nat.cast_eq_zero]
-  exact Or.inl <| prod_eq_zero_iff.mpr ⟨n, ⟨mem_range.mpr n_lt, by simp⟩⟩
-
-lemma bosonic_sugawara_cc_calc (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zPrimitive (fun l ↦ (l : R) * (n - l)) n = (n^3 - n) / 6 := by
-  have obs : (n^3 - n) / 6 = (n - 1 : R) * zMonomialF R 2 n - 2 * zMonomialF R 3 n := by
-    rw [zMonomialF_two_eq, zMonomialF_three_eq]
-    field_simp
-    ring
-  have key : (zPrimitive fun l ↦ (n - 1 : R) * l) - (zPrimitive fun l ↦ 2 * zMonomialF R 2 l)
-              = zPrimitive ((fun (l : ℤ) ↦ (l : R) * (n - l))) := by
-    rw [← zPrimitive_sub]
-    apply congr_arg zPrimitive
-    ext l
-    simp [zMonomialF_two_eq]
-    ring
-  simp_rw [obs, ← key, zPrimitive_mul_left]
-  dsimp
-  congr
-  ext m
-  rw [zMonomialF_one_eq]
-
-lemma bosonic_sugawara_cc_calc_nonneg (n : ℕ) :
-    ∑ l ∈ Finset.range n, (l : ℚ) * (n - l) = (n^3 - n) / 6 := by
-  have key := bosonic_sugawara_cc_calc ℚ n
-  simp only [Int.cast_natCast, Nat.cast_nonneg, zPrimitive_apply_of_nonneg, Int.toNat_natCast]
-    at key
-  rw [← key]
-
-end central_charge_calculation
 
 
 
@@ -886,55 +622,6 @@ end commutator_sugawaraGen
 
 section representation
 
-noncomputable def _root_.LieAlgebra.representationOfBasisAux
-    {𝕂 : Type*} [Field 𝕂] {V : Type*} [AddCommGroup V] [Module 𝕂 V]
-    {𝓖 : Type*} [LieRing 𝓖] [LieAlgebra 𝕂 𝓖] {ι : Type*} (B : Basis ι 𝕂 𝓖)
-    (genOper : ι → (V →ₗ[𝕂] V)) :
-    𝓖 →ₗ[𝕂] (V →ₗ[𝕂] V) :=
-  B.constr 𝕂 <| fun i ↦ genOper i
-
-@[simp] lemma _root_.LieAlgebra.representationOfBasisAux_apply_basis
-    {𝕂 : Type*} [Field 𝕂] {V : Type*} [AddCommGroup V] [Module 𝕂 V]
-    {𝓖 : Type*} [LieRing 𝓖] [LieAlgebra 𝕂 𝓖] {ι : Type*} (B : Basis ι 𝕂 𝓖)
-    (genOper : ι → (V →ₗ[𝕂] V)) (i : ι) :
-    LieAlgebra.representationOfBasisAux B genOper (B i) = genOper i := by
-  simp [LieAlgebra.representationOfBasisAux]
-
-lemma _root_.LieAlgebra.representationOfBasisAux_property
-    {𝕂 : Type*} [Field 𝕂] {V : Type*} [AddCommGroup V] [Module 𝕂 V]
-    {𝓖 : Type*} [LieRing 𝓖] [LieAlgebra 𝕂 𝓖] {ι : Type*} (B : Basis ι 𝕂 𝓖)
-    {genOper : ι → (V →ₗ[𝕂] V)}
-    (genComm : ∀ i j, (genOper i).commutator (genOper j)
-      = LieAlgebra.representationOfBasisAux B genOper ⁅B i, B j⁆) :
-    (LieAlgebra.representationOfBasisAux B genOper).compRight.comp (LieAlgebra.bracketHom 𝕂 𝓖)
-      = (LinearMap.commutatorBilin V).compl₁₂
-          (LieAlgebra.representationOfBasisAux B genOper)
-          (LieAlgebra.representationOfBasisAux B genOper) :=
-  B.ext fun i ↦ B.ext fun j ↦ by simp [genComm i j]
-
-noncomputable def _root_.LieAlgebra.representationOfBasis
-    {𝕂 : Type*} [Field 𝕂] {V : Type*} [AddCommGroup V] [Module 𝕂 V]
-    {𝓖 : Type*} [LieRing 𝓖] [LieAlgebra 𝕂 𝓖] {ι : Type*} (B : Basis ι 𝕂 𝓖)
-    {genOper : ι → (V →ₗ[𝕂] V)}
-    (genComm : ∀ i j, (genOper i).commutator (genOper j)
-      = LieAlgebra.representationOfBasisAux B genOper ⁅B i, B j⁆) :
-    𝓖 →ₗ⁅𝕂⁆ (V →ₗ[𝕂] V) where
-  toFun := LieAlgebra.representationOfBasisAux B genOper
-  map_add' := by simp
-  map_smul' := by simp
-  map_lie' := by
-    intro X Y
-    have key := LieAlgebra.representationOfBasisAux_property B genComm
-    exact LinearMap.congr_fun (LinearMap.congr_fun key X) Y
-
-lemma commutator_smul_one (A : V →ₗ[𝕜] V) (c : 𝕜) :
-    A.commutator (c • 1) = 0 := by
-  simp [LinearMap.commutator]
-
-lemma smul_one_commutator (A : V →ₗ[𝕜] V) (c : 𝕜) :
-    (c • 1 : V →ₗ[𝕜] V).commutator A = 0 := by
-  simp [LinearMap.commutator]
-
 /-- Construct a representation of Virasoro algebra from a central charge value `c` and a
 collection `(Lₙ)`, `n ∈ ℤ`, of operators satisfying the commutation relations of Virasoro
 generators with that central charge. -/
@@ -950,9 +637,9 @@ noncomputable def VirasoroAlgebra.representationOfCentralChangeOfL
   apply LieAlgebra.representationOfBasis (VirasoroAlgebra.basisLC 𝕂) (genOper := ops)
   intro n' m'
   match n' with
-  | none => simpa [ops] using smul_one_commutator ..
+  | none => simp [ops]
   | some n => match m' with
-    | none => simpa [ops] using commutator_smul_one ..
+    | none => simp [ops]
     | some m =>
       simp only [ops, lComm, basisLC_some, lgen_bracket, map_add, map_smul]
       congr 1
@@ -1018,12 +705,37 @@ lemma VirasoroAlgebra.sugawaraRepresentation_cgen [CharZero 𝕜] :
 
 /-- The formula for the action of the Virasoro generator `Lₙ` on the representation obtained
 by the basic bosonic Sugawara construction. -/
-lemma VirasoroAlgebra.sugawaraRepresentation_lgen [CharZero 𝕜] (n : ℤ) (v : V) :
+lemma VirasoroAlgebra.sugawaraRepresentation_lgen_apply' [CharZero 𝕜] (n : ℤ) (v : V) :
     VirasoroAlgebra.sugawaraRepresentation heiTrunc heiComm (lgen 𝕜 n) v =
       (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k v := by
   rw [← sugawaraGen_apply heiTrunc]
   apply LinearMap.congr_fun _ v
   convert VirasoroAlgebra.representationOfCentralChangeOfL_lgen ..
+
+/-- The formula for the action of the Virasoro generator `Lₙ` on the representation obtained
+by the basic bosonic Sugawara construction. -/
+lemma VirasoroAlgebra.sugawaraRepresentation_lgen_apply [CharZero 𝕜] (n : ℤ) (v : V) :
+    VirasoroAlgebra.sugawaraRepresentation heiTrunc heiComm (lgen 𝕜 n) v =
+      (2 : 𝕜)⁻¹ • ((∑ᶠ k ≥ 0, (heiOper (n-k) ∘ₗ heiOper k) v)
+                  + (∑ᶠ k < 0, (heiOper k ∘ₗ heiOper (n-k)) v)) := by
+  rw [sugawaraRepresentation_lgen_apply']
+  simp_rw [heiOper_pairNO_eq_pairNO' heiComm]
+  rw [finsum_add_finsum_compl (Set.Ici 0) _
+        (finite_support_pairNO'_heiOper_apply₀ heiTrunc heiComm n v)]
+  congr 2
+  · simp_rw [heiOper_pairNO'_symm heiOper heiComm]
+    simp only [Set.mem_Ici, pairNO', ge_iff_le, LinearMap.coe_comp, Function.comp_apply]
+    apply finsum_congr
+    intro k
+    by_cases hk : 0 ≤ k <;> simp [hk]
+  · simp_rw [heiOper_pairNO'_symm heiOper heiComm]
+    simp only [Set.compl_Ici, Set.mem_Iio, pairNO', LinearMap.coe_comp, Function.comp_apply]
+    apply finsum_congr
+    intro k
+    by_cases hk : k < 0
+    · have hk' : ¬ 0 ≤ k := by linarith
+      simp [hk, hk']
+    · simp [hk]
 
 end representation
 
