@@ -3,11 +3,9 @@ Copyright (c) 2025 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
-import VirasoroProject.VirasoroAlgebra
-import VirasoroProject.CentralChargeCalc
+import Mathlib.Algebra.Lie.OfAssociative
 import VirasoroProject.Commutator
-import VirasoroProject.ToMathlib.Topology.Algebra.Module.LinearMap.Defs
-import Mathlib
+import VirasoroProject.ToMathlib.Algebra.Lie.Basic
 
 /-!
 # Constructing representations of Lie algebras from operators corresponding to a basis

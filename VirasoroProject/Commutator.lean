@@ -3,10 +3,8 @@ Copyright (c) 2025 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
-import VirasoroProject.VirasoroAlgebra
-import VirasoroProject.CentralChargeCalc
-import VirasoroProject.ToMathlib.Topology.Algebra.Module.LinearMap.Defs
-import Mathlib
+import Mathlib.Algebra.Algebra.Basic
+import Mathlib.Algebra.EuclideanDomain.Field
 
 /-!
 # Commutators of linear maps
@@ -37,13 +35,16 @@ lemma mul_eq_mul_add_commutator (A B : V →ₗ[𝕜] V) :
 /-- `[AB,C] = A[B,C] + [A,C]B` -/
 lemma commutator_pair (A B C : V →ₗ[𝕜] V) :
     (A * B).commutator C = A * B.commutator C + A.commutator C * B := by
-  simp [LinearMap.commutator, sub_mul, mul_sub, ← mul_assoc]
+  calc  A * B * C - C * (A * B)
+    _ = A * B * C - A * C * B + A * C * B - C * A * B     := by simp [← mul_assoc]
+    _ = A * (B * C - C * B) + (A * C - C * A) * B         := by simp [mul_sub, sub_mul, ← mul_assoc]
 
 /-- `[A,BC] = B[A,C] + [A,B]C` -/
 lemma commutator_pair' (A B C : V →ₗ[𝕜] V) :
     A.commutator (B * C) = B * A.commutator C + A.commutator B * C := by
-  simp [LinearMap.commutator, sub_mul, mul_sub, ← mul_assoc]
-
+  calc  A * (B * C) - B * C * A
+    _ = A * B * C - B * A * C + B * A * C - B * C * A     := by simp [← mul_assoc]
+    _ = B * (A * C - C * A) + (A * B - B * A) * C         := by simp [mul_sub, sub_mul, ← mul_assoc]
 
 @[simp] lemma commutator_smul_one {𝕜 : Type*} [Field 𝕜] (V : Type*) [AddCommGroup V] [Module 𝕜 V]
     (A : V →ₗ[𝕜] V) (c : 𝕜) :

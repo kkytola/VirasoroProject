@@ -193,10 +193,12 @@ instance : Add (LieTwoCocycle 𝕜 𝓖 𝓐) where
     { toBilin := γ.toBilin + γ'.toBilin
       self' := fun X ↦ by simp [γ.self', γ'.self']
       leibniz' := fun X Y Z ↦ by
-        simp only [LinearMap.add_apply, γ.leibniz' X Y Z, γ'.leibniz' X Y Z]
-        simp only [add_assoc, add_right_inj]
-        simp only [← add_assoc, add_left_inj]
-        rw [add_comm] }
+        calc (γ.toBilin X) ⁅Y, Z⁆ + (γ'.toBilin X) ⁅Y, Z⁆
+            = (γ.toBilin ⁅X, Y⁆) Z + (γ.toBilin Y) ⁅X, Z⁆
+              + (γ'.toBilin ⁅X, Y⁆) Z + (γ'.toBilin Y) ⁅X, Z⁆ := by
+              simp [γ.leibniz' X Y Z, γ'.leibniz' X Y Z, ← add_assoc]
+          _ = ((γ.toBilin + γ'.toBilin) ⁅X, Y⁆) Z + ((γ.toBilin + γ'.toBilin) Y) ⁅X, Z⁆ := by
+              simp only [LinearMap.add_apply] ; ac_rfl }
 
 instance : SMul 𝕜 (LieTwoCocycle 𝕜 𝓖 𝓐) where
   smul c γ :=

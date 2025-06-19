@@ -7,6 +7,8 @@ package «VirasoroProject» where
 require mathlib from git
   "https://github.com/leanprover-community/mathlib4.git"
 
+require calcify from git "https://github.com/nomeata/lean-calcify" @ "master"
+
 @[default_target]
 lean_lib «VirasoroProject» where
   -- add any library configuration options here

@@ -3,9 +3,12 @@ Copyright (c) 2025 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
-import VirasoroProject.VirasoroAlgebra
-import VirasoroProject.ToMathlib.Topology.Algebra.Module.LinearMap.Defs
-import Mathlib
+import Mathlib.Algebra.EuclideanDomain.Field
+import Mathlib.Algebra.Lie.OfAssociative
+import Mathlib.Algebra.Order.Ring.Star
+import Mathlib.Analysis.Normed.Field.Lemmas
+import Mathlib.Data.Int.Star
+import Mathlib.RingTheory.Henselian
 
 /-!
 # Central charge calculations for Sugawara constructions
@@ -66,9 +69,9 @@ def zPrimitive {R : Type*} [AddCommGroup R] (f : ℤ → R) (n : ℤ) : R :=
   · simp [zPrimitive, hn, Int.le_add_one hn, Int.toNat_add hn zero_le_one, sum_range_succ]
   · simp only [not_le] at hn
     have n_natAbs : n.natAbs = (n+1).natAbs + 1 := by
-      simpa using Int.natAbs_add_of_nonpos (b := -1) hn (Int.toNat_eq_zero.mp rfl)
+        simpa using Int.natAbs_add_of_nonpos (b := -1) hn (Int.toNat_eq_zero.mp rfl)
     simp only [zPrimitive_apply_of_nonpos _ hn, zPrimitive_apply_of_nonpos _ hn.le, n_natAbs,
-               sum_range_succ, Int.natCast_natAbs, neg_add_rev]
+              sum_range_succ, Int.natCast_natAbs, neg_add_rev]
     simp only [add_comm (-(f _)), add_assoc, left_eq_add]
     simp [show -|n + 1| - 1 = n by rw [abs_of_nonpos hn, neg_neg] ; ring]
 
@@ -147,27 +150,28 @@ lemma zMonomialF_eq (R : Type*) [Field R] [CharZero R] (d : ℕ) :
     simp [zMonomialF]
   rw [zMonomialF, Eq.comm]
   apply eq_zPrimitive_of_eq_zero_of_forall_eq_add
-  · simp only [Int.cast_zero, zero_sub, prod_div_distrib, prod_const, card_range, div_eq_zero_iff,
-               ne_eq, AddLeftCancelMonoid.add_eq_zero, one_ne_zero, and_false, not_false_eq_true,
-               pow_eq_zero_iff, Nat.cast_eq_zero]
-    left
-    exact prod_eq_zero_iff.mpr ⟨0, by simp, by simp⟩
+  · simpa using Or.inl <| prod_eq_zero_iff.mpr ⟨0, by simp, by simp⟩
   · intro n
-    simp only [Int.cast_add, Int.cast_one] at *
-    simp [ihd]
-    simp only [Nat.factorial_succ, Nat.cast_mul, Nat.cast_add, Nat.cast_one]
     have aux₀ : (d.factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
     have aux₁: ((d+1).factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
     have aux' : ((d+1) : R) ≠ 0 := by norm_cast
-    field_simp
-    simp only [← mul_assoc, mul_eq_mul_right_iff, aux₀, or_false]
-    simp only [← add_mul, ← mul_add]
-    simp only [mul_assoc, mul_comm _ (d.factorial : R)]
-    rw [mul_right_inj' aux₀]
-    simp only [← mul_assoc, mul_left_inj' aux']
-    rw [prod_range_succ (fun a ↦ (n : R) - a), ← mul_add]
-    rw [show (n - d + (d + 1) : R) = n + 1 by ring]
-    simp [prod_range_succ']
+    calc  (∏ j ∈ range (d + 1), ((↑(n + 1) : R) - j)) / (d + 1).factorial
+      _ = (∏ x ∈ range (d + 1), (n + 1 - x)) / (d + 1).factorial := by simp
+      _ = (∏ j ∈ range (d + 1), (n - j)) / ((d + 1) * d.factorial)
+          + (∏ j ∈ range d, (n - j : R)) / d.factorial := ?_
+      _ = (∏ j ∈ range (d + 1), (↑n - ↑j)) / ↑(d + 1).factorial + zMonomialF R d n := ?_
+    · simp only [Nat.factorial_succ, Nat.cast_mul, Nat.cast_add, Nat.cast_one]
+      field_simp
+      simp only [← mul_assoc, ← add_mul, mul_eq_mul_right_iff, aux₀, or_false]
+      simp only [mul_assoc, mul_comm _ (d.factorial : R)]
+      rw [mul_right_inj' aux₀]
+      simp only [← mul_assoc, mul_left_inj' aux']
+      rw [prod_range_succ (fun a ↦ (n : R) - a), ← mul_add]
+      simp [show (n - d + (d + 1) : R) = n + 1 by ring, prod_range_succ']
+    · simp only [ihd, Int.cast_prod, Int.cast_sub, Int.cast_natCast, add_left_inj]
+      simp only [mul_assoc, mul_comm _ (d.factorial : R)]
+      field_simp
+      exact Or.inl <| by simp [Nat.factorial_succ, mul_comm]
 
 lemma zMonomialF_zero_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
     zMonomialF R 0 n = 1 := by
@@ -219,7 +223,7 @@ lemma bosonic_sugawara_cc_calc (R : Type*) [Field R] [CharZero R] (n : ℤ) :
   rw [zMonomialF_one_eq]
 
 lemma bosonic_sugawara_cc_calc_nonneg (n : ℕ) :
-    ∑ l ∈ Finset.range n, (l : ℚ) * (n - l) = (n^3 - n) / 6 := by
+    ∑ l ∈ range n, (l : ℚ) * (n - l) = (n^3 - n) / 6 := by
   have key := bosonic_sugawara_cc_calc ℚ n
   simp only [Int.cast_natCast, Nat.cast_nonneg, zPrimitive_apply_of_nonneg, Int.toNat_natCast]
     at key
