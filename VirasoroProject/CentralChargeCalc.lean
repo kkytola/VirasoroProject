@@ -13,7 +13,33 @@ import Mathlib.RingTheory.Henselian
 /-!
 # Central charge calculations for Sugawara constructions
 
-Using discrete primitives in dimension one.
+This file contains the crucial auxiliary calculations leading to the values of the central charge
+in various Sugawara constructions. The calculations make use of "discrete integration" on `ℤ`.
+
+## Main definitions
+
+* `zPrimitive`: A "discrete integral function" to a given function `f : ℤ → R`. The defining
+  properties of `F = zPrimitive f` are `F(0) = 0` and `F(n+1) - F(n) = f(n)`.
+* `zMonomialF`: The `d`th discrete monomial function is defined by `d`-fold discrete integration
+  of the constant function `1`. (The continuum analogue is the monomial `1/d! • x^d`.)
+
+## Main statements
+
+* `zMonomialF_eq` The `d`th discrete monomial function is given by
+  `n ↦ 1/d! • ∏ j (0 ≤ j < d), (n - j)`
+* `bosonic_sugawara_cc_calc`: For any `n ∈ ℤ`, we have
+   `zPrimitive (fun l ↦ (l : R) * (n - l)) n = (n^3 - n) / 6`.
+* `bosonic_sugawara_cc_calc_nonneg`: For any `n ∈ ℕ`, we have
+   `∑ l (0 ≤ l < n), (l : ℚ) * (n - l) = (n^3 - n) / 6`.
+
+## TODO
+
+* TODO: Add variants of the calculation for fermionic Sugawara constructions etc.
+
+## Tags
+
+central charge, Sugawara construction
+
 -/
 
 namespace VirasoroProject
@@ -23,25 +49,6 @@ namespace VirasoroProject
 section central_charge_calculation
 
 open Finset
-
-/-- A discrete integral of a function on `ℕ`. -/
-def nPrimitive {R : Type*} [AddCommMonoid R] (f : ℕ → R) (n : ℕ) : R := match n with
-  | 0 => (0 : R)
-  | n + 1 => nPrimitive f n + f n
-
-@[simp] lemma nPrimitive_zero {R : Type*} [AddCommMonoid R] (f : ℕ → R) :
-    nPrimitive f 0 = 0 :=
-  rfl
-
-@[simp] lemma nPrimitive_succ {R : Type*} [AddCommMonoid R] (f : ℕ → R) (n : ℕ) :
-    nPrimitive f (n + 1) = nPrimitive f n + f n :=
-  rfl
-
-lemma nPrimitive_eq_sum {R : Type*} [AddCommMonoid R] (f : ℕ → R) (n : ℕ) :
-    nPrimitive f n = ∑ j ∈ range n, f j := by
-  induction' n with n ih
-  · simp
-  · simp [nPrimitive_succ, sum_range_succ, ih]
 
 /-- A discrete integral of a function on `ℤ`. -/
 def zPrimitive {R : Type*} [AddCommGroup R] (f : ℤ → R) (n : ℤ) : R :=

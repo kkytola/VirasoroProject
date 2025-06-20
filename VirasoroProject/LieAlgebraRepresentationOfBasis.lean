@@ -9,6 +9,17 @@ import VirasoroProject.ToMathlib.Algebra.Lie.Basic
 
 /-!
 # Constructing representations of Lie algebras from operators corresponding to a basis
+
+This file contains a construction of a Lie algebra representation from a basis and operators
+satisfying the corresponding commutation relations. (It is used in particular in the Sugawara
+constructions.)
+
+## Main definitions
+
+* `LieAlgebra.representationOfBasis`: Given a basis `B` of a Lie algebra `𝓖` and a collection of
+  linear operators on a vector space `V` satisfying the commutation relations specified by the Lie
+  brackets of the basis elements, construct a representation of `𝓖` on the vector space `V`.
+
 -/
 
 

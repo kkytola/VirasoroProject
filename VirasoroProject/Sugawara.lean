@@ -12,6 +12,37 @@ import Mathlib
 
 /-!
 # The bosonic Sugawara construction
+
+This file contains the basic bosonic Sugawara construction.
+
+## Main definitions
+
+* `VirasoroAlgebra.representationOfCentralChangeOfL`: A veriant of the construction
+  (`LieAlgebra.representationOfBasis`) of a representation of a Lie algebra from operators
+  corresponding to a basis, for the special case of the Virasoro algebra: a representation is
+  constructed from operators corresponding to the `lgen` Virasoro generators satisfying
+  commutation relations with a given central charge `c`.
+* `VirasoroProject.sugawaraRepresentation`: Any representation of the Heisenberg algebra
+  where the Heisenberg modes act in a locally truncated fashion can be made into a representation
+  of the Virasoro algebra with central charge `c = 1` by the (basic) bosonic Sugawara construction.
+
+## Main statements
+
+* `VirasoroProject.commutator_sugawaraGen`: Given operators `A(k)`, `k ∈ ℤ`, satisfying Heisengerg
+  algebra commutation relations and acting in a locally truncated way, the Sugawara operators
+  `Lₙ = 1/2 • ∑ k, :A(n-k)A(k):` for `n ∈ ℤ` satisfy the commutation relations of the Virasoro
+  generators (here the normal ordered product `:A(n-k)A(k):` is the composition of `A(n-k)` and
+  `A(k)` in an order depending on the indices `n-k` and `k`).
+* `VirasoroProject.sugawaraRepresentation_lgen_apply`: In `VirasoroProject.sugawaraRepresentation`,
+  the Virasoro generators `lgen _ n`, `n ∈ ℤ`, act by the Sugawara formula
+  `Lₙ = 1/2 • ∑ k ≥ 0, A(n-k) ∘ A(k) + 1/2 • ∑ k < 0, A(k) ∘ A(n-k)`.
+* `VirasoroProject.sugawaraRepresentation_cgen_apply`: In `VirasoroProject.sugawaraRepresentation`,
+  the central charge is `c = 1`, i.e., the Virasoro generator `cgen _` acts as `1 • id`.
+
+## Tags
+
+Sugawara construction, Virasoro algebra, Heisenberg algebra, bosonic Fock space
+
 -/
 
 namespace VirasoroProject
@@ -684,7 +715,7 @@ variable {heiOper} in
 On a vector space with a representation of the Heisenberg algebra that acts locally truncatedly,
 we get a representation of the Virasoro algebra with central charge 1 by the Sugawara
 construction. -/
-noncomputable def VirasoroAlgebra.sugawaraRepresentation [CharZero 𝕜] :
+noncomputable def sugawaraRepresentation [CharZero 𝕜] :
     VirasoroAlgebra 𝕜 →ₗ⁅𝕜⁆ (V →ₗ[𝕜] V) := by
   apply VirasoroAlgebra.representationOfCentralChangeOfL 1 (lOper := sugawaraGen heiTrunc)
   intro n m
@@ -696,26 +727,29 @@ noncomputable def VirasoroAlgebra.sugawaraRepresentation [CharZero 𝕜] :
     field_simp
   · simp [hnm]
 
+open VirasoroAlgebra in
 /-- The central element `C` of the Virasoro algebra acts as `1` on the representation obtained
 by the basic bosonic Sugawara construction. -/
-lemma VirasoroAlgebra.sugawaraRepresentation_cgen [CharZero 𝕜] :
-    VirasoroAlgebra.sugawaraRepresentation heiTrunc heiComm (cgen 𝕜) = 1 := by
+lemma sugawaraRepresentation_cgen [CharZero 𝕜] :
+    sugawaraRepresentation heiTrunc heiComm (cgen 𝕜) = 1 := by
   convert VirasoroAlgebra.representationOfCentralChangeOfL_cgen ..
   simp
 
+open VirasoroAlgebra in
 /-- The formula for the action of the Virasoro generator `Lₙ` on the representation obtained
 by the basic bosonic Sugawara construction. -/
-lemma VirasoroAlgebra.sugawaraRepresentation_lgen_apply' [CharZero 𝕜] (n : ℤ) (v : V) :
-    VirasoroAlgebra.sugawaraRepresentation heiTrunc heiComm (lgen 𝕜 n) v =
+lemma sugawaraRepresentation_lgen_apply' [CharZero 𝕜] (n : ℤ) (v : V) :
+    sugawaraRepresentation heiTrunc heiComm (lgen 𝕜 n) v =
       (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k v := by
   rw [← sugawaraGen_apply heiTrunc]
   apply LinearMap.congr_fun _ v
   convert VirasoroAlgebra.representationOfCentralChangeOfL_lgen ..
 
+open VirasoroAlgebra in
 /-- The formula for the action of the Virasoro generator `Lₙ` on the representation obtained
 by the basic bosonic Sugawara construction. -/
-lemma VirasoroAlgebra.sugawaraRepresentation_lgen_apply [CharZero 𝕜] (n : ℤ) (v : V) :
-    VirasoroAlgebra.sugawaraRepresentation heiTrunc heiComm (lgen 𝕜 n) v =
+lemma sugawaraRepresentation_lgen_apply [CharZero 𝕜] (n : ℤ) (v : V) :
+    sugawaraRepresentation heiTrunc heiComm (lgen 𝕜 n) v =
       (2 : 𝕜)⁻¹ • ((∑ᶠ k ≥ 0, (heiOper (n-k) ∘ₗ heiOper k) v)
                   + (∑ᶠ k < 0, (heiOper k ∘ₗ heiOper (n-k)) v)) := by
   rw [sugawaraRepresentation_lgen_apply']

@@ -10,6 +10,37 @@ import Calcify
 
 /-!
 # Sections of short exact sequences
+
+This file contains basics of sections of short exact sequences. In particular it is proved that
+in a short exact sequence of
+
+## Main definitions
+
+* `MonoidHom.corrector`: Given a short exact sequence `1 ⟶ H ⟶ K ⟶ G ⟶ 1` of groups (with maps
+  `ι : H → K` and `π : K → G`) and a section `σ : G → K` of it (`π ∘ σ = id_G`), the corrector
+  `γ : K → H` is the unique function such that `k = σ(π(k)) * ι(γ(k))` for any `k : K`.
+* `MonoidHom.correctorHom`: Given a short exact sequence `0 ⟶ U ⟶ V ⟶ W ⟶ 0` of abelian groups
+  and a section `σ : W → V` of it, the corrector `γ : V → U` is a group homomorphism, uniquely
+  specified by the condition `v = σ(π(v)) + ι(γ(v))` for any `v : V`.
+* `LinearMap.choose_section`: Given a short exact sequence `0 ⟶ U ⟶ V ⟶ W ⟶ 0` of modules,
+  where `W` is a free module, one can choose a linear section `σ : W → V` of the short exact
+  sequence.
+* `LinearMap.corrector`: Given a short exact sequence `0 ⟶ U ⟶ V ⟶ W ⟶ 0` of modules
+  and a section `σ : W → V`, the corrector `γ : V → U` is a linear map, uniquely
+  specified by the condition `v = σ(π(v)) + ι(γ(v))` for any `v : V`.
+* `ses_basis`: Given a short exact sequence `0 ⟶ U ⟶ V ⟶ W ⟶ 0` of modules and a section
+  `σ : W → V` of it, one can construct a basis of `V` from a basis of `W` and a basis of `U`.
+
+## Main statements
+
+* `ses_directSum_isInternal`: The property `v = σ(π(v)) + ι(γ(v))` of a corrector `γ` of a
+  section `σ` of a short exact sequence `0 ⟶ U ⟶ V ⟶ W ⟶ 0` of modules gives an internal
+  direct sum decomposition `V = σ(W) ⊕ ι(U)`.
+
+## Tags
+
+short exact sequence
+
 -/
 
 section group_section

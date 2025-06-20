@@ -8,6 +8,14 @@ import Mathlib.Algebra.EuclideanDomain.Field
 
 /-!
 # Commutators of linear maps
+
+This file defines commutators of linear operators, and proves a few useful properties of them.
+
+## Main definitions
+
+* `LinearMap.commutator`: The commutator `[A,B] := AB-BA` of two linear operators `A`, `B`.
+* `LinearMap.commutatorBilin`: The commutator `[⬝,⬝]` as a bilinear map on the space of linear maps.
+
 -/
 
 namespace LinearMap
