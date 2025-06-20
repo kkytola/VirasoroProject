@@ -163,10 +163,10 @@ lemma zMonomialF_eq (R : Type*) [Field R] [CharZero R] (d : ℕ) :
     have aux₁: ((d+1).factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
     have aux' : ((d+1) : R) ≠ 0 := by norm_cast
     calc  (∏ j ∈ range (d + 1), ((↑(n + 1) : R) - j)) / (d + 1).factorial
-      _ = (∏ x ∈ range (d + 1), (n + 1 - x)) / (d + 1).factorial := by simp
+      _ = (∏ x ∈ range (d + 1), (n + 1 - x)) / (d + 1).factorial                      := by simp
       _ = (∏ j ∈ range (d + 1), (n - j)) / ((d + 1) * d.factorial)
-          + (∏ j ∈ range d, (n - j : R)) / d.factorial := ?_
-      _ = (∏ j ∈ range (d + 1), (↑n - ↑j)) / ↑(d + 1).factorial + zMonomialF R d n := ?_
+          + (∏ j ∈ range d, (n - j : R)) / d.factorial                                := ?_
+      _ = (∏ j ∈ range (d + 1), (↑n - ↑j)) / ↑(d + 1).factorial + zMonomialF R d n    := ?_
     · simp only [Nat.factorial_succ, Nat.cast_mul, Nat.cast_add, Nat.cast_one]
       field_simp
       simp only [← mul_assoc, ← add_mul, mul_eq_mul_right_iff, aux₀, or_false]

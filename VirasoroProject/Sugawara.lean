@@ -4,6 +4,7 @@ Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
 import VirasoroProject.VirasoroAlgebra
+import VirasoroProject.HeisenbergAlgebra
 import VirasoroProject.CentralChargeCalc
 import VirasoroProject.Commutator
 import VirasoroProject.LieAlgebraRepresentationOfBasis
@@ -661,7 +662,8 @@ noncomputable def VirasoroAlgebra.representationOfCentralChangeOfL
     {V : Type*} [AddCommGroup V] [Module 𝕂 V] (c : 𝕂) {lOper : ℤ → (V →ₗ[𝕂] V)}
     (lComm : ∀ n m, (lOper n).commutator (lOper m)
       = (n-m) • lOper (n+m) + if n + m = 0 then (c / 12 * (n^3 - n)) • (1 : V →ₗ[𝕂] V) else 0) :
-    VirasoroAlgebra 𝕂 →ₗ⁅𝕂⁆ (V →ₗ[𝕂] V) := by
+    LieAlgebra.Representation 𝕂 𝕂 (VirasoroAlgebra 𝕂) V := by
+    --VirasoroAlgebra 𝕂 →ₗ⁅𝕂⁆ (V →ₗ[𝕂] V) := by
   let ops : Option ℤ → (V →ₗ[𝕂] V) := fun n' ↦ match n' with
     | none => c • 1
     | some n => lOper n
@@ -772,6 +774,28 @@ lemma sugawaraRepresentation_lgen_apply [CharZero 𝕜] (n : ℤ) (v : V) :
     · simp [hk]
 
 end representation
+
+section heisenberg_representation
+
+omit heiOper heiTrunc heiComm in
+open HeisenbergAlgebra in
+-- TODO: Generalize to `kgen` acting as `κ • 1`.
+/-- **The basic bosonic Sugawara representation of Virasoro algebra (c=1)**:
+On a vector space with a representation of the Heisenberg algebra that acts locally truncatedly
+(and the central element `k` acts as `1`), we get a representation of the Virasoro algebra with
+central charge `c = 1` by the Sugawara construction. -/
+noncomputable def sugawaraRepresentation_of_representation_heisenbergAlgebra [CharZero 𝕜]
+    (α : LieAlgebra.Representation 𝕜 𝕜 (HeisenbergAlgebra 𝕜) V)
+    (hα : ∀ v, ∀ᶠ k in atTop, α (jgen _ k) v = 0) (hαc : α (kgen _) = 1) :
+    LieAlgebra.Representation 𝕜 𝕜 (VirasoroAlgebra 𝕜) V := by
+  apply sugawaraRepresentation hα
+  intro k l
+  simp [← LieAlgebra.Representation.apply_bracket_eq_commutator α (jgen _ k) (jgen _ l)]
+  by_cases hkl : k + l = 0
+  · simp [hkl, hαc]
+  · simp [hkl]
+
+end heisenberg_representation
 
 end Sugawara_boson -- section
 
