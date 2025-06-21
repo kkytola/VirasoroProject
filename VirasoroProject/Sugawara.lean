@@ -299,7 +299,7 @@ lemma commutator_sugawaraGen_apply_eq_finsum_commutator_apply (n : ℤ) (A : V �
     intro k hk
     simp [hk]
 
-lemma sugawaraGen_commutator_apply_eq_tsum_commutator_apply (n : ℤ) (A : V →ₗ[𝕜] V) (v : V) :
+lemma sugawaraGen_commutator_apply_eq_finsum_commutator_apply (n : ℤ) (A : V →ₗ[𝕜] V) (v : V) :
     A.commutator (sugawaraGen heiTrunc n) v =
       (2 : 𝕜)⁻¹ • ∑ᶠ k, A.commutator (pairNO heiOper (n-k) k) v := by
   rw [LinearMap.commutator_comm, LinearMap.neg_apply]
@@ -486,7 +486,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
       = (n-m) • (sugawaraGen heiTrunc (n+m))
         + if n + m = 0 then ((n ^ 3 - n : 𝕜) / (12 : 𝕜)) • (1 : V →ₗ[𝕜] V) else 0 := by
   ext v
-  rw [sugawaraGen_commutator_apply_eq_tsum_commutator_apply]
+  rw [sugawaraGen_commutator_apply_eq_finsum_commutator_apply]
   simp only [heiOper_pairNO_eq_pairNO' heiComm]
   have aux_commutator (k : ℤ) :=
     commutator_sugawaraGen_heiPairNO'_apply heiTrunc heiComm n m (m-k) v

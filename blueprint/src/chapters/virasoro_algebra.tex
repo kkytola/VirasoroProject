@@ -9,3 +9,24 @@
   obtained as the central extension of the Witt algebra $\witt$
   corresponding to the Virasoro cocycle ${\gamma}_{\vir} \in C^2(\witt,\bbk)$.
 \end{definition}
+
+From the definition of the Virasoro algebra and the Virasoro cocycle,
+Definition~\ref{def:VirasoroAlgebra} and~\ref{def:VirasoroCocycle},
+we directly obtain that $\vir$ has a basis of the following form.
+
+\begin{definition}[The standard basis of the Virasoro algebra]
+  \label{def:VirasoroBasis}
+  \uses{def:VirasoroAlgebra}
+  \lean{VirasoroProject.VirasoroAlgebra.basisLC}
+  \leanok
+  The Virasoro algebra $\vir$ has a basis consisting of $(L_n)_{n \in \bZ}$
+  and $C$, with Lie brackets determined by the following
+  \begin{align*}
+    [L_n, L_m] = \; & (n-m) \, L_{n+m} + \delta_{n+m,0} \frac{n^3 - n}{12} \, C ,
+  \end{align*}
+  \begin{align*}
+    [C, L_n] = 0 , \qquad
+    [C, C] = 0 ,
+  \end{align*}
+  for $n,m \in \bZ$.
+\end{definition}

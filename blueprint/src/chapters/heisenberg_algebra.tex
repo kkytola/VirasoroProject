@@ -44,3 +44,22 @@ In this section we assume that $\bbk$ is a field of characteristic zero.
   with basis $(j_k)_{k \in \bZ}$,
   corresponding to the Heisenberg cocycle ${\gamma}_{\hei} \in C^2(\gLie,\bbk)$.
 \end{definition}
+
+From the definition of the Heisenberg algebra and the Heisenberg cocycle,
+Definition~\ref{def:HeisenbergAlgebra} and~\ref{def:HeisenbergCocycle},
+we directly obtain that $\hei$ has a basis of the following form.
+
+\begin{definition}[The standard basis of the Heisenberg algebra]
+  \label{def:HeisenbergBasis}
+  \uses{def:HeisenbergAlgebra}
+  \lean{VirasoroProject.HeisenbergAlgebra.basisJK}
+  \leanok
+  The Heisenberg algebra $\hei$ has a basis consisting of $(J_k)_{k \in \bZ}$
+  and $K$, with Lie brackets determined by the following
+  \begin{align*}
+    [J_k, J_l] = k \, \delta_{k+l,0} \, K , \quad
+    [K, J_k] = 0 , \quad
+    [K, K] = 0 ,
+  \end{align*}
+  for $k,l \in \bZ$.
+\end{definition}
