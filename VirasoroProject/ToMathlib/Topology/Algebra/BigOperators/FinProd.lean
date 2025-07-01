@@ -33,7 +33,7 @@ lemma finsum_add_finsum_compl {V : Type*} [AddCommMonoid V] {ι : Type*} (I : Se
     simp [hi.2]
   have obs_f (i) (J : Set ι) (hifI : i ∉ hf.toFinset) : ∑ᶠ (_ : i ∈ J), f i = 0 := by
     by_cases hiI : i ∈ J
-    · simp only [Finset.mem_filter, Set.Finite.mem_toFinset, Function.mem_support, not_and] at hifI
+    · simp only [Set.Finite.mem_toFinset, Function.mem_support] at hifI
       simpa [hiI] using hifI
     · simp [hiI]
   have obs_f_nonzero {i} (J : Set ι) : ∑ᶠ (_ : i ∈ J), f i ≠ 0 → (i ∈ J ∧ i ∈ hf.toFinset) := by
@@ -46,7 +46,7 @@ lemma finsum_add_finsum_compl {V : Type*} [AddCommMonoid V] {ι : Type*} (I : Se
   · rw [dite_cond_eq_true]
     · have obs_Ic (i) (hiIc : i ∉ I) : ∑ᶠ (_ : i ∈ I), f i = 0 := by simp [hiIc]
       rw [Finset.sum_eq_sum_of_support_subset_of_support_subset
-              (s₂ := (hf.toFinset.filter (fun i ↦ i ∈ I)))]
+            (s₂ := (hf.toFinset.filter (fun i ↦ i ∈ I)))]
       · apply Finset.sum_congr rfl (obs I)
       · apply hf.subset
         simp only [Function.support_subset_iff, Function.mem_support]
@@ -66,7 +66,7 @@ lemma finsum_add_finsum_compl {V : Type*} [AddCommMonoid V] {ι : Type*} (I : Se
         simpa [this.1] using this.2
   · rw [dite_cond_eq_true]
     · rw [Finset.sum_eq_sum_of_support_subset_of_support_subset
-              (s₂ := (hf.toFinset.filter (fun i ↦ i ∈ Iᶜ)))]
+            (s₂ := (hf.toFinset.filter (fun i ↦ i ∈ Iᶜ)))]
       · convert Finset.sum_congr rfl (obs Iᶜ)
       · apply hf.subset
         simp only [Function.support_subset_iff, Function.mem_support]

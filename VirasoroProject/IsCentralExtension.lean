@@ -120,7 +120,8 @@ lemma mem_ker_proj_iff (Z : γ.CentralExtension) :
 lemma range_emb_eq_ker_proj [IsLieAbelian 𝓐] :
     (LieTwoCocycle.CentralExtension.emb γ).range = (LieTwoCocycle.CentralExtension.proj γ).ker := by
   ext Z
-  change Z ∈ (LieTwoCocycle.CentralExtension.emb γ).range ↔ Z ∈ (LieTwoCocycle.CentralExtension.proj γ).ker
+  change Z ∈ (LieTwoCocycle.CentralExtension.emb γ).range
+        ↔ Z ∈ (LieTwoCocycle.CentralExtension.proj γ).ker
   rw [mem_range_emb_iff, mem_ker_proj_iff]
 
 /-- If `𝓔` is the (central) extension of `𝓖` by `𝓐` defined by a 2-cocycle `γ ∈ C²(𝓖,𝓐)`,
@@ -145,13 +146,14 @@ instance isCentralExtension [IsLieAbelian 𝓐] (γ : LieTwoCocycle 𝕜 𝓖 �
     simp only [emb, LieHom.coe_mk, lie_def, zero_lie, map_zero, LinearMap.zero_apply]
     rfl
 
-noncomputable def stdSection [IsLieAbelian 𝓐] (γ : LieTwoCocycle 𝕜 𝓖 𝓐) :
+/-- A standard section of a Lie algebra central extension associated to a Lie 2-cocycle. -/
+noncomputable def stdSection (γ : LieTwoCocycle 𝕜 𝓖 𝓐) :
     𝓖 →ₗ[𝕜] γ.CentralExtension where
   toFun X := ⟨X, 0⟩
   map_add' X₁ X₂ := by rw [LieTwoCocycle.CentralExtension.add_def] ; simp
   map_smul' c X := by rw [LieTwoCocycle.CentralExtension.smul_def] ; simp
 
-lemma stdSection_prop [IsLieAbelian 𝓐] (γ : LieTwoCocycle 𝕜 𝓖 𝓐) :
+lemma stdSection_prop (γ : LieTwoCocycle 𝕜 𝓖 𝓐) :
     proj γ ∘ₗ stdSection γ = (1 : 𝓖 →ₗ[𝕜] 𝓖) :=
   rfl
 

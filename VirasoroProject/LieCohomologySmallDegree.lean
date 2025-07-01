@@ -220,11 +220,10 @@ lemma toBilin_smul (c : 𝕜) (γ : LieTwoCocycle 𝕜 𝓖 𝓐) :
 instance : AddCommMonoid (LieTwoCocycle 𝕜 𝓖 𝓐) where
   add_assoc γ γ' γ'' := by
     ext1
-    simp only [LieTwoCocycle.toBilin_add]
-    exact add_assoc _ _ _
+    simpa only [LieTwoCocycle.toBilin_add] using add_assoc ..
   zero_add γ := by ext1 ; simp only [LieTwoCocycle.toBilin_add, add_eq_right] ; rfl
   add_zero γ := by ext1 ; simp only [LieTwoCocycle.toBilin_add, add_eq_left] ; rfl
-  add_comm γ γ' := by ext1 ; simp only [LieTwoCocycle.toBilin_add] ; exact AddCommMagma.add_comm _ _
+  add_comm γ γ' := by ext1 ; simpa only [LieTwoCocycle.toBilin_add] using AddCommMagma.add_comm ..
   nsmul n γ :=
     { toBilin := n • γ.toBilin
       self' := fun X ↦ by simp only [LinearMap.smul_apply, γ.self', smul_zero]
@@ -236,13 +235,13 @@ instance : AddCommMonoid (LieTwoCocycle 𝕜 𝓖 𝓐) where
 
 instance : Module 𝕜 (LieTwoCocycle 𝕜 𝓖 𝓐) where
   one_smul γ := by ext1 ; simp
-  mul_smul c c' γ := by ext1 ; simp ; exact mul_smul c c' γ.toBilin
+  mul_smul c c' γ := by ext1 ; simpa using mul_smul c c' γ.toBilin
   smul_zero γ := by ext1 ; simp
   smul_add c γ γ' := by ext1 ; simp
-  add_smul c c' γ := by ext1 ; simp ; exact Module.add_smul c c' γ.toBilin
+  add_smul c c' γ := by ext1 ; simpa using Module.add_smul c c' γ.toBilin
   zero_smul γ := by ext1 ; simp
 
-instance [AddCommGroup 𝓖] [Module 𝕜 𝓖] [LieAlgebra 𝕜 𝓖] [AddCommGroup 𝓐] [Module 𝕜 𝓐] :
+instance [LieAlgebra 𝕜 𝓖] [AddCommGroup 𝓐] [Module 𝕜 𝓐] :
     AddCommGroup (LieTwoCocycle 𝕜 𝓖 𝓐) where
   zero_add γ := AddZeroClass.zero_add γ
   add_zero γ := AddZeroClass.add_zero γ

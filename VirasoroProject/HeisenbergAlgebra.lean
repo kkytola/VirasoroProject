@@ -62,7 +62,7 @@ namespace AbelianLieAlgebraOn
 variable {ι}
 
 /-- The basis of `jᵢ` generators of the abelian Lie algebra (indices `i : ι`). -/
-def jgen : Basis ι 𝕜 (AbelianLieAlgebraOn ι 𝕜) := Finsupp.basisFun _ _
+noncomputable def jgen : Basis ι 𝕜 (AbelianLieAlgebraOn ι 𝕜) := Finsupp.basisFun _ _
 
 lemma jgen_eq_single (i : ι) : jgen 𝕜 i = Finsupp.single i 1 := rfl
 
@@ -116,7 +116,7 @@ lemma heisenbergCocycleBilin_eq_neg_flip :
   intro k l
   simp only [heisenbergCocycleBilin, Basis.constr_basis, LinearMap.neg_apply, LinearMap.flip_apply]
   by_cases opp : k + l = 0
-  · simp [add_comm l k, opp, ↓reduceIte, show l = -k by linarith]
+  · simp [↓reduceIte, show l = -k by linarith]
   · simp [opp, add_comm l k]
 
 variable [CharZero 𝕜]
@@ -261,11 +261,13 @@ lemma toAbelianLieAlgebraOn_kgen :
   by_cases h : k + l = 0
   · simp [h]
     apply ext'
-    · simp [jgen, kgen_eq']
-    · simp [AbelianLieAlgebraOn.heisenbergCocycle_apply_jgen_jgen, jgen, kgen_eq', h]
+    · simp [kgen_eq']
+    · simp [AbelianLieAlgebraOn.heisenbergCocycle_apply_jgen_jgen, kgen_eq', h]
   · simp [h]
     apply ext' <;> simp [AbelianLieAlgebraOn.heisenbergCocycle_apply_jgen_jgen, h]
 
+/-- A section of the standard projection from the Heisenberg algebra to the underlying
+abelian Lie algebra. -/
 noncomputable def jsection : AbelianLieAlgebraOn ℤ 𝕜 →ₗ[𝕜] HeisenbergAlgebra 𝕜 :=
   LieTwoCocycle.CentralExtension.stdSection (AbelianLieAlgebraOn.heisenbergCocycle 𝕜)
 
@@ -273,6 +275,8 @@ noncomputable def jsection : AbelianLieAlgebraOn ℤ 𝕜 →ₗ[𝕜] Heisenber
     jsection 𝕜 (AbelianLieAlgebraOn.jgen 𝕜 l) = jgen 𝕜 l :=
   rfl
 
+/-- The most commonly used basis of the Heisenberg algebra, consisting of `Jₖ` (`k ∈ ℤ`)
+and the central element `K`. -/
 noncomputable def basisJK : Basis (Option ℤ) 𝕜 (HeisenbergAlgebra 𝕜) :=
   ((isCentralExtension 𝕜).basis (jsection 𝕜) rfl
         (Basis.singleton Unit 𝕜) (AbelianLieAlgebraOn.jgen 𝕜)).reindex

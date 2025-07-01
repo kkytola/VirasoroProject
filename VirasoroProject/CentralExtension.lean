@@ -112,8 +112,7 @@ def bracket : γ.CentralExtension
 
 lemma bracket_self (Z : γ.CentralExtension) :
     γ.bracket Z Z = 0 := by
-  simp
-  rfl
+  simp ; rfl
 
 lemma bracket_smul (c : 𝕜) (Z W : γ.CentralExtension) :
     γ.bracket Z (c • W) = c • γ.bracket Z W := by
@@ -121,8 +120,7 @@ lemma bracket_smul (c : 𝕜) (Z W : γ.CentralExtension) :
 
 lemma bracket_leibniz (Z W₁ W₂ : γ.CentralExtension) :
     γ.bracket Z (γ.bracket W₁ W₂)
-      = γ.bracket (γ.bracket Z W₁) W₂
-        + γ.bracket W₁ (γ.bracket Z W₂) := by
+      = γ.bracket (γ.bracket Z W₁) W₂ + γ.bracket W₁ (γ.bracket Z W₂) := by
   simp only [γ.bracket_apply]
   ext
   · exact leibniz_lie Z.1 W₁.1 W₂.1
@@ -232,34 +230,31 @@ lemma hom_of_coboundary_add (γ₁ γ₂ γ₃ : LieTwoCocycle 𝕜 𝓖 𝓐)
 which differ by a coboundary. -/
 noncomputable def equiv_of_lieTwoCoboundary {γ' : LieTwoCocycle 𝕜 𝓖 𝓐}
     (h : γ' - γ ∈ LieTwoCoboundary 𝕜 𝓖 𝓐) :
-    (γ.CentralExtension) ≃ₗ⁅𝕜⁆ (γ'.CentralExtension) := by
-  -- TODO: I should not construct data in tactic mode, but this is tedious to write in term mode...
-  simp only [LinearMap.mem_range] at h
-  set hβ := Exists.choose_spec h
-  set β := Exists.choose h
+    (γ.CentralExtension) ≃ₗ⁅𝕜⁆ (γ'.CentralExtension) :=
+  let β := h.choose
   have obs : γ + β.bdry = γ' := by
-    change γ + lieOneCocycle_bdryHom _ _ _ β = γ' ; simp [hβ]
+    change γ + lieOneCocycle_bdryHom _ _ _ h.choose = γ' ; simp [h.choose_spec]
   have obs' : γ' + -β.bdry = γ := by
-    change γ' - lieOneCocycle_bdryHom _ _ _ β = γ ; simp [hβ]
-  set f := (LieTwoCocycle.CentralExtension.congr obs).toLieHom.comp <| β.bdryHom γ
-  set g := (LieTwoCocycle.CentralExtension.congr obs').toLieHom.comp <| (-β).bdryHom γ'
-  apply LieEquiv.mk_of_comp_eq_id (f := f) (g := g)
-  · convert LieTwoCocycle.CentralExtension.hom_of_coboundary_add γ γ' γ β (-β) obs obs'
-    ext1 Z
-    simp only [LieHom.coe_id, id_eq, LieTwoCocycle.CentralExtension.congr, Prod.mk.eta,
-      LieOneCocycle.bdryHom, add_neg_cancel, LieHom.comp_apply, LieHom.coe_mk]
-    ext
-    · rfl
-    · simp only [left_eq_add]
-      rfl
-  · convert LieTwoCocycle.CentralExtension.hom_of_coboundary_add γ' γ γ' (-β) β obs' obs
-    ext1 Z
-    simp only [LieHom.coe_id, id_eq, LieTwoCocycle.CentralExtension.congr, Prod.mk.eta,
-      LieOneCocycle.bdryHom, add_neg_cancel, LieHom.comp_apply, LieHom.coe_mk]
-    ext
-    · rfl
-    · simp only [neg_add_cancel, left_eq_add]
-      rfl
+    change γ' - lieOneCocycle_bdryHom _ _ _ h.choose = γ ; simp [h.choose_spec]
+  LieEquiv.mk_of_comp_eq_id
+      (f := (LieTwoCocycle.CentralExtension.congr obs).toLieHom.comp <| β.bdryHom γ)
+      (g := (LieTwoCocycle.CentralExtension.congr obs').toLieHom.comp <| (-β).bdryHom γ')
+      (by
+        convert LieTwoCocycle.CentralExtension.hom_of_coboundary_add γ γ' γ β (-β) obs obs'
+        ext1 Z
+        simp only [LieHom.coe_id, id_eq, LieTwoCocycle.CentralExtension.congr, Prod.mk.eta,
+                  LieOneCocycle.bdryHom, add_neg_cancel, LieHom.comp_apply, LieHom.coe_mk]
+        ext
+        · rfl
+        · simp only [left_eq_add] ; rfl)
+      (by
+        convert LieTwoCocycle.CentralExtension.hom_of_coboundary_add γ' γ γ' (-β) β obs' obs
+        ext1 Z
+        simp only [LieHom.coe_id, id_eq, LieTwoCocycle.CentralExtension.congr, Prod.mk.eta,
+                  LieOneCocycle.bdryHom, LieHom.comp_apply, LieHom.coe_mk]
+        ext
+        · rfl
+        · simp only [neg_add_cancel, left_eq_add] ; rfl)
 
 end CentralExtension -- namespace
 

@@ -58,7 +58,7 @@ noncomputable instance : Module 𝕜 (WittAlgebra 𝕜) := Finsupp.module ..
 namespace WittAlgebra
 
 /-- The basis of `ℓₙ` generators of the Witt algebra (indices `n : ℤ`). -/
-def lgen : Basis ℤ 𝕜 (WittAlgebra 𝕜) := Finsupp.basisFun _ _
+noncomputable def lgen : Basis ℤ 𝕜 (WittAlgebra 𝕜) := Finsupp.basisFun _ _
 
 lemma lgen_eq_single (n : ℤ) : lgen 𝕜 n = Finsupp.single n 1 := rfl
 
@@ -121,7 +121,7 @@ lemma bracket_leibniz (X Y Z : WittAlgebra 𝕜) :
       bracket 𝕜 (bracket 𝕜 X Y) Z + bracket 𝕜 Y (bracket 𝕜 X Z) := by
   have key := LinearMap.congr_fun (LinearMap.congr_fun (LinearMap.congr_fun
                 (bracketCyclic_eq_zero 𝕜) X) Y) Z
-  simp only [cyclicTripleSumHom_apply, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.zero_apply] at key
+  simp only [cyclicTripleSumHom_apply, LinearMap.zero_apply] at key
   rw [add_assoc (bracket 𝕜 X _)] at key
   rw [eq_neg_of_add_eq_zero_left key]
   rw [bracket_antisymm Z X, bracket_antisymm Z _]

@@ -116,7 +116,7 @@ lemma finite_support_smul_pairNO_heiOper_apply {𝕂 : Type*} [SMulZeroClass �
     (Function.support fun k ↦ a k • ((pairNO heiOper (m - k) (n + k)) v)).Finite := by
   obtain ⟨N, hN⟩ := eventually_atTop.mp <| heiTrunc v
   apply (Set.finite_Ioo (m - N) (N - n)).subset
-  simp only [Function.support_subset_iff, ne_eq, Set.mem_Icc, tsub_le_iff_right]
+  simp only [Function.support_subset_iff, ne_eq]
   intro k hk
   by_contra con
   apply hk
@@ -135,8 +135,7 @@ lemma finite_support_pairNO_heiOper_apply (n m : ℤ) (v : V) :
   apply (finite_support_smul_pairNO_heiOper_apply heiTrunc n m  (fun _ ↦ 1) v).subset
   intro k hk
   simp only [Function.mem_support, ne_eq, one_smul] at hk ⊢
-  intro con
-  simp [hk] at con
+  grind
 
 include heiTrunc in
 lemma finite_support_smul_pairNO'_heiOper_apply {𝕂 : Type*} [SMulZeroClass 𝕂 V]
@@ -203,7 +202,7 @@ lemma heiPairNO_trunc_atTop_sub (n : ℤ) (v : V) :
   obtain ⟨N, hN⟩ := eventually_atTop.mp (heiTrunc v)
   filter_upwards [Ici_mem_atTop N] with l hl
   rw [Set.mem_Ici] at hl
-  by_cases hln : l ≤ n-l
+  by_cases hln : l ≤ n - l
   · simp [pairNO, hln, hN _ (show N ≤ n-l by linarith)]
   · simp [pairNO, hln, hN _ (show N ≤ l by linarith)]
 
@@ -212,7 +211,7 @@ lemma heiPairNO_trunc_atBot_sub (n : ℤ) (v : V) :
   obtain ⟨N, hN⟩ := eventually_atTop.mp (heiTrunc v)
   filter_upwards [Iic_mem_atBot (n-N)] with l hl
   rw [Set.mem_Iic] at hl
-  by_cases hln : l ≤ n-l
+  by_cases hln : l ≤ n - l
   · simp [pairNO, hln, hN _ (show N ≤ n-l by linarith)]
   · simp [pairNO, hln, hN _ (show N ≤ l by linarith)]
 
@@ -230,6 +229,7 @@ lemma heiPairNO_trunc_cofinite_sub (n : ℤ) (v : V) :
 
 open Topology
 
+/-- The basic bosonic Sugawara generators (an auxiliary definition). -/
 noncomputable def sugawaraGenAux (n : ℤ) (v : V) : V :=
   (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k v
 
@@ -265,6 +265,7 @@ lemma sugawaraGenAux_smul (n : ℤ) (c : 𝕜) (v : V) :
     sugawaraGenAux heiOper n (c • v) = c • sugawaraGenAux heiOper n v := by
   simp [sugawaraGenAux_def, map_smul, smul_finsum, smul_comm c]
 
+/-- The basic bosonic Sugawara generators (as linear operators). -/
 noncomputable def sugawaraGen (n : ℤ) : V →ₗ[𝕜] V where
   toFun := sugawaraGenAux heiOper n
   map_add' v w := sugawaraGenAux_add heiTrunc n v w
@@ -360,7 +361,7 @@ lemma commutator_sugawaraGen_heiOper [CharZero 𝕜] (n m : ℤ) :
       rw [finsum_eq_single _ (n + m)]
       · simp only [sub_add_cancel_left, neg_add_cancel, ↓reduceIte]
         simp only [← two_smul (R := 𝕜), ← smul_assoc, smul_eq_mul, smul_neg, ← mul_assoc, neg_inj]
-        simp [inv_mul_cancel₀ (G₀ := 𝕜) two_ne_zero, one_mul]
+        simp [one_mul]
         norm_cast
       · intro j hjnm
         simp [show n - j + m ≠ 0 by intro con ; apply hjnm ; linarith]
@@ -383,7 +384,7 @@ lemma commutator_sugawaraGen_heiOperPair [CharZero 𝕜] (n m k : ℤ) :
       = -k • (heiOper (m-k) * heiOper (n+k)) - (m-k) • (heiOper (n+m-k) * heiOper k) := by
   rw [LinearMap.commutator_pair']
   rw [commutator_sugawaraGen_heiOper _ heiComm, commutator_sugawaraGen_heiOper _ heiComm]
-  simp only [neg_smul, zsmul_eq_mul, mul_neg, neg_sub, Int.cast_sub, sub_eq_add_neg]
+  simp only [neg_smul, zsmul_eq_mul, mul_neg, sub_eq_add_neg]
   congr 2
   · simp only [← mul_assoc]
     congr 1
@@ -401,17 +402,17 @@ lemma commutator_sugawaraGen_heiPairNO' [CharZero 𝕜] (n m k : ℤ) :
   · by_cases hnk : 0 ≤ n + k
     · have hk' : ¬ k < 0 := by linarith
       have hnk' : ¬ k < -n := by linarith
-      simp only [pairNO', hk, hk', hnk, hnk', ↓reduceIte, and_false, true_and, false_and, add_zero,
-                 neg_smul, zsmul_eq_mul, Int.cast_sub, ← Module.End.mul_eq_comp]
+      simp only [pairNO', hk, hk', hnk, hnk', ↓reduceIte, and_false, false_and, add_zero, neg_smul,
+        zsmul_eq_mul, Int.cast_sub, ← Module.End.mul_eq_comp]
       simp [commutator_sugawaraGen_heiOperPair heiTrunc heiComm]
     · have hnk' : k < -n := by linarith
-      simp only [pairNO', hk, ↓reduceIte, hnk, hnk', and_true, add_zero, neg_smul, zsmul_eq_mul,
-                 Int.cast_sub, ← Module.End.mul_eq_comp]
+      simp only [pairNO', hk, ↓reduceIte, hnk, hnk', neg_smul, zsmul_eq_mul, Int.cast_sub, ←
+        Module.End.mul_eq_comp]
       rw [commutator_sugawaraGen_heiOperPair heiTrunc heiComm]
       have aux := (heiComm (n+k) (m-k)) ▸
                   LinearMap.mul_eq_mul_add_commutator (heiOper (n+k)) (heiOper (m-k))
       simp only [aux, show n + k + (m - k) = n + m by ring, neg_smul, zsmul_eq_mul, Int.cast_sub,
-                 Int.cast_add, true_and, Int.cast_ite, Int.cast_zero, sub_left_inj, neg_inj]
+                 Int.cast_add, true_and, sub_left_inj, neg_inj]
       simp only [mul_one, neg_add_rev, mul_ite, mul_zero, mul_add (k : V →ₗ[𝕜] V),
                  add_assoc, left_eq_add]
       by_cases hnm : n + m = 0
@@ -426,34 +427,34 @@ lemma commutator_sugawaraGen_heiPairNO' [CharZero 𝕜] (n m k : ℤ) :
     by_cases hnk : 0 ≤ n + k
     · have hk' : k < 0 := by linarith
       have hnk' : -n ≤ k := by linarith
-      simp only [pairNO', hk, hk', hnk, hnk', ↓reduceIte, and_false, true_and, false_and, add_zero,
-                 neg_smul, zsmul_eq_mul, Int.cast_sub, ← Module.End.mul_eq_comp]
-      simp only [obs, add_sub, Int.cast_add, mul_one, neg_add_rev, zero_add]
+      simp only [pairNO', hk, hk', hnk, hnk', ↓reduceIte, true_and, false_and, neg_smul,
+        zsmul_eq_mul, Int.cast_sub, ← Module.End.mul_eq_comp]
+      simp only [obs, add_sub, Int.cast_add, mul_one, zero_add]
       have aux := (heiComm (m-k) (n+k)) ▸
                   LinearMap.mul_eq_mul_add_commutator (heiOper (m-k)) (heiOper (n+k))
       rw [aux, show m - k + (n + k) = n + m by ring]
       rw [sub_eq_add_neg _ ((k : V →ₗ[𝕜] V) * _), sub_eq_add_neg _ ((m - k : V →ₗ[𝕜] V) * _)]
       rw [add_comm _ (-_)]
-      simp only [Int.cast_add, mul_one, neg_add_rev, zero_add, neg_add, ← neg_mul]
-      simp only [mul_add (_ : V →ₗ[𝕜] V), add_assoc, add_right_inj, add_sub]
+      simp only [← neg_mul]
+      simp only [mul_add (_ : V →ₗ[𝕜] V), add_assoc, add_right_inj]
       by_cases hnm : n + m = 0
       · simp only [hnm, zero_sub, ↓reduceIte, Int.cast_sub, Algebra.mul_smul_comm, mul_one,
                    smul_neg, neg_mul, neg_sub]
         rw [show n = -m by linarith]
-        simp only [right_eq_add, sub_eq_add_neg, add_smul, mul_add, ← add_assoc,
-                   neg_add, mul_neg, neg_smul, neg_neg]
+        simp only [right_eq_add, sub_eq_add_neg, add_smul, mul_add, ← add_assoc, neg_add, neg_smul,
+          neg_neg]
         have (j : ℤ) : Int.cast (R := V →ₗ[𝕜] V) j = Int.cast (R := 𝕜) j • 1 := by norm_cast
         simp [this]
       · simp [hnm]
     · have hk' : k < 0 := by linarith
       have hnk' : ¬ -n ≤ k := by linarith
-      simp only [pairNO', hk, hk', hnk, hnk', ↓reduceIte, and_false, true_and, false_and, add_zero,
-                 neg_smul, zsmul_eq_mul, Int.cast_sub, ← Module.End.mul_eq_comp]
+      simp only [pairNO', hk, hk', hnk, hnk', ↓reduceIte, and_false, false_and, add_zero, neg_smul,
+        zsmul_eq_mul, Int.cast_sub, ← Module.End.mul_eq_comp]
       rw [obs]
       rw [sub_eq_add_neg _ ((k : V →ₗ[𝕜] V) * _), sub_eq_add_neg _ ((m - k : V →ₗ[𝕜] V) * _)]
       rw [add_comm _ (-_)]
-      simp only [Int.cast_add, mul_one, neg_add_rev, zero_add, neg_add, ← neg_mul]
-      simp only [mul_add (_ : V →ₗ[𝕜] V), add_assoc, add_right_inj, add_sub]
+      simp only [← neg_mul]
+      simp only [add_right_inj, add_sub]
       congr 1
       simp
 
@@ -465,7 +466,7 @@ lemma commutator_sugawaraGen_heiPairNO'_apply [CharZero 𝕜] (n m k : ℤ) (v :
         + if k < 0 ∧ -n ≤ k ∧ n + m = 0 then (n + k) • v else 0)
         - (m-k) • (pairNO' heiOper k (n+m-k) v) := by
   have key := LinearMap.congr_fun (commutator_sugawaraGen_heiPairNO' heiTrunc heiComm n m k) v
-  simp only [LinearMap.sub_apply, LinearMap.add_apply] at key
+  simp only [LinearMap.sub_apply] at key
   rw [key]
   simp_rw [smul_add, sub_eq_add_neg, neg_add, LinearMap.add_apply, LinearMap.smul_apply, add_assoc]
   rw [add_right_inj]
@@ -494,9 +495,9 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
   simp_rw [aux_commutator, sub_eq_add_neg, smul_add, ← add_assoc]
   rw [finsum_add_distrib]
   · simp only [neg_add_rev, neg_neg, le_add_neg_iff_add_le, zero_add, add_neg_lt_iff_lt_add,
-          lt_neg_add_iff_add_lt, neg_add_le_iff_le_add, smul_ite, smul_zero, smul_add, zsmul_eq_mul,
-          Int.cast_add, Int.cast_neg, LinearMap.add_apply, Module.End.mul_apply,
-          Module.End.intCast_apply, LinearMap.neg_apply]
+               lt_neg_add_iff_add_lt, neg_add_le_iff_le_add, smul_ite, smul_zero, smul_add,
+               zsmul_eq_mul, Int.cast_add, Int.cast_neg, LinearMap.add_apply, Module.End.mul_apply,
+               Module.End.intCast_apply, LinearMap.neg_apply]
     rw [finsum_add_distrib]
     · simp only [smul_add]
       rw [add_comm, ← add_assoc]
@@ -569,7 +570,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
                 simp only [Finset.mem_Ioc.mp hi, and_self, ↓reduceIte, neg_smul]
             · refine Function.support_subset_iff'.mpr ?_
               intro k hk
-              simp only [Finset.coe_Ioc, Set.mem_Ioc, and_comm] at hk
+              simp only [Finset.coe_Ioc, Set.mem_Ioc] at hk
               simp [hk]
           · have obs (i : ℤ) : ¬ (-n < i ∧ i ≤ 0) := by intro maybe ; linarith
             simp only [obs, ↓reduceIte]
@@ -594,8 +595,8 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
                 have n_natAbs : -n = n.natAbs := by
                   simpa [hn] using (abs_of_neg <| not_le.mp hn).symm
                 rw [@Finset.sum_of_injOn ℕ ℤ 𝕜 _ (Finset.range n.natAbs) (Finset.Ioc 0 (-n))
-                          (fun x ↦ (↑x + 1) * (n + (x + 1))) (fun x ↦ (↑x + ↑n) * x)
-                          (fun i ↦ i + 1) ?_ ?_ ?_ ?_]
+                      (fun x ↦ (↑x + 1) * (n + (x + 1))) (fun x ↦ (↑x + ↑n) * x)
+                      (fun i ↦ i + 1) ?_ ?_ ?_ ?_]
                 · intro i _ j _ hij
                   simpa using hij
                 · intro i hi
@@ -628,7 +629,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
     · apply ((Set.finite_Ioc (n+m) m).union (Set.finite_Ioc m (n+m))).subset
       refine Function.support_subset_iff'.mpr ?_
       intro k hk
-      simp only [Set.Ioc_union_Ioc_symm, Set.mem_Ioc, inf_lt_iff, le_sup_iff, not_le] at hk
+      simp only [Set.Ioc_union_Ioc_symm, Set.mem_Ioc, inf_lt_iff, le_sup_iff] at hk
       have hk₂' : ¬ ((k ≤ m) ∧ (n + m < k) ∧ n + m = 0) := by grind
       have hk₃' : ¬ (m < k ∧ k ≤ n + m ∧ n + m = 0) := by grind
       simp [hk₂', hk₃']
@@ -678,14 +679,13 @@ noncomputable def VirasoroAlgebra.representationOfCentralChangeOfL
       congr 1
       · have obs (k : ℤ) : lgen 𝕂 k = (VirasoroAlgebra.basisLC 𝕂) (some k) := by simp
         rw [obs]
-        simp only [LieAlgebra.representationOfBasisAux_apply_basis, ops]
+        simp only [LieAlgebra.representationOfBasisAux_apply_basis]
         ext v
-        simp only [Module.End.mul_apply, LinearMap.sub_apply, Module.End.intCast_apply, sub_smul,
-                   LinearMap.smul_apply]
+        simp only [LinearMap.sub_apply, sub_smul, LinearMap.smul_apply]
         congr 1 <;> rw [Int.cast_smul_eq_zsmul]
       · by_cases hnm : n + m = 0
         · have obs : cgen 𝕂 = (VirasoroAlgebra.basisLC 𝕂) none := by simp
-          simp only [hnm, ↓reduceIte, map_smul, ops]
+          simp only [hnm, ↓reduceIte, map_smul]
           simp only [obs, LieAlgebra.representationOfBasisAux_apply_basis]
           simp only [← smul_assoc, smul_eq_mul]
           congr 1

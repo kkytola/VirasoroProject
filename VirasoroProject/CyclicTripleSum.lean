@@ -74,30 +74,26 @@ lemma cyclicTripleSum_map_add_fst_of_map_add [Add V] (β : V → V → V) (φ : 
       = cyclicTripleSum β φ x y z₁ + cyclicTripleSum β φ x y z₂) (x₁ x₂ y z : V) :
     cyclicTripleSum β φ (x₁ + x₂) y z
       = cyclicTripleSum β φ x₁ y z + cyclicTripleSum β φ x₂ y z := by
-  simp_rw [cyclicTripleSum_cyclic _ _ _ y]
-  exact h y z x₁ x₂
+  simpa only [cyclicTripleSum_cyclic _ _ _ y] using h y z x₁ x₂
 
 lemma cyclicTripleSum_map_add_snd_of_map_add [Add V] (β : V → V → V) (φ : V → V → W)
     (h : ∀ x y z₁ z₂ : V, cyclicTripleSum β φ x y (z₁ + z₂)
       = cyclicTripleSum β φ x y z₁ + cyclicTripleSum β φ x y z₂) (x y₁ y₂ z : V) :
     cyclicTripleSum β φ x (y₁ + y₂) z
       = cyclicTripleSum β φ x y₁ z + cyclicTripleSum β φ x y₂ z := by
-  simp_rw [cyclicTripleSum_cyclic' _ _ x]
-  exact h z x y₁ y₂
+  simpa only [cyclicTripleSum_cyclic' _ _ x] using h z x y₁ y₂
 
 lemma cyclicTripleSum_map_smul_fst_of_map_smul {R : Type*} [SMul R V] [SMul R W] (β : V → V → V) (φ : V → V → W)
     (h : ∀ c : R, ∀ x y z : V,
       cyclicTripleSum β φ x y (c • z) = c • cyclicTripleSum β φ x y z) (c : R) (x y z : V) :
     cyclicTripleSum β φ (c • x) y z = c • cyclicTripleSum β φ x y z := by
-  simp_rw [cyclicTripleSum_cyclic _ _ _ y]
-  exact h c y z x
+  simpa only [cyclicTripleSum_cyclic _ _ _ y] using h c y z x
 
 lemma cyclicTripleSum_map_smul_snd_of_map_smul {R : Type*} [SMul R V] [SMul R W] (β : V → V → V) (φ : V → V → W)
     (h : ∀ c : R, ∀ x y z : V,
       cyclicTripleSum β φ x y (c • z) = c • cyclicTripleSum β φ x y z) (c : R) (x y z : V) :
     cyclicTripleSum β φ x (c • y) z = c • cyclicTripleSum β φ x y z := by
-  simp_rw [cyclicTripleSum_cyclic' _ _ x]
-  exact h c z x y
+  simpa only [cyclicTripleSum_cyclic' _ _ x] using h c z x y
 
 end cyclicTripleSum
 

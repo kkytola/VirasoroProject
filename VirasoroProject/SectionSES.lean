@@ -66,7 +66,7 @@ variable {σ : W → V}
     obtain ⟨u, hu⟩ : ∃ x, f x = (σ (g v))⁻¹ * v := by simpa [← hfg] using this
     refine ⟨u, by simp [hu]⟩
   have := congr_fun hgσ (g v)
-  simp only [Function.comp_apply, Pi.one_apply] at this
+  simp only [Function.comp_apply] at this
   simp [this]
 
 /-- The corrector function `γ : V → U` associated to a section `σ : W → V` of a
@@ -152,6 +152,7 @@ section module_section
 namespace LinearMap
 
 open Module.Free in
+/-- A choice of a linear section of a surjective linear map to a free module. -/
 noncomputable def choose_section {𝕜 : Type*} [CommSemiring 𝕜] {V W : Type*}
     [AddCommGroup V] [Module 𝕜 V] [AddCommGroup W] [Module 𝕜 W] [Module.Free 𝕜 W]
     {g : V →ₗ[𝕜] W} (hg : range g = ⊤) :
@@ -161,7 +162,7 @@ noncomputable def choose_section {𝕜 : Type*} [CommSemiring 𝕜] {V W : Type*
   (chooseBasis 𝕜 W).constr 𝕜 fun i ↦ (aux i).choose
 
 open Module.Free in
-noncomputable def choose_section_prop {𝕜 : Type*} [CommSemiring 𝕜] {V W : Type*}
+lemma choose_section_prop {𝕜 : Type*} [CommSemiring 𝕜] {V W : Type*}
     [AddCommGroup V] [Module 𝕜 V] [AddCommGroup W] [Module 𝕜 W] [Module.Free 𝕜 W]
     {g : V →ₗ[𝕜] W} (hg : range g = ⊤) :
     g ∘ₗ (choose_section hg) = 1 := by
@@ -170,7 +171,7 @@ noncomputable def choose_section_prop {𝕜 : Type*} [CommSemiring 𝕜] {V W : 
     range_eq_top.mp hg (chooseBasis 𝕜 W i)
   simp [choose_section, (aux i).choose_spec]
 
-noncomputable def choose_section_prop_apply {𝕜 : Type*} [CommSemiring 𝕜] {V W : Type*}
+lemma choose_section_prop_apply {𝕜 : Type*} [CommSemiring 𝕜] {V W : Type*}
     [AddCommGroup V] [Module 𝕜 V] [AddCommGroup W] [Module 𝕜 W] [Module.Free 𝕜 W]
     {g : V →ₗ[𝕜] W} (hg : range g = ⊤) (w : W) :
     g (choose_section hg w) = w :=
@@ -188,8 +189,7 @@ lemma correctorHom_smul (hf : f.toAddMonoidHom.ker = ⊥)
     (hfg : f.toAddMonoidHom.range = g.toAddMonoidHom.ker)
     (hgσ : g.toAddMonoidHom.comp σ.toAddMonoidHom = AddMonoidHom.id _) (c : 𝕜) (v : V) :
     correctorHom hf hfg hgσ (c • v) = c • correctorHom hf hfg hgσ v := by
-  simp only [correctorHom, ZeroHom.toFun_eq_coe, toZeroHom_coe, toAddMonoidHom_coe, coe_mk,
-             ZeroHom.coe_mk]
+  simp only [correctorHom, ZeroHom.toFun_eq_coe, toZeroHom_coe, toAddMonoidHom_coe]
   have aux : ↑g ∘ σ = _root_.id := by ext w ; convert congrFun (congrArg DFunLike.coe hgσ) w
   apply unique_corrector hf (c • v) _ _ (corrector_spec hfg aux (c • v))
   nth_rw 1 [corrector_spec hfg aux v]

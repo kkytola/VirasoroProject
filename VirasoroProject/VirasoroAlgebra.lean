@@ -164,6 +164,7 @@ lemma lgen_bracket' (n m : ℤ) :
       = (n - m : 𝕜) • lgen 𝕜 (n + m) + if n + m = 0 then ((n-1 : 𝕜)*n*(n+1)/12) • cgen 𝕜 else 0 := by
   rw [lgen_bracket] ; congr ; ring
 
+/-- A section of the standard projection from the Virasoro algebra to the Witt algebra. -/
 noncomputable def lsection : WittAlgebra 𝕜 →ₗ[𝕜] VirasoroAlgebra 𝕜 :=
   LieTwoCocycle.CentralExtension.stdSection (WittAlgebra.virasoroCocycle 𝕜)
 
@@ -171,6 +172,8 @@ noncomputable def lsection : WittAlgebra 𝕜 →ₗ[𝕜] VirasoroAlgebra 𝕜 
     lsection 𝕜 (WittAlgebra.lgen 𝕜 n) = lgen 𝕜 n :=
   rfl
 
+/-- The most commonly used basis of the Virasoro algebra, consisting of `Lₙ` (`n ∈ ℤ`)
+and the central element `C`. -/
 noncomputable def basisLC : Basis (Option ℤ) 𝕜 (VirasoroAlgebra 𝕜) :=
   ((isCentralExtension 𝕜).basis (lsection 𝕜) rfl
         (Basis.singleton Unit 𝕜) (WittAlgebra.lgen 𝕜)).reindex

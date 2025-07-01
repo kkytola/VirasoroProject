@@ -64,14 +64,14 @@ lemma normalizingCocycle_apply_lgen (n : ℤ) (hn : n ≠ 0) :
 lemma add_bdry_normalizingCocycle_apply_lgen_one :
     (γ + (normalizingCocycle γ).bdry) (lgen 𝕜 1) (lgen 𝕜 (-1)) = 0 := by
   simp only [Int.reduceNeg, LieTwoCocycle.add_apply, LieOneCocycle.bdry_apply, bracket_lgen_lgen,
-    Int.cast_one, Int.cast_neg, sub_neg_eq_add, add_neg_cancel, map_smul,
-    normalizingCocycle_apply_lgen_zero, neg_mul, smul_eq_mul, mul_neg]
+             Int.cast_one, Int.cast_neg, sub_neg_eq_add, add_neg_cancel, map_smul,
+             normalizingCocycle_apply_lgen_zero, neg_mul, smul_eq_mul, mul_neg]
   ring
 
 lemma add_bdry_normalizingCocycle_apply_lgen_zero (n : ℤ) (hn : n ≠ 0) :
     (γ + (normalizingCocycle γ).bdry) (lgen 𝕜 0) (lgen 𝕜 n) = 0 := by
   simp only [LieTwoCocycle.add_apply, LieOneCocycle.bdry_apply, bracket_lgen_lgen, Int.cast_zero,
-    zero_sub, zero_add, neg_smul, map_neg, map_smul, smul_eq_mul]
+             zero_sub, zero_add, neg_smul, map_neg, map_smul, smul_eq_mul]
   rw [normalizingCocycle_apply_lgen γ n hn]
   simp only [one_div, ← mul_assoc]
   simp [show (n : 𝕜) * (n : 𝕜)⁻¹ = 1 from mul_inv_cancel₀ <| Int.cast_ne_zero.mpr hn]

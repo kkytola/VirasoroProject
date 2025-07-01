@@ -76,9 +76,9 @@ def zPrimitive {R : Type*} [AddCommGroup R] (f : ℤ → R) (n : ℤ) : R :=
   · simp [zPrimitive, hn, Int.le_add_one hn, Int.toNat_add hn zero_le_one, sum_range_succ]
   · simp only [not_le] at hn
     have n_natAbs : n.natAbs = (n+1).natAbs + 1 := by
-        simpa using Int.natAbs_add_of_nonpos (b := -1) hn (Int.toNat_eq_zero.mp rfl)
+      simpa using Int.natAbs_add_of_nonpos (b := -1) hn (Int.toNat_eq_zero.mp rfl)
     simp only [zPrimitive_apply_of_nonpos _ hn, zPrimitive_apply_of_nonpos _ hn.le, n_natAbs,
-              sum_range_succ, Int.natCast_natAbs, neg_add_rev]
+               sum_range_succ, Int.natCast_natAbs, neg_add_rev]
     simp only [add_comm (-(f _)), add_assoc, left_eq_add]
     simp [show -|n + 1| - 1 = n by rw [abs_of_nonpos hn, neg_neg] ; ring]
 
@@ -91,18 +91,14 @@ lemma eq_zPrimitive_of_eq_zero_of_forall_eq_add {R : Type*} [AddCommGroup R] {f 
     · simp [h0]
     · have keyF := h1 n
       have keyP := zPrimitive_succ f n
-      norm_cast at *
-      rw [keyF, ih, ← keyP]
+      grind
   have obsM : ∀ (n : ℕ), F (-n) = zPrimitive f (-n) := by
     intro n
     induction' n with n ih
     · simp [h0]
     · have keyF := h1 (-(n + 1))
       have keyP := zPrimitive_succ f (-(n + 1))
-      simp only [Int.natAbs_neg, Int.natAbs_natCast, neg_add_rev, Int.reduceNeg,
-                 neg_add_cancel_comm, Nat.cast_add, Nat.cast_one] at ih keyF keyP ⊢
-      rw [keyF, keyP] at ih
-      exact add_right_cancel_iff.mp ih
+      grind
   ext m
   by_cases hm : 0 ≤ m
   · rw [(Int.toNat_of_nonneg hm).symm]
@@ -129,7 +125,7 @@ lemma zPrimitive_sub {R : Type*} [AddCommGroup R] (f g : ℤ → R) :
   apply (eq_zPrimitive_of_eq_zero_of_forall_eq_add ..).symm
   · simp
   · intro n
-    simp only [Pi.sub_apply, zPrimitive_succ, ←sub_sub, sub_eq_add_neg, neg_add_rev, ←add_assoc]
+    simp only [Pi.sub_apply, zPrimitive_succ, sub_eq_add_neg, neg_add_rev, ← add_assoc]
     ac_rfl
 
 lemma zPrimitive_mul_left {R : Type*} [Ring R] (c : R) (f : ℤ → R) :
@@ -146,6 +142,9 @@ lemma zPrimitive_mul_right {R : Type*} [Ring R] (c : R) (f : ℤ → R) :
   · intro n
     simp [add_mul]
 
+/-- A discrete monomial function of degree `d`, obtained recursively by starting from the
+constant function `1` and taking the discrete privimite `d` times.
+(Note: The resulting normalization is such that this monomial approximately `x ↦ 1/d! * x^d`.) -/
 def zMonomialF (R : Type*) [AddCommGroup R] [One R] (d : ℕ) : ℤ → R := match d with
   | 0 => fun _ ↦ 1
   | d + 1 => zPrimitive (zMonomialF R d)
@@ -172,15 +171,15 @@ lemma zMonomialF_eq (R : Type*) [Field R] [CharZero R] (d : ℕ) :
       simp only [← mul_assoc, ← add_mul, mul_eq_mul_right_iff, aux₀, or_false]
       simp only [mul_assoc, mul_comm _ (d.factorial : R)]
       rw [mul_right_inj' aux₀]
-      simp only [← mul_assoc, mul_left_inj' aux']
+      simp only [mul_left_inj' aux']
       rw [prod_range_succ (fun a ↦ (n : R) - a), ← mul_add]
       simp [show (n - d + (d + 1) : R) = n + 1 by ring, prod_range_succ']
     · simp only [ihd, Int.cast_prod, Int.cast_sub, Int.cast_natCast, add_left_inj]
-      simp only [mul_assoc, mul_comm _ (d.factorial : R)]
+      simp only [mul_comm _ (d.factorial : R)]
       field_simp
       exact Or.inl <| by simp [Nat.factorial_succ, mul_comm]
 
-lemma zMonomialF_zero_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
+lemma zMonomialF_zero_eq (R : Type*) [Field R] (n : ℤ) :
     zMonomialF R 0 n = 1 := by
   simp [zMonomialF]
 
