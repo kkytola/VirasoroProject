@@ -131,7 +131,7 @@ variable (𝕜)
 theorem cohomologyClass_virasoroCocycle_ne_zero :
     (virasoroCocycle 𝕜).cohomologyClass ≠ 0 := by
   intro con
-  obtain ⟨β, hβ⟩ := LieTwoCocycle.exists_eq_bdry con
+  obtain ⟨β, hβ⟩ := LieTwoCocycle.exists_eq_bdry _ con
   have hβ' (n : ℤ) :
       (virasoroCocycle 𝕜) (lgen 𝕜 n) (lgen 𝕜 (-n)) = β.bdry (lgen 𝕜 n) (lgen 𝕜 (-n)) := by
     grind

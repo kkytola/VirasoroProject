@@ -6,7 +6,6 @@ Authors: Kalle Kytölä
 import Mathlib.Algebra.DirectSum.Module
 import Mathlib.LinearAlgebra.FreeModule.Basic
 import Mathlib.Order.CompletePartialOrder
-import Calcify
 
 /-!
 # Sections of short exact sequences
@@ -336,4 +335,4 @@ end basis
 
 open AddHom
 
-section module_section
+end module_section
