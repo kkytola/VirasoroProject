@@ -18,7 +18,7 @@ This file contains the basic bosonic Sugawara construction.
 
 ## Main definitions
 
-* `VirasoroAlgebra.representationOfCentralChangeOfL`: A veriant of the construction
+* `VirasoroAlgebra.representationOfCentralChargeOfL`: A variant of the construction
   (`LieAlgebra.representationOfBasis`) of a representation of a Lie algebra from operators
   corresponding to a basis, for the special case of the Virasoro algebra: a representation is
   constructed from operators corresponding to the `lgen` Virasoro generators satisfying
@@ -103,11 +103,11 @@ lemma heiOper_pairNO_eq_pairNO' (k l : ℤ) :
   · simp only [hk, ↓reduceIte, ite_eq_left_iff, not_le]
     intro hkl
     apply heiComm_of_add_ne_zero _ heiComm
-    exact ne_of_gt (by linarith)
+    linarith
   · simp only [hk, ↓reduceIte, ite_eq_right_iff]
     intro hlk
     apply heiComm_of_add_ne_zero _ heiComm
-    exact ne_of_lt (by linarith)
+    linarith
 
 include heiTrunc in
 omit heiComm in
@@ -185,7 +185,7 @@ omit heiComm
 /-- `pairNO k l` is symmetric in `k` and `l`. -/
 lemma heiOper_pairNO_symm (k l : ℤ) :
     pairNO heiOper k l = pairNO heiOper l k := by
-  unfold pairNO ; grind
+  grind [pairNO]
 
 include heiComm
 
@@ -225,7 +225,7 @@ lemma heiPairNO_trunc_cofinite_sub (n : ℤ) (v : V) :
   simp only [Set.mem_compl_iff, Set.mem_Ioo, not_and, not_lt] at hkBT
   by_cases hk : k ≤ B
   · exact hB k hk
-  · exact hT k (hkBT (Int.lt_of_not_ge hk))
+  · exact hT k (hkBT <| by grind only) -- the whole line is `grind`able
 
 open Topology
 
@@ -333,7 +333,7 @@ lemma commutator_heiPair_heiGen (l k m : ℤ) :
 lemma commutator_heiPairNO_heiGen (l k m : ℤ) :
     (pairNO heiOper l k).commutator (heiOper m)
       = ((-m : 𝕜) * ((if k + m = 0 then 1 else 0)
-               + (if l + m = 0 then 1 else 0))) • heiOper (k + l + m) := by
+            + (if l + m = 0 then 1 else 0))) • heiOper (k + l + m) := by
   by_cases hlk : k ≤ l
   · simp [pairNO, hlk]
     have key := @commutator_heiPair_heiGen 𝕜 _ V _ _ heiOper heiComm k l m
@@ -366,7 +366,7 @@ lemma commutator_sugawaraGen_heiOper [CharZero 𝕜] (n m : ℤ) :
       · intro j hjnm
         simp [show n - j + m ≠ 0 by intro con ; apply hjnm ; linarith]
     · intro j hjm
-      simp [show j + m ≠ 0 by intro con ; apply hjm ; linarith]
+      simp [show j + m ≠ 0 by grind]
   · apply (show Set.Finite {-m} from Set.finite_singleton (-m)).subset
     simp only [Set.subset_singleton_iff, Function.mem_support, ne_eq, ite_eq_right_iff,
                smul_eq_zero, Classical.not_imp, not_or, and_imp]
@@ -491,7 +491,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
   simp only [heiOper_pairNO_eq_pairNO' heiComm]
   have aux_commutator (k : ℤ) :=
     commutator_sugawaraGen_heiPairNO'_apply heiTrunc heiComm n m (m-k) v
-  simp only [show ∀ k, m - (m-k) = k by intro k; ring] at aux_commutator
+  simp only [show ∀ k, m - (m-k) = k by grind] at aux_commutator
   simp_rw [aux_commutator, sub_eq_add_neg, smul_add, ← add_assoc]
   rw [finsum_add_distrib]
   · simp only [neg_add_rev, neg_neg, le_add_neg_iff_add_le, zero_add, add_neg_lt_iff_lt_add,
@@ -507,8 +507,8 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
         dsimp only [Equiv.coe_fn_mk]
         rw [← smul_add, ← finsum_add_distrib]
         · simp only [neg_sub, add_sub_assoc', ← add_assoc]
-          simp_rw [show ∀ k, n + m + k - n + -m = k by intro k; ring]
-          simp_rw [show ∀ k, m + n - k = n + m - k by intro k; ring]
+          simp_rw [show ∀ k, n + m + k - n + -m = k by grind]
+          simp_rw [show ∀ k, m + n - k = n + m - k by grind]
           simp_rw [add_smul, sub_smul, ← add_assoc, neg_sub, sub_eq_add_neg]
           simp_rw [neg_add_cancel_right]
           rw [finsum_add_distrib]
@@ -532,7 +532,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
           simp only [m_eq_neg_n, add_neg_cancel, and_true, neg_neg, add_zero, zero_add, neg_smul,
                      smul_neg, ↓reduceIte, LinearMap.smul_apply, Module.End.one_apply]
           by_cases hn : 0 ≤ n
-          · have obs (i : ℤ) : ¬ (i ≤ -n ∧ 0 < i) := by intro maybe ; linarith
+          · have obs (i : ℤ) : ¬ (i ≤ -n ∧ 0 < i) := by grind
             simp only [obs, ↓reduceIte]
             rw [finsum_eq_sum_of_support_subset _ (s := Finset.Ioc (-n) 0) ?_]
             · rw [Finset.sum_congr rfl (g := fun i ↦ -(i + n) • i • v)]
@@ -552,7 +552,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
                 norm_num
                 rw [@Finset.sum_of_injOn ℕ ℤ 𝕜 _ (Finset.range n.toNat) (Finset.Ioc (-n) 0)
                           (fun x ↦ ↑x * (n - x)) (fun x ↦ (-↑n + -↑x) * x)
-                          (fun i ↦ -i) ?_ ?_ ?_ ?_]
+                          (fun i ↦ -i) ..]
                 · intro i _ j _ hij
                   simpa using hij
                 · intro i hi
@@ -596,7 +596,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
                   simpa [hn] using (abs_of_neg <| not_le.mp hn).symm
                 rw [@Finset.sum_of_injOn ℕ ℤ 𝕜 _ (Finset.range n.natAbs) (Finset.Ioc 0 (-n))
                       (fun x ↦ (↑x + 1) * (n + (x + 1))) (fun x ↦ (↑x + ↑n) * x)
-                      (fun i ↦ i + 1) ?_ ?_ ?_ ?_]
+                      (fun i ↦ i + 1) ..]
                 · intro i _ j _ hij
                   simpa using hij
                 · intro i hi
@@ -630,9 +630,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
       refine Function.support_subset_iff'.mpr ?_
       intro k hk
       simp only [Set.Ioc_union_Ioc_symm, Set.mem_Ioc, inf_lt_iff, le_sup_iff] at hk
-      have hk₂' : ¬ ((k ≤ m) ∧ (n + m < k) ∧ n + m = 0) := by grind
-      have hk₃' : ¬ (m < k ∧ k ≤ n + m ∧ n + m = 0) := by grind
-      simp [hk₂', hk₃']
+      grind
   · have aux₀ := finite_support_pairNO'_heiOper_apply heiTrunc heiComm 0 (n + m) v
     simp only [sub_eq_add_neg, zero_add] at aux₀
     apply ((aux₀.union (Set.finite_Ioc (m+n) m)).union (Set.finite_Ioc m (m+n))).subset
@@ -641,10 +639,9 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
     simp only [Set.mem_union, Function.mem_support, ne_eq, Set.mem_Ioc, not_or, not_not, not_and,
                not_le] at hk
     rcases hk with ⟨⟨hk₁, hk₂⟩, hk₃⟩
-    have hk₂' : ¬ ((0 ≤ m + -k) ∧ (m + -k < -n) ∧ n + m = 0) := by grind
-    have hk₃' : ¬ (m + -k < 0 ∧ -n ≤ m + -k ∧ n + m = 0) := by grind
-    simp_rw [hk₂', hk₃']
-    simp [hk₁]
+    simp only [neg_add_rev, neg_neg, hk₁, smul_zero, le_add_neg_iff_add_le, zero_add,
+               add_neg_lt_iff_lt_add, lt_neg_add_iff_add_lt, neg_add_le_iff_le_add, smul_ite]
+    grind
   · have (k : ℤ) : n + m - (m - k) = n + k := by ring
     simp_rw [← sub_eq_add_neg, this, Function.support_neg]
     exact finite_support_smul_pairNO'_heiOper_apply heiTrunc heiComm ..
@@ -658,7 +655,7 @@ section representation
 /-- Construct a representation of Virasoro algebra from a central charge value `c` and a
 collection `(Lₙ)`, `n ∈ ℤ`, of operators satisfying the commutation relations of Virasoro
 generators with that central charge. -/
-noncomputable def VirasoroAlgebra.representationOfCentralChangeOfL
+noncomputable def VirasoroAlgebra.representationOfCentralChargeOfL
     {𝕂 : Type*} [Field 𝕂] [CharZero 𝕂]
     {V : Type*} [AddCommGroup V] [Module 𝕂 V] (c : 𝕂) {lOper : ℤ → (V →ₗ[𝕂] V)}
     (lComm : ∀ n m, (lOper n).commutator (lOper m)
@@ -693,22 +690,22 @@ noncomputable def VirasoroAlgebra.representationOfCentralChangeOfL
           rw [mul_comm]
         · simp [hnm]
 
-lemma VirasoroAlgebra.representationOfCentralChangeOfL_cgen
+lemma VirasoroAlgebra.representationOfCentralChargeOfL_cgen
     {𝕂 : Type*} [Field 𝕂] [CharZero 𝕂]
     {V : Type*} [AddCommGroup V] [Module 𝕂 V] (c : 𝕂) {lOper : ℤ → (V →ₗ[𝕂] V)}
     (lComm : ∀ n m, (lOper n).commutator (lOper m)
       = (n-m) • lOper (n+m) + if n + m = 0 then (c / 12 * (n^3 - n)) • (1 : V →ₗ[𝕂] V) else 0) :
-    (representationOfCentralChangeOfL c lComm) (cgen 𝕂) = c • 1 := by
+    (representationOfCentralChargeOfL c lComm) (cgen 𝕂) = c • 1 := by
   convert LieAlgebra.representationOfBasisAux_apply_basis (VirasoroAlgebra.basisLC 𝕂) _ none
   simp
 
-lemma VirasoroAlgebra.representationOfCentralChangeOfL_lgen
+lemma VirasoroAlgebra.representationOfCentralChargeOfL_lgen
     {𝕂 : Type*} [Field 𝕂] [CharZero 𝕂]
     {V : Type*} [AddCommGroup V] [Module 𝕂 V] (c : 𝕂) {lOper : ℤ → (V →ₗ[𝕂] V)}
     (lComm : ∀ n m, (lOper n).commutator (lOper m)
       = (n-m) • lOper (n+m) + if n + m = 0 then (c / 12 * (n^3 - n)) • (1 : V →ₗ[𝕂] V) else 0)
     (n : ℤ) :
-    (representationOfCentralChangeOfL c lComm) (lgen 𝕂 n) = lOper n := by
+    (representationOfCentralChargeOfL c lComm) (lgen 𝕂 n) = lOper n := by
   convert LieAlgebra.representationOfBasisAux_apply_basis (VirasoroAlgebra.basisLC 𝕂) _ (some n)
   simp
 
@@ -719,7 +716,7 @@ we get a representation of the Virasoro algebra with central charge 1 by the Sug
 construction. -/
 noncomputable def sugawaraRepresentation [CharZero 𝕜] :
     VirasoroAlgebra 𝕜 →ₗ⁅𝕜⁆ (V →ₗ[𝕜] V) := by
-  apply VirasoroAlgebra.representationOfCentralChangeOfL 1 (lOper := sugawaraGen heiTrunc)
+  apply VirasoroAlgebra.representationOfCentralChargeOfL 1 (lOper := sugawaraGen heiTrunc)
   intro n m
   simp only [commutator_sugawaraGen heiOper heiTrunc heiComm n m, zsmul_eq_mul, Int.cast_sub,
              one_div, add_right_inj]
@@ -734,7 +731,7 @@ open VirasoroAlgebra in
 by the basic bosonic Sugawara construction. -/
 lemma sugawaraRepresentation_cgen [CharZero 𝕜] :
     sugawaraRepresentation heiTrunc heiComm (cgen 𝕜) = 1 := by
-  convert VirasoroAlgebra.representationOfCentralChangeOfL_cgen ..
+  convert VirasoroAlgebra.representationOfCentralChargeOfL_cgen ..
   simp
 
 open VirasoroAlgebra in
@@ -745,7 +742,7 @@ lemma sugawaraRepresentation_lgen_apply' [CharZero 𝕜] (n : ℤ) (v : V) :
       (2 : 𝕜)⁻¹ • ∑ᶠ k, pairNO heiOper (n-k) k v := by
   rw [← sugawaraGen_apply heiTrunc]
   apply LinearMap.congr_fun _ v
-  convert VirasoroAlgebra.representationOfCentralChangeOfL_lgen ..
+  convert VirasoroAlgebra.representationOfCentralChargeOfL_lgen ..
 
 open VirasoroAlgebra in
 /-- The formula for the action of the Virasoro generator `Lₙ` on the representation obtained

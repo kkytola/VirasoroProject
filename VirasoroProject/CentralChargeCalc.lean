@@ -68,15 +68,14 @@ def zPrimitive {R : Type*} [AddCommGroup R] (f : ℤ → R) (n : ℤ) : R :=
     zPrimitive f n = -(∑ j ∈ range (Int.natAbs n), f (-j-1)) := by
   by_cases hn' : n = 0
   · simp [hn']
-  · simp [zPrimitive, lt_of_le_of_ne hn hn']
+  · grind [zPrimitive]
 
 @[simp] lemma zPrimitive_succ {R : Type*} [AddCommGroup R] (f : ℤ → R) (n : ℤ) :
     zPrimitive f (n + 1) = zPrimitive f n + f n := by
   by_cases hn : 0 ≤ n
   · simp [zPrimitive, hn, Int.le_add_one hn, Int.toNat_add hn zero_le_one, sum_range_succ]
   · simp only [not_le] at hn
-    have n_natAbs : n.natAbs = (n+1).natAbs + 1 := by
-      simpa using Int.natAbs_add_of_nonpos (b := -1) hn (Int.toNat_eq_zero.mp rfl)
+    have n_natAbs : n.natAbs = (n+1).natAbs + 1 := by grind
     simp only [zPrimitive_apply_of_nonpos _ hn, zPrimitive_apply_of_nonpos _ hn.le, n_natAbs,
                sum_range_succ, Int.natCast_natAbs, neg_add_rev]
     simp only [add_comm (-(f _)), add_assoc, left_eq_add]
@@ -89,8 +88,7 @@ lemma eq_zPrimitive_of_eq_zero_of_forall_eq_add {R : Type*} [AddCommGroup R] {f 
     intro n
     induction' n with n ih
     · simp [h0]
-    · have keyF := h1 n
-      have keyP := zPrimitive_succ f n
+    · have keyP := zPrimitive_succ f n
       grind
   have obsM : ∀ (n : ℕ), F (-n) = zPrimitive f (-n) := by
     intro n
