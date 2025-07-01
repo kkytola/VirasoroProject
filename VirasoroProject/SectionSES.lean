@@ -70,7 +70,9 @@ variable {σ : W → V}
 
 /-- The corrector function `γ : V → U` associated to a section `σ : W → V` of a
 short exact sequence `1 ⟶ U ⟶ V ⟶ W ⟶ 1`. -/
-@[to_additive] noncomputable def corrector (hfg : f.range = g.ker) (hgσ : g ∘ σ = _root_.id) (v : V) : U :=
+@[to_additive] noncomputable def corrector
+    (hfg : f.range = g.ker) (hgσ : g ∘ σ = _root_.id) (v : V) :
+    U :=
   (exists_corrector hfg hgσ v).choose
 
 /-- The corrector map `γ : V → U` satisfies `v = σ(g(v)) * f(γ(v))` for any `v : V`. -/
@@ -78,8 +80,8 @@ short exact sequence `1 ⟶ U ⟶ V ⟶ W ⟶ 1`. -/
     v = σ (g v) * f (corrector hfg hgσ v) :=
   (exists_corrector hfg hgσ v).choose_spec
 
-@[to_additive] lemma corrector_eq_iff (hf : f.ker = ⊥) (hfg : f.range = g.ker) (hgσ : g ∘ σ = _root_.id)
-    (v : V) (u : U) :
+@[to_additive] lemma corrector_eq_iff
+    (hf : f.ker = ⊥) (hfg : f.range = g.ker) (hgσ : g ∘ σ = _root_.id) (v : V) (u : U) :
     corrector hfg hgσ v = u ↔ v = σ (g v) * f u :=
   ⟨fun h ↦ h ▸ corrector_spec hfg hgσ v, unique_corrector hf v _ _ (corrector_spec hfg hgσ v)⟩
 

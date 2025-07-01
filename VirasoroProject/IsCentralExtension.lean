@@ -10,8 +10,8 @@ import VirasoroProject.SectionSES
 # Abstract central extensions of Lie algebras (characteristic predicate)
 
 This file defines the short exact sequence characteristic predicate for a central extension of
-a Lie algebra. It is proven that central extension defined by a 2-cocycle satisfy this characteristic
-predicate.
+a Lie algebra. It is proven that central extension defined by a 2-cocycle satisfy this
+characteristic predicate.
 
 ## Main definitions
 

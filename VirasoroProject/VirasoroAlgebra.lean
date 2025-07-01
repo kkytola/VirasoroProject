@@ -161,7 +161,8 @@ lemma lgen_eq' (n : ℤ) : lgen 𝕜 n = ⟨WittAlgebra.lgen 𝕜 n, 0⟩ := rfl
 
 lemma lgen_bracket' (n m : ℤ) :
     ⁅lgen 𝕜 n, lgen 𝕜 m⁆
-      = (n - m : 𝕜) • lgen 𝕜 (n + m) + if n + m = 0 then ((n-1 : 𝕜)*n*(n+1)/12) • cgen 𝕜 else 0 := by
+      = (n - m : 𝕜) • lgen 𝕜 (n + m)
+        + if n + m = 0 then ((n-1 : 𝕜)*n*(n+1)/12) • cgen 𝕜 else 0 := by
   rw [lgen_bracket] ; congr ; ring
 
 /-- A section of the standard projection from the Virasoro algebra to the Witt algebra. -/

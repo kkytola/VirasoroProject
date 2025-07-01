@@ -97,7 +97,8 @@ variable (𝕜 : Type*) [Field 𝕜]
 
 /-- A bilinear map version of the Heisenberg cocycle.
 (Defining equation: `γ (jgen k) (jgen l) = k * δ[k+l,0]`.) -/
-noncomputable def heisenbergCocycleBilin : (AbelianLieAlgebraOn ℤ 𝕜) →ₗ[𝕜] (AbelianLieAlgebraOn ℤ 𝕜) →ₗ[𝕜] 𝕜 :=
+noncomputable def heisenbergCocycleBilin :
+    (AbelianLieAlgebraOn ℤ 𝕜) →ₗ[𝕜] (AbelianLieAlgebraOn ℤ 𝕜) →ₗ[𝕜] 𝕜 :=
   (jgen 𝕜).constr 𝕜 <| fun k ↦ (jgen 𝕜).constr 𝕜 <| fun l ↦ if k + l = 0 then k else 0
 
 lemma heisenbergCocycleBilin_apply_jgen_jgen (k l : ℤ) :
@@ -194,14 +195,18 @@ noncomputable def ofCentral : 𝕜 →ₗ⁅𝕜⁆ HeisenbergAlgebra 𝕜 :=
 
 lemma bracket_def' (X Y : HeisenbergAlgebra 𝕜) :
     ⁅X, Y⁆ = ⟨⁅toAbelianLieAlgebraOn X, toAbelianLieAlgebraOn Y⁆,
-              (AbelianLieAlgebraOn.heisenbergCocycle 𝕜) (toAbelianLieAlgebraOn X) (toAbelianLieAlgebraOn Y)⟩ := by
+              (AbelianLieAlgebraOn.heisenbergCocycle 𝕜)
+              (toAbelianLieAlgebraOn X) (toAbelianLieAlgebraOn Y)⟩ := by
   rfl
 
 @[simp] lemma bracket_fst (X Y : HeisenbergAlgebra 𝕜) :
     ⁅X, Y⁆.1 = 0 := rfl
 
 @[simp] lemma bracket_snd (X Y : HeisenbergAlgebra 𝕜) :
-    ⁅X, Y⁆.2 = (AbelianLieAlgebraOn.heisenbergCocycle 𝕜) (toAbelianLieAlgebraOn X) (toAbelianLieAlgebraOn Y) := rfl
+    ⁅X, Y⁆.2 =
+      (AbelianLieAlgebraOn.heisenbergCocycle 𝕜)
+        (toAbelianLieAlgebraOn X) (toAbelianLieAlgebraOn Y) :=
+  rfl
 
 lemma add_def' (X Y : HeisenbergAlgebra 𝕜) :
     X + Y = ⟨X.1 + Y.1, X.2 + Y.2⟩ := rfl

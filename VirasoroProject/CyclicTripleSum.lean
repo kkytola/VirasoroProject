@@ -83,13 +83,15 @@ lemma cyclicTripleSum_map_add_snd_of_map_add [Add V] (β : V → V → V) (φ : 
       = cyclicTripleSum β φ x y₁ z + cyclicTripleSum β φ x y₂ z := by
   simpa only [cyclicTripleSum_cyclic' _ _ x] using h z x y₁ y₂
 
-lemma cyclicTripleSum_map_smul_fst_of_map_smul {R : Type*} [SMul R V] [SMul R W] (β : V → V → V) (φ : V → V → W)
+lemma cyclicTripleSum_map_smul_fst_of_map_smul {R : Type*} [SMul R V] [SMul R W]
+    (β : V → V → V) (φ : V → V → W)
     (h : ∀ c : R, ∀ x y z : V,
       cyclicTripleSum β φ x y (c • z) = c • cyclicTripleSum β φ x y z) (c : R) (x y z : V) :
     cyclicTripleSum β φ (c • x) y z = c • cyclicTripleSum β φ x y z := by
   simpa only [cyclicTripleSum_cyclic _ _ _ y] using h c y z x
 
-lemma cyclicTripleSum_map_smul_snd_of_map_smul {R : Type*} [SMul R V] [SMul R W] (β : V → V → V) (φ : V → V → W)
+lemma cyclicTripleSum_map_smul_snd_of_map_smul {R : Type*} [SMul R V] [SMul R W]
+    (β : V → V → V) (φ : V → V → W)
     (h : ∀ c : R, ∀ x y z : V,
       cyclicTripleSum β φ x y (c • z) = c • cyclicTripleSum β φ x y z) (c : R) (x y z : V) :
     cyclicTripleSum β φ x (c • y) z = c • cyclicTripleSum β φ x y z := by
@@ -125,18 +127,21 @@ lemma cyclicTripleSum_map_add_fst_of_bilin (β : V →+ V →+ V) (φ : V →+ V
 variable {𝕜} [CommSemiring 𝕜]
 variable [Module 𝕜 V] [Module 𝕜 W]
 
-lemma cyclicTripleSum_map_smul_of_bilin (β : V →ₗ[𝕜] V →ₗ[𝕜] V) (φ : V →ₗ[𝕜] V →ₗ[𝕜] W) (c : 𝕜) (x y z : V) :
+lemma cyclicTripleSum_map_smul_of_bilin (β : V →ₗ[𝕜] V →ₗ[𝕜] V) (φ : V →ₗ[𝕜] V →ₗ[𝕜] W)
+    (c : 𝕜) (x y z : V) :
     cyclicTripleSum (fun a ↦ ⇑(β a)) (fun a ↦ ⇑(φ a)) x y (c • z)
       = c • cyclicTripleSum (fun a ↦ ⇑(β a)) (fun a ↦ ⇑(φ a)) x y z := by
   simp [cyclicTripleSum]
 
-lemma cyclicTripleSum_map_smul_fst_of_bilin (β : V →ₗ[𝕜] V →ₗ[𝕜] V) (φ : V →ₗ[𝕜] V →ₗ[𝕜] W) (c : 𝕜) (x y z : V) :
+lemma cyclicTripleSum_map_smul_fst_of_bilin (β : V →ₗ[𝕜] V →ₗ[𝕜] V) (φ : V →ₗ[𝕜] V →ₗ[𝕜] W)
+    (c : 𝕜) (x y z : V) :
     cyclicTripleSum (fun a ↦ ⇑(β a)) (fun a ↦ ⇑(φ a)) (c • x) y z
       = c • cyclicTripleSum (fun a ↦ ⇑(β a)) (fun a ↦ ⇑(φ a)) x y z := by
   apply cyclicTripleSum_map_smul_fst_of_map_smul
   exact cyclicTripleSum_map_smul_of_bilin β φ
 
-lemma cyclicTripleSum_map_smul_snd_of_bilin (β : V →ₗ[𝕜] V →ₗ[𝕜] V) (φ : V →ₗ[𝕜] V →ₗ[𝕜] W) (c : 𝕜) (x y z : V) :
+lemma cyclicTripleSum_map_smul_snd_of_bilin (β : V →ₗ[𝕜] V →ₗ[𝕜] V) (φ : V →ₗ[𝕜] V →ₗ[𝕜] W)
+    (c : 𝕜) (x y z : V) :
     cyclicTripleSum (fun a ↦ ⇑(β a)) (fun a ↦ ⇑(φ a)) x (c • y) z
       = c • cyclicTripleSum (fun a ↦ ⇑(β a)) (fun a ↦ ⇑(φ a)) x y z := by
   apply cyclicTripleSum_map_smul_snd_of_map_smul
