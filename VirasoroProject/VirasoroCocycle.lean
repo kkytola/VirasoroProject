@@ -43,7 +43,8 @@ namespace WittAlgebra
 
 variable (𝕜 : Type*) [Field 𝕜]
 
-/-- A bilinear map version of the Virasoro cocycle. -/
+/-- A bilinear map version of the Virasoro cocycle.
+(Defining formula: `γ (lgen n) (lgen m) = (n^3 - n) / 12 * δ[n+m,0]`.) -/
 noncomputable def virasoroCocycleBilin : (WittAlgebra 𝕜) →ₗ[𝕜] (WittAlgebra 𝕜) →ₗ[𝕜] 𝕜 :=
   (lgen 𝕜).constr 𝕜 <| fun n ↦ (lgen 𝕜).constr 𝕜 <| fun m ↦
       if n + m = 0 then (n^3 - n) / 12 else 0
@@ -132,21 +133,17 @@ theorem cohomologyClass_virasoroCocycle_ne_zero :
   intro con
   obtain ⟨β, hβ⟩ := LieTwoCocycle.exists_eq_bdry con
   have hβ' (n : ℤ) :
-      (virasoroCocycle 𝕜) (lgen 𝕜 n) (lgen 𝕜 (-n)) = β.bdry (lgen 𝕜 n) (lgen 𝕜 (-n)) :=
-    congrFun (congrArg DFunLike.coe (congrFun (congrArg DFunLike.coe hβ) ((lgen 𝕜) n)))
-      ((lgen 𝕜) (-n))
-  have obsB₁ := bdry_lgen_lgen_neg_eq β 3
-  have obsB₂ := bdry_lgen_lgen_neg_eq β 6
+      (virasoroCocycle 𝕜) (lgen 𝕜 n) (lgen 𝕜 (-n)) = β.bdry (lgen 𝕜 n) (lgen 𝕜 (-n)) := by
+    grind
+  simp_rw [bdry_lgen_lgen_neg_eq β] at hβ'
   have obsV₁ := virasoroCocycle_apply_lgen_lgen 𝕜 3 (-3)
   have obsV₂ := virasoroCocycle_apply_lgen_lgen 𝕜 6 (-6)
-  norm_num at obsB₁ obsB₂ obsV₁ obsV₂
-  rw [hβ' 3, obsB₁] at obsV₁
-  rw [hβ' 6, obsB₂] at obsV₂
+  rw [hβ'] at obsV₁ obsV₂
+  norm_num at obsV₁ obsV₂
   have aux := congrArg (2 * ·) obsV₁
   simp only [← mul_assoc] at aux
   norm_num at aux
-  rw [aux] at obsV₂
-  exact (show ¬ (4 : 𝕜) = 35/2 by norm_num) obsV₂
+  apply (show (4 : 𝕜) ≠ 35/2 by norm_num) <| by grind
 
 /-- The Witt algebra 2-cohomology `H²(WittAlgebra, 𝕜)` is nontrivial. -/
 theorem nontrivial_lieTwoCohomology :

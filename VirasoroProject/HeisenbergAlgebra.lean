@@ -95,14 +95,13 @@ namespace AbelianLieAlgebraOn
 
 variable (𝕜 : Type*) [Field 𝕜]
 
-/-- A bilinear map version of the Heisenberg cocycle. -/
+/-- A bilinear map version of the Heisenberg cocycle.
+(Defining equation: `γ (jgen k) (jgen l) = k * δ[k+l,0]`.) -/
 noncomputable def heisenbergCocycleBilin : (AbelianLieAlgebraOn ℤ 𝕜) →ₗ[𝕜] (AbelianLieAlgebraOn ℤ 𝕜) →ₗ[𝕜] 𝕜 :=
-  (jgen 𝕜).constr 𝕜 <| fun k ↦ (jgen 𝕜).constr 𝕜 <| fun l ↦
-      if k + l = 0 then k else 0
+  (jgen 𝕜).constr 𝕜 <| fun k ↦ (jgen 𝕜).constr 𝕜 <| fun l ↦ if k + l = 0 then k else 0
 
 lemma heisenbergCocycleBilin_apply_jgen_jgen (k l : ℤ) :
-    heisenbergCocycleBilin 𝕜 (jgen 𝕜 k) (jgen 𝕜 l)
-      = if k + l = 0 then k else 0 := by
+    heisenbergCocycleBilin 𝕜 (jgen 𝕜 k) (jgen 𝕜 l) = if k + l = 0 then k else 0 := by
   simp [heisenbergCocycleBilin]
 
 example (R U V W : Type) [Field R] [AddCommGroup U] [AddCommGroup V] [AddCommGroup W]
@@ -139,9 +138,7 @@ lemma heisenbergCocycle_apply_jgen_jgen (k l : ℤ) :
 lemma heisenbergCocycle_ne_zero :
     heisenbergCocycle 𝕜 ≠ 0 := by
   have obs := heisenbergCocycle_apply_jgen_jgen 𝕜 1 (-1)
-  simp only [Int.reduceNeg, add_neg_cancel, ↓reduceIte, Int.cast_one] at obs
-  intro maybe_zero
-  simp [maybe_zero] at obs
+  aesop
 
 /-- The Heisenberg cocycle is cohomologically nontrivial. -/
 theorem cohomologyClass_heisenbergCocycle_ne_zero :
@@ -276,7 +273,7 @@ noncomputable def jsection : AbelianLieAlgebraOn ℤ 𝕜 →ₗ[𝕜] Heisenber
   rfl
 
 /-- The most commonly used basis of the Heisenberg algebra, consisting of `Jₖ` (`k ∈ ℤ`)
-and the central element `K`. -/
+and the central element `K`. (Lean notation: `jgen _ k` and `kgen _`, respectively.) -/
 noncomputable def basisJK : Basis (Option ℤ) 𝕜 (HeisenbergAlgebra 𝕜) :=
   ((isCentralExtension 𝕜).basis (jsection 𝕜) rfl
         (Basis.singleton Unit 𝕜) (AbelianLieAlgebraOn.jgen 𝕜)).reindex
