@@ -88,8 +88,7 @@ lemma eq_zPrimitive_of_eq_zero_of_forall_eq_add {R : Type*} [AddCommGroup R] {f 
     intro n
     induction' n with n ih
     · simp [h0]
-    · have keyP := zPrimitive_succ f n
-      grind
+    · aesop
   have obsM : ∀ (n : ℕ), F (-n) = zPrimitive f (-n) := by
     intro n
     induction' n with n ih
