@@ -303,6 +303,15 @@ noncomputable def basisJK : Basis (Option ℤ) 𝕜 (HeisenbergAlgebra 𝕜) :=
     basisJK 𝕜 none = kgen 𝕜 := by
   simp [basisJK]
 
+/-- J₀ is central -/
+@[simp] lemma jgen_zero_bracket (Z : HeisenbergAlgebra 𝕜) :
+    ⁅jgen 𝕜 0, Z⁆ = 0 := by
+  change LieAlgebra.bracketHom 𝕜 _ (jgen 𝕜 0) Z = 0
+  suffices LieAlgebra.bracketHom 𝕜 _ (jgen 𝕜 0) = 0 by simp [this]
+  apply (basisJK 𝕜).ext fun i ↦ match i with
+  | none => by simp [basisJK_none, ← lie_skew (jgen 𝕜 0)]
+  | some l => by simp
+
 end HeisenbergAlgebra -- namespace
 
 end HeisenbergAlgebra
