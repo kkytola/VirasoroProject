@@ -16,10 +16,6 @@ lemma Algebra.smul_scalar_smul_eq_smul_algebraMap_mul (c : 𝕜) (a : A) :
     c • a = a * (c • (1 : A)) := by
   simp only [Algebra.mul_smul_comm, mul_one]
 
-example (c : 𝕜) (a : A) :
-    Commute (algebraMap 𝕜 A c) a :=
-  Algebra.commute_algebraMap_left c a
-
 variable (V : Type*) [AddCommGroup V] [Module A V]
 
 /-- Any module over an algebra is a module over the scalars. -/
