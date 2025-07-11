@@ -4,25 +4,11 @@ import VirasoroProject.HeisenbergAlgebra
 
 namespace VirasoroProject
 
+
+
 section Fock_space
 
---@[inherit_doc UniversalEnvelopingAlgebra]
---abbrev 𝓤 := UniversalEnvelopingAlgebra
-
 variable (𝕜 : Type*) [Field 𝕜] [CharZero 𝕜]
-
---/-- The indexed collection of Heisenberg (Lie) algebra generators of
---nonnegative index: K, J₀, J₁, J₂, ... -/
---noncomputable def HeisenbergAlgebra.nnGenerators (i : Option ℕ) :
---    HeisenbergAlgebra 𝕜 := match i with
---  | none => kgen 𝕜
---  | some k => jgen 𝕜 k
---
---/-- The indexed collection of Heisenberg (associative) algebra generators
---of nonnegative index: K, J₀, J₁, J₂, ... -/
---noncomputable def HeisenbergAlgebra.nnGeneratorsUEA (i : Option ℕ) :
---    𝓤 𝕜 (HeisenbergAlgebra 𝕜) :=
---  UniversalEnvelopingAlgebra.ι 𝕜 (nnGenerators 𝕜 i)
 
 /-- The indexed collection of Heisenberg (associative) algebra generators
 of nonnegative index (K, J₀, J₁, J₂, ...) together with the scalars by which

@@ -46,15 +46,6 @@ end auxiliary
 
 section generalized_Verma_module
 
---/-- The left ideal used in the construction of a (generalized) Verma module for an algebra `A`:
---* `B ⊆ A` is a subset meant to act by scalar multiples on the highest weight vector
---  (a "Borel subalgebra").
---* `η : B → 𝕜` is a is a function giving those scalars ("highest weight" data). -/
---def vermaIdeal'' {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A]
---    {B : Set A} (η : B → 𝕜) :
---    Submodule A A :=
---  Submodule.span A (Set.range <| fun (b : B) ↦ b - algebraMap 𝕜 A (η b))
-
 /-- The left ideal used in the construction of a (generalized) Verma module for an algebra `A`:
 * `B ⊆ A` is a subset meant to act by scalar multiples on the highest weight vector
   (a "Borel subalgebra").
@@ -64,14 +55,6 @@ def vermaIdeal {ι : Type*} {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra �
     Submodule A A :=
   Submodule.span A (Set.range <| fun (i : ι) ↦ (η i).1 - algebraMap 𝕜 A (η i).2)
 
---/-- The (generalied) Verma module of an algebra `S` associated to a function `η : s → 𝕜`:
---* `𝓝 ⊆ 𝓖` is a (nilpotent) Lie subalgebra meant to act as zero on the highest weight vector,
---* `𝓗 ⊆ 𝓖` is a (commutative) Lie subalgebra (Cartan subalgebra) meant to act by scalar
---  multiples determined by a functional `η : 𝓗 → 𝕜` on the highest weight vector. -/
---def VermaModule'' {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A]
---    {B : Set A} (η : B → 𝕜) :=
---  A ⧸ vermaIdeal'' η
-
 /-- The (generalied) Verma module of an algebra `S` associated to a function `η : s → 𝕜`:
 * `𝓝 ⊆ 𝓖` is a (nilpotent) Lie subalgebra meant to act as zero on the highest weight vector,
 * `𝓗 ⊆ 𝓖` is a (commutative) Lie subalgebra (Cartan subalgebra) meant to act by scalar
@@ -80,23 +63,10 @@ def VermaModule {𝕜 A ι : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A]
     (η : ι → A × 𝕜) :=
   A ⧸ vermaIdeal η
 
---/-- The highest weight vector in a (generalized) Verma module. -/
---def VermaModule.hwVec'' {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A] {B : Set A} (η : B → 𝕜) :
---    VermaModule'' η :=
---  Submodule.Quotient.mk 1
-
 /-- The highest weight vector in a (generalized) Verma module. -/
 def VermaModule.hwVec {𝕜 A ι : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A] (η : ι → A × 𝕜) :
     VermaModule η :=
   Submodule.Quotient.mk 1
-
---instance {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A] {B : Set A} (η : B → 𝕜) :
---    AddCommGroup (VermaModule'' η) :=
---  Submodule.Quotient.addCommGroup _
---
---instance {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A] {B : Set A} (η : B → 𝕜) :
---    Module A (VermaModule'' η) :=
---  Submodule.Quotient.module _
 
 instance {𝕜 A ι : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A] (η : ι → A × 𝕜) :
     AddCommGroup (VermaModule η) :=
@@ -125,21 +95,6 @@ lemma LinearMap.apply_cyclic_of_cyclic_of_surjective {R : Type*} [Semiring R]
 lemma VermaModule.hwVec_cyclic {𝕜 A ι : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A] (η : ι → A × 𝕜) :
     Submodule.span A {hwVec η} = ⊤ :=
   LinearMap.apply_cyclic_of_cyclic_of_surjective (Submodule.range_mkQ _) 1 one_cyclic
-
---/-- The defining property of the highest weight vector in a Verma module. -/
---lemma VermaModule.apply_hwVec_eq''
---    {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A] {B : Set A} (η : B → 𝕜)
---    {a : A} (a_in_B : a ∈ B) :
---    a • hwVec'' η = (algebraMap 𝕜 A (η ⟨a, a_in_B⟩)) • hwVec'' η := by
---  have aux₁ : a • hwVec'' η = Submodule.Quotient.mk (a • 1) := rfl
---  have aux₂ : (algebraMap 𝕜 A (η ⟨a, a_in_B⟩)) • hwVec'' η
---              = Submodule.Quotient.mk ((algebraMap 𝕜 A (η ⟨a, a_in_B⟩)) • 1) :=
---    rfl
---  simp only [aux₁, aux₂, smul_eq_mul, mul_one]
---  rw [← sub_eq_zero, ← Submodule.Quotient.mk_sub]
---  apply (Submodule.Quotient.mk_eq_zero ..).mpr
---  apply Submodule.mem_span_of_mem
---  exact Set.mem_range.mpr ⟨⟨a, a_in_B⟩, by simp⟩
 
 /-- The defining property of the highest weight vector in a Verma module. -/
 lemma VermaModule.apply_hwVec_eq
@@ -172,15 +127,6 @@ lemma Ring.range_smulVectorₗ_eq_span (A : Type*) [Ring A]
   simp only [LinearMap.mem_range, Set.mem_range]
   rfl
 
---lemma vermaIdeal_le_ker_smulVectorₗ'' {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A]
---    {B : Set A} (η : B → 𝕜) {M : Type*} [AddCommGroup M] [Module A M]
---    {hwv : M} (hwv_prop : ∀ {b} (hb : b ∈ B), b • hwv = algebraMap 𝕜 A (η ⟨b, hb⟩) • hwv) :
---    vermaIdeal'' η ≤ LinearMap.ker (Ring.smulVectorₗ A hwv) := by
---  simp only [vermaIdeal'', Submodule.span_le]
---  intro a ⟨b, a_eq⟩
---  simp only [← a_eq, SetLike.mem_coe, LinearMap.mem_ker, map_sub, sub_eq_zero]
---  exact hwv_prop b.prop
-
 lemma vermaIdeal_le_ker_smulVectorₗ {𝕜 A ι : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A]
     (η : ι → A × 𝕜) {M : Type*} [AddCommGroup M] [Module A M]
     {hwv : M} (hwv_prop : ∀ i, (η i).1 • hwv = algebraMap 𝕜 A (η i).2 • hwv) :
@@ -190,14 +136,6 @@ lemma vermaIdeal_le_ker_smulVectorₗ {𝕜 A ι : Type*} [CommRing 𝕜] [Ring 
   simp only [← a_eq, SetLike.mem_coe, LinearMap.mem_ker, map_sub, sub_eq_zero]
   exact hwv_prop i
 
---/-- The map guaranteed by the universal property of a Verma module. -/
---def VermaModule.universalMap''
---    {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A] {B : Set A} (η : B → 𝕜)
---    {M : Type*} [AddCommGroup M] [Module A M]
---    {hwv : M} (hwv_prop : ∀ {b} (hb : b ∈ B), b • hwv = algebraMap 𝕜 A (η ⟨b, hb⟩) • hwv) :
---    VermaModule'' η →ₗ[A] M :=
---  Submodule.liftQ (vermaIdeal'' η) (Ring.smulVectorₗ A hwv) (vermaIdeal_le_ker_smulVectorₗ'' _ hwv_prop)
-
 /-- The map guaranteed by the universal property of a Verma module. -/
 def VermaModule.universalMap
     {𝕜 A ι : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A] (η : ι → A × 𝕜)
@@ -205,16 +143,6 @@ def VermaModule.universalMap
     {hwv : M} (hwv_prop : ∀ i, (η i).1 • hwv = algebraMap 𝕜 A (η i).2 • hwv) :
     VermaModule η →ₗ[A] M :=
   Submodule.liftQ (vermaIdeal η) (Ring.smulVectorₗ A hwv) (vermaIdeal_le_ker_smulVectorₗ _ hwv_prop)
-
---/-- The image of the highest weight vector of a Verma module under the map guaranteed by the
---universal property is the assigned highest weight vector in the image module. -/
---@[simp] lemma VermaModule.universalMap_hwVec''
---    {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A] {B : Set A} (η : B → 𝕜)
---    (M : Type*) [AddCommGroup M] [Module A M]
---    (hwv : M) (hwv_prop : ∀ {b} (hb : b ∈ B), b • hwv = algebraMap 𝕜 A (η ⟨b, hb⟩) • hwv) :
---    universalMap'' η hwv_prop (hwVec'' η) = hwv := by
---  convert Submodule.liftQ_apply (vermaIdeal'' η) (Ring.smulVectorₗ A hwv) 1
---  simp
 
 /-- The image of the highest weight vector of a Verma module under the map guaranteed by the
 universal property is the assigned highest weight vector in the image module. -/
@@ -226,23 +154,12 @@ universal property is the assigned highest weight vector in the image module. -/
   convert Submodule.liftQ_apply (vermaIdeal η) (Ring.smulVectorₗ A hwv) 1
   simp
 
---/-- The range of the map guaranteed by the universal property of a Verma module is the submodule
---generated by the assigned highest weight vector in the image module. -/
---lemma VermaModule.range_universalMap_eq_span''
---    {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A] {B : Set A} (η : B → 𝕜)
---    {M : Type*} [AddCommGroup M] [Module A M]
---    {hwv : M} (hwv_prop : ∀ {b} (hb : b ∈ B), b • hwv = algebraMap 𝕜 A (η ⟨b, hb⟩) • hwv)
---    (c : A) :
---    LinearMap.range (universalMap'' η hwv_prop) = Submodule.span A {hwv} := by
---  sorry
-
 /-- The range of the map guaranteed by the universal property of a Verma module is the submodule
 generated by the assigned highest weight vector in the image module. -/
 lemma VermaModule.range_universalMap_eq_span
     {𝕜 A ι : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A] (η : ι → A × 𝕜)
     {M : Type*} [AddCommGroup M] [Module A M]
-    {hwv : M} (hwv_prop : ∀ i, (η i).1 • hwv = algebraMap 𝕜 A (η i).2 • hwv)
-    (c : A) :
+    {hwv : M} (hwv_prop : ∀ i, (η i).1 • hwv = algebraMap 𝕜 A (η i).2 • hwv) :
     LinearMap.range (universalMap η hwv_prop) = Submodule.span A {hwv} := by
   have key := VermaModule.hwVec_cyclic η ▸ Submodule.map_top (universalMap η hwv_prop)
   simp [← key, Submodule.map_span]
@@ -270,7 +187,6 @@ lemma centralSMulHom_apply {R : Type*} [Semiring R] {z : R} (z_central : ∀ a, 
 
 variable {𝕜 A : Type*} [CommRing 𝕜] [Semiring A] [Algebra 𝕜 A]
 variable (M : Type*) [AddCommGroup M] [Module 𝕜 M] [Module A M] [IsScalarTower 𝕜 A M]
---variable [SMulCommClass 𝕜 A M]
 
 /-- In a module over a ring, the set of vectors on which a given central element acts by
 a given scalar multiple is a submodule. -/
@@ -317,11 +233,6 @@ variable (𝓖 : Type*) [LieRing 𝓖] [LieAlgebra 𝕜 𝓖]
 
 @[inherit_doc UniversalEnvelopingAlgebra]
 abbrev 𝓤 := UniversalEnvelopingAlgebra
-
-#check 𝓤 𝕜 𝓖
-
-#check TensorAlgebra.induction
---#check UniversalEnvelopingAlgebra.induction
 
 -- TODO: To Mathlib...
 lemma UniversalEnvelopingAlgebra.mkAlgHom_range_eq_top :
@@ -394,110 +305,5 @@ lemma UniversalEnvelopingAlgebra.smul_eq_of_cyclic_of_forall_lie_eq_zero
   exact (good_iff w).mpr hw
 
 end
-
---set_option linter.unusedVariables false in
---/-- Highest weight data constructed from
---* `𝓝 ⊆ 𝓖` is a (nilpotent) Lie subalgebra meant to act as zero on the highest weight vector;
---* `𝓗 ⊆ 𝓖` is a (commutative) Lie subalgebra (Cartan subalgebra) meant to act by scalar
---  multiples on the highest weight vector;
---* `η : 𝓗 → 𝕜` is a functional determining the above mentioned scalars. -/
-----def highestWeightData (η : 𝓗 →ₗ[𝕜] 𝕜) :
-----  ↑((UniversalEnvelopingAlgebra.ι 𝕜 '' (((𝓗.toSubmodule) ⊔ (𝓝.toSubmodule)) : Set 𝓖))) → 𝕜 :=
-----  fun X ↦ by -- **TODO:** Rubbish placeholder, think about the best way.
-----    have (Y) (hY : Y ∈ 𝓗.toSubmodule ⊔ 𝓝.toSubmodule) : ∃ H ∈ 𝓗, ∃ N ∈ 𝓝, Y = H + N := by
-----      obtain ⟨H, hH, N, hN, rfl⟩ := Submodule.mem_sup.mp hY
-----      exact ⟨H, hH, N, hN, rfl⟩
-----    have : X.val ∈ UniversalEnvelopingAlgebra.ι 𝕜 '' (𝓗.toSubmodule ⊔ 𝓝.toSubmodule) :=
-----      Subtype.coe_prop X
-----    have : ∃ Y ∈ 𝓗.toSubmodule ⊔ 𝓝.toSubmodule, X.val = UniversalEnvelopingAlgebra.ι 𝕜 Y := by
-----      --rw [Set.mem_image] at this
-----      obtain ⟨X', hX', ιX'⟩ := (Set.mem_image ..).mp this
-----      refine ⟨X', ?_, ?_⟩
-----
-----      sorry
-----    --cases' X with Y hY
-----    sorry
---def highestWeightData (η : 𝓗 →ₗ[𝕜] 𝕜) :
---  ↑((UniversalEnvelopingAlgebra.ι 𝕜 '' 𝓝) ∪ (UniversalEnvelopingAlgebra.ι 𝕜 '' (𝓗 : Set 𝓖))) → 𝕜 :=
---  fun _ ↦ 0 -- **TODO:** Rubbish placeholder, think about the best way.
---
---variable {𝓖 𝓗} in
---/-- The left ideal used in the construction of a Verma module:
---* `𝓝 ⊆ 𝓖` is a (nilpotent) Lie subalgebra meant to act as zero on the highest weight vector,
---* `𝓗 ⊆ 𝓖` is a (commutative) Lie subalgebra (Cartan subalgebra) meant to act by scalar
---  multiples determined by a functional `η : 𝓗 → 𝕜` on the highest weight vector. -/
---def UniversalEnvelopingAlgebra.vermaIdeal :
---    Submodule (𝓤 𝕜 𝓖) (𝓤 𝕜 𝓖) :=
---  vermaIdeal (𝕜 := 𝕜) (A := (𝓤 𝕜 𝓖)) (highestWeightData 𝕜 𝓖 𝓝 𝓗 η)
-----  Ideal.span (Set.range <| fun (H : 𝓗) ↦ ι 𝕜 (H : 𝓖) - η H • 1)
-----    ⊔ Ideal.span (𝓝.map (ι 𝕜) : Set (𝓤 𝕜 𝓖))
---
---/-
---variable {𝓖 𝓗} in
---/-- The Verma module of a Lie algebra `𝓖` associated to data:
--- * `𝓝 ⊆ 𝓖` is a (nilpotent) Lie subalgebra meant to act as zero on the highest weight vector,
--- * `𝓗 ⊆ 𝓖` is a (commutative) Lie subalgebra (Cartan subalgebra) meant to act by scalar
---   multiples determined by a functional `η : 𝓗 → 𝕜` on the highest weight vector. -/
---def vermaModule :=
---  𝓤 𝕜 𝓖 ⧸ UniversalEnvelopingAlgebra.vermaIdeal 𝕜 𝓝 η
---
---instance : AddCommGroup (vermaModule 𝕜 𝓝 η) :=
---  Submodule.Quotient.addCommGroup _
---
---instance : Module (𝓤 𝕜 𝓖) (vermaModule 𝕜 𝓝 η) :=
---  Submodule.Quotient.module _
---
---/-- Make any module over an algebra into a module over the scalars.
---(Is this a bad idea as an instance? I think this is near essential both for palatable
---notation and for being able to talk about vector subspaces and submodules of a module
---over a noncommutative algebra.) -/
---def moduleScalarOfModule (R A M : Type*)
---    [CommRing R] [Semiring A] [Algebra R A] [AddCommMonoid M] [Module A M] :
---    Module R M where
---  smul c v := (algebraMap R A c) • v
---  one_smul v := by
---    change (algebraMap R A 1) • v = v
---    simp
---  mul_smul c₁ c₂ v := by
---    change (algebraMap R A (c₁ * c₂)) • v = (algebraMap R A c₁) • (algebraMap R A c₂ • v)
---    simp [← mul_smul]
---  smul_zero c := by
---    change (algebraMap R A c) • (0 : M) = 0
---    simp
---  smul_add c v₁ v₂ := by
---    change (algebraMap R A c) • (v₁ + v₂) = (algebraMap R A c) • v₁ + (algebraMap R A c) • v₂
---    simp
---  add_smul c₁ c₂ v := by
---    change (algebraMap R A (c₁ + c₂)) • v = (algebraMap R A c₁) • v + (algebraMap R A c₂) • v
---    simp [add_smul]
---  zero_smul v := by
---    change (algebraMap R A 0) • v = 0
---    simp
---
-----instance (R A M : Type*) [CommRing R] [Semiring A] [Algebra R A] [AddCommMonoid M] [Module A M] :
-----    SMul R M where
-----  smul c v := (c • (1 : A)) • v
---
-----open UniversalEnvelopingAlgebra in
-----/-- The universal property of a Verma module. -/
-----def vermaModule.lift' (M : Type*) [AddCommGroup M] [Module (𝓤 𝕜 𝓖) M]
-----    (hvw : M) (hvwN : ∀ (N : 𝓝), (UniversalEnvelopingAlgebra.ι 𝕜 (N : 𝓖) • hvw = 0))
-----    (hvwH : ∀ (H : 𝓗), (ι 𝕜 (H : 𝓖) • hvw = (η H • (1 : 𝓤 𝕜 𝓖)) • hvw)) :
-----    vermaModule 𝕜 𝓝 η →ₗ[𝓤 𝕜 𝓖] M :=
-----  let f : 𝓤 𝕜 𝓖 →ₗ[𝓤 𝕜 𝓖] M := {
-----    toFun U := U • hvw
-----    map_add' U₁ U₂ := by simp [add_smul]
-----    map_smul' U₁ U₂ := by simp [mul_smul] }
-----  Submodule.liftQ (vermaIdeal 𝕜 𝓝 η) f <| sup_le_iff.mpr
-----    ⟨ by
-----        apply Ideal.span_le.mpr
-----        intro H' ⟨H, hH⟩
-----        simpa only [← hH, SetLike.mem_coe, LinearMap.mem_ker, map_sub, sub_eq_zero] using hvwH H,
-----      by
-----        apply Ideal.span_le.mpr
-----        intro N' ⟨N, N_mem, ιN_eq⟩
-----        simpa [← ιN_eq] using hvwN ⟨N, N_mem⟩⟩
---
---end
 
 end VirasoroProject
