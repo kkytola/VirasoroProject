@@ -94,4 +94,38 @@ variable {V}
 
 end commutatorBilin
 
+
+
+section algebra_commutator
+
+variable (𝕜 : Type*) {A : Type*} [CommSemiring 𝕜] [Ring A] [Algebra 𝕜 A]
+
+/-- Commutator with a fixed element in a `𝕜`-algebra as a `𝕜`-linear map. -/
+def algebraCommutator' (a : A) : A →ₗ[𝕜] A where
+  toFun b := a * b - b * a
+  map_add' b₁ b₂ := by
+    simp only [mul_add, add_mul, sub_eq_add_neg, neg_add_rev]
+    ac_rfl
+  map_smul' r b := by
+    rw [smul_sub]
+    congr <;> simp
+
+lemma algebraCommutator'_apply (a : A) (b : A) :
+    algebraCommutator' 𝕜 a b = a * b - b * a :=
+  rfl
+
+/-- Commutator in a `𝕜`-algebra as a `𝕜`-bilinear linear map. -/
+def algebraCommutator : A →ₗ[𝕜] A →ₗ[𝕜] A where
+  toFun := algebraCommutator' 𝕜
+  map_add' a₁ a₂ := by
+    ext b
+    simp only [algebraCommutator'_apply,
+               add_mul, mul_add, sub_eq_add_neg, neg_add_rev, ← add_assoc, add_apply]
+    ac_rfl
+  map_smul' r a := by
+    ext b
+    simp [algebraCommutator'_apply, smul_sub]
+
+end algebra_commutator
+
 end LinearMap -- namespace

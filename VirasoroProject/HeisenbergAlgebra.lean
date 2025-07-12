@@ -253,11 +253,11 @@ lemma toAbelianLieAlgebraOn_kgen :
 @[simp] lemma toAbelianLieAlgebraOn_jgen (n : ℤ) :
   toAbelianLieAlgebraOn (jgen 𝕜 n) = AbelianLieAlgebraOn.jgen 𝕜 n := rfl
 
-@[simp] lemma kgen_bracket (Z : HeisenbergAlgebra 𝕜) :
+@[simp] lemma lie_kgen (Z : HeisenbergAlgebra 𝕜) :
     ⁅kgen 𝕜, Z⁆ = 0 :=
   (isCentralExtension 𝕜).central 1 Z
 
-@[simp] lemma jgen_bracket (k l : ℤ) :
+@[simp] lemma lie_jgen (k l : ℤ) :
     ⁅jgen 𝕜 k, jgen 𝕜 l⁆ = if k + l = 0 then (k : 𝕜) • kgen 𝕜 else 0 := by
   simp_rw [bracket_def']
   by_cases h : k + l = 0
@@ -304,7 +304,7 @@ noncomputable def basisJK : Basis (Option ℤ) 𝕜 (HeisenbergAlgebra 𝕜) :=
   simp [basisJK]
 
 /-- J₀ is central -/
-@[simp] lemma jgen_zero_bracket (Z : HeisenbergAlgebra 𝕜) :
+@[simp] lemma lie_jgen_zero (Z : HeisenbergAlgebra 𝕜) :
     ⁅jgen 𝕜 0, Z⁆ = 0 := by
   change LieAlgebra.bracketHom 𝕜 _ (jgen 𝕜 0) Z = 0
   suffices LieAlgebra.bracketHom 𝕜 _ (jgen 𝕜 0) = 0 by simp [this]
