@@ -35,6 +35,24 @@ noncomputable instance (α : 𝕜) :
     Module (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) (ChargedFockSpace 𝕜 α) :=
   instModuleVermaModule _
 
+noncomputable instance (α : 𝕜) :
+    Module 𝕜 (ChargedFockSpace 𝕜 α) :=
+  moduleScalarOfModule 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) (ChargedFockSpace 𝕜 α)
+
+instance (α : 𝕜) :
+    IsScalarTower 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) (ChargedFockSpace 𝕜 α) :=
+  isScalarTowerModuleScalarOfModule 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) (ChargedFockSpace 𝕜 α)
+
+lemma ChargedFockSpace.smul_eq_algebraHom_smul {α : 𝕜} (r : 𝕜) (v : ChargedFockSpace 𝕜 α) :
+    r • v = (algebraMap 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) r) • v :=
+  rfl
+
+instance (α : 𝕜) :
+    SMulCommClass 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) (ChargedFockSpace 𝕜 α) where
+  smul_comm r a v := by
+    simp_rw [ChargedFockSpace.smul_eq_algebraHom_smul]
+    simp only [← smul_assoc, smul_eq_mul, Algebra.commutes r a]
+
 lemma ChargedFockSpace.vacuum_cyclic (α : 𝕜) :
     Submodule.span (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) {vacuum 𝕜 α} = ⊤ :=
   VermaModule.hwVec_cyclic _
@@ -47,7 +65,7 @@ lemma ChargedFockSpace.kgen_vacuum (α : 𝕜) :
   rfl
 
 /-- `K • v = v` for all `v` in `ChargedFockSpace 𝕜 α` -/
-lemma ChargedFockSpace.kgen_smul (α : 𝕜) (v : ChargedFockSpace 𝕜 α) :
+@[simp] lemma ChargedFockSpace.kgen_smul (α : 𝕜) (v : ChargedFockSpace 𝕜 α) :
     (UniversalEnvelopingAlgebra.ι 𝕜 (HeisenbergAlgebra.kgen 𝕜)) • v = v := by
   simpa using UniversalEnvelopingAlgebra.smul_eq_of_cyclic_of_forall_lie_eq_zero 𝕜
     (HeisenbergAlgebra 𝕜) (Z := .kgen 𝕜) (ζ := 1) (HeisenbergAlgebra.lie_kgen _)
@@ -56,13 +74,12 @@ lemma ChargedFockSpace.kgen_smul (α : 𝕜) (v : ChargedFockSpace 𝕜 α) :
 /-- `J₀ • vacuum(α) = α • vacuum(α)` -/
 lemma ChargedFockSpace.jgen_zero_vacuum (α : 𝕜) :
     (UniversalEnvelopingAlgebra.ι 𝕜 (HeisenbergAlgebra.jgen 𝕜 0)) • vacuum 𝕜 α
-      = (algebraMap 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) α) • vacuum 𝕜 α :=
+      = α • vacuum 𝕜 α :=
   VermaModule.apply_hwVec_eq (HeisenbergAlgebra.chargedFockHW 𝕜 α) (some 0)
 
 /-- `J₀ • v = α • v` for all `v` in `ChargedFockSpace 𝕜 α` -/
-lemma ChargedFockSpace.jgen_zero_smul (α : 𝕜) (v : ChargedFockSpace 𝕜 α) :
-    (UniversalEnvelopingAlgebra.ι 𝕜 (HeisenbergAlgebra.jgen 𝕜 0)) • v
-      = algebraMap 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) α • v := by
+@[simp] lemma ChargedFockSpace.jgen_zero_smul (α : 𝕜) (v : ChargedFockSpace 𝕜 α) :
+    (UniversalEnvelopingAlgebra.ι 𝕜 (HeisenbergAlgebra.jgen 𝕜 0)) • v = α • v := by
   exact UniversalEnvelopingAlgebra.smul_eq_of_cyclic_of_forall_lie_eq_zero 𝕜
     (HeisenbergAlgebra 𝕜) (Z := .jgen 𝕜 0) (ζ := α) (HeisenbergAlgebra.lie_jgen_zero _)
     (vacuum_cyclic 𝕜 α) (jgen_zero_vacuum 𝕜 α) v

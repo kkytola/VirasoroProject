@@ -776,7 +776,7 @@ section heisenberg_representation
 
 omit heiOper heiTrunc heiComm in
 open HeisenbergAlgebra in
--- TODO: Generalize to `kgen` acting as `κ • 1`.
+-- TODO: Generalize to `kgen` acting as `κ • 1`, maybe.
 /-- **The basic bosonic Sugawara representation of Virasoro algebra (c=1)**:
 On a vector space with a representation of the Heisenberg algebra that acts locally truncatedly
 (and the central element `k` acts as `1`), we get a representation of the Virasoro algebra with

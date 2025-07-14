@@ -39,48 +39,48 @@ lemma isScalarTowerModuleScalarOfModule :
 
 /-- Type synonym of a module over an algebra, when it is to be viewed as a module over
 the scalars. -/
-def _root_.moduleOfModuleAlgebra (𝕜 A V : Type*) [CommRing 𝕜]
+def _root_.ModuleOfModuleAlgebra (𝕜 A V : Type*) [CommRing 𝕜]
     [Semiring A] [Algebra 𝕜 A] [AddCommGroup V] [Module A V] :=
   V
 
 instance (𝕜 A V : Type*) [CommRing 𝕜]
     [Semiring A] [Algebra 𝕜 A] [AddCommGroup V] [Module A V] :
-    AddCommGroup (moduleOfModuleAlgebra 𝕜 A V) :=
+    AddCommGroup (ModuleOfModuleAlgebra 𝕜 A V) :=
   ‹AddCommGroup V›
 
 instance (𝕜 A V : Type*) [CommRing 𝕜]
     [Semiring A] [Algebra 𝕜 A] [AddCommGroup V] [Module A V] :
-    Module 𝕜 (moduleOfModuleAlgebra 𝕜 A V) :=
+    Module 𝕜 (ModuleOfModuleAlgebra 𝕜 A V) :=
   moduleScalarOfModule 𝕜 A V
 
-/-- The map from `V` to its type synonym `moduleOfModuleAlgebra 𝕜 A V`. -/
-def _root_.moduleOfModuleAlgebra.mk (𝕜 A V : Type*) [CommRing 𝕜]
+/-- The map from `V` to its type synonym `ModuleOfModuleAlgebra 𝕜 A V`. -/
+def _root_.ModuleOfModuleAlgebra.mk (𝕜 A V : Type*) [CommRing 𝕜]
     [Semiring A] [Algebra 𝕜 A] [AddCommGroup V] [Module A V] (v : V) :
-    moduleOfModuleAlgebra 𝕜 A V :=
+    ModuleOfModuleAlgebra 𝕜 A V :=
   v
 
-/-- The map from `V` to its type synonym `moduleOfModuleAlgebra 𝕜 A V` as a
+/-- The map from `V` to its type synonym `ModuleOfModuleAlgebra 𝕜 A V` as a
 homomorphism of additive groups. -/
-def _root_.moduleOfModuleAlgebra.mkAddHom (𝕜 A V : Type*) [CommRing 𝕜]
+def _root_.ModuleOfModuleAlgebra.mkAddHom (𝕜 A V : Type*) [CommRing 𝕜]
     [Semiring A] [Algebra 𝕜 A] [AddCommGroup V] [Module A V] :
-    V →+ moduleOfModuleAlgebra 𝕜 A V where
-  toFun := moduleOfModuleAlgebra.mk 𝕜 A V
+    V →+ ModuleOfModuleAlgebra 𝕜 A V where
+  toFun := ModuleOfModuleAlgebra.mk 𝕜 A V
   map_zero' := rfl
   map_add' _ _ := rfl
 
-/-- The map from the type synonym `moduleOfModuleAlgebra 𝕜 A V` back to `V`. -/
-def _root_.moduleOfModuleAlgebra.unMk (𝕜 A V : Type*) [CommRing 𝕜]
+/-- The map from the type synonym `ModuleOfModuleAlgebra 𝕜 A V` back to `V`. -/
+def _root_.ModuleOfModuleAlgebra.unMk (𝕜 A V : Type*) [CommRing 𝕜]
     [Semiring A] [Algebra 𝕜 A] [AddCommGroup V] [Module A V]
-    (v : moduleOfModuleAlgebra 𝕜 A V) :
+    (v : ModuleOfModuleAlgebra 𝕜 A V) :
     V :=
   v
 
-/-- The map from the type synonym `moduleOfModuleAlgebra 𝕜 A V` back to `V` as a
+/-- The map from the type synonym `ModuleOfModuleAlgebra 𝕜 A V` back to `V` as a
 homomorphism of additive groups. -/
-def _root_.moduleOfModuleAlgebra.unMkAddHom (𝕜 A V : Type*) [CommRing 𝕜]
+def _root_.ModuleOfModuleAlgebra.unMkAddHom (𝕜 A V : Type*) [CommRing 𝕜]
     [Semiring A] [Algebra 𝕜 A] [AddCommGroup V] [Module A V] :
-    moduleOfModuleAlgebra 𝕜 A V →+ V where
-  toFun := moduleOfModuleAlgebra.unMk 𝕜 A V
+    ModuleOfModuleAlgebra 𝕜 A V →+ V where
+  toFun := ModuleOfModuleAlgebra.unMk 𝕜 A V
   map_zero' := rfl
   map_add' _ _ := rfl
 
@@ -270,7 +270,7 @@ end central_element_action
 
 
 
-section
+section UniversalEnvelopingAlgebra
 
 variable (𝕜 : Type*) [CommRing 𝕜]
 variable (𝓖 : Type*) [LieRing 𝓖] [LieAlgebra 𝕜 𝓖]
@@ -348,64 +348,50 @@ lemma UniversalEnvelopingAlgebra.smul_eq_of_cyclic_of_forall_lie_eq_zero
   apply (Submodule.span_singleton_le_iff_mem ..).mpr
   exact (good_iff w).mpr hw
 
---variable {V : Type*} [AddCommGroup V] [Module (𝓤 𝕜 𝓖) V]
---#check @LieAlgebra.Representation 𝕜 𝕜 _ _ 𝓖 _ _ V _ (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) _ _ _
---#check LinearMap.lsmul
---
---#check @Module.End 𝕜 V _ _ (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V)
---#check @LinearMap.module 𝕜 𝕜 𝕜 V V _ _ _ _ (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) (RingHom.id _) _ (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) _
---#check @LinearMap 𝕜 𝕜 _ _ (RingHom.id _) V (@Module.End 𝕜 V _ _ (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V)) _ _ (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) (@LinearMap.module 𝕜 𝕜 𝕜 V V _ _ _ _ (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) (RingHom.id _) _ (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) _)
-
---variable (X : 𝓖)
---
---#check @Module.End 𝕜 V _ _ (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) --_ _ (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) (@LinearMap.module 𝕜 𝕜 𝕜 V V _ _ _ _ (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V) -- (RingHom.id _) --_ (moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓖) V)
---
-#check moduleOfModuleAlgebra.mkAddHom
-
 private def UniversalEnvelopingAlgebra.representationAux
     (V : Type*) [AddCommGroup V] [Module (𝓤 𝕜 𝓖) V] (X : 𝓖) :
     -- V →ₗ[𝕜] V :=
-    Module.End 𝕜 (moduleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V) where
+    Module.End 𝕜 (ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V) where
   toFun v :=
-    (UniversalEnvelopingAlgebra.ι 𝕜 X) • (moduleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v)
+    (UniversalEnvelopingAlgebra.ι 𝕜 X) • (ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v)
   map_add' v₁ v₂ :=
-    smul_add (UniversalEnvelopingAlgebra.ι 𝕜 X) (moduleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v₁) (moduleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v₂)
+    smul_add (UniversalEnvelopingAlgebra.ι 𝕜 X) (ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v₁) (ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v₂)
   map_smul' r v := by
     change
         (UniversalEnvelopingAlgebra.ι 𝕜 X) • (algebraMap 𝕜 (𝓤 𝕜 𝓖) r
-              • (moduleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v))
+              • (ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v))
           = algebraMap 𝕜 (𝓤 𝕜 𝓖) r • (UniversalEnvelopingAlgebra.ι 𝕜 X)
-              • (moduleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v)
+              • (ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v)
     simp only [← mul_smul]
     congr 1
     exact (Algebra.commutes r _).symm
 
 private lemma UniversalEnvelopingAlgebra.representationAux_apply
     {V : Type*} [AddCommGroup V] [Module (𝓤 𝕜 𝓖) V] (X : 𝓖)
-    (v : moduleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V) :
+    (v : ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V) :
     representationAux 𝕜 𝓖 V X v =
       (UniversalEnvelopingAlgebra.ι 𝕜 X)
-        • (moduleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v) := by
+        • (ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v) := by
   rfl
 
 /-- Any module `V` over the universal enveloping algebra of a Lie algebra is a representation of the
 Lie algebra.
 
-This is recorded on the type synonym `moduleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V` of `V`, in order to
+This is recorded on the type synonym `ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V` of `V`, in order to
 make the `V` a `𝕜`-module and talk about a representation of a `𝕜`-Lie algebra on it. -/
 def UniversalEnvelopingAlgebra.representation
     {V : Type*} [AddCommGroup V] [Module (𝓤 𝕜 𝓖) V] :
-    LieAlgebra.Representation 𝕜 𝕜 𝓖 (moduleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V) where
+    LieAlgebra.Representation 𝕜 𝕜 𝓖 (ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V) where
   toFun := representationAux 𝕜 𝓖 V
   map_add' X Y := by
     ext v
     simp only [LinearMap.add_apply, representationAux_apply, LieHom.map_add]
-    exact Module.add_smul _ _ ((moduleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V) v)
+    exact Module.add_smul _ _ ((ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V) v)
   map_smul' r X := by
     ext v
     simp only [LinearMap.smul_apply, representationAux_apply]
     simp only [LieHom.map_smul, RingHom.id_apply]
-    set v' := moduleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v with def_v'
+    set v' := ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v with def_v'
     set a := (UniversalEnvelopingAlgebra.ι 𝕜 X) with def_a
     have : ((algebraMap 𝕜 (𝓤 𝕜 𝓖) r) • a) • v' = (algebraMap 𝕜 (𝓤 𝕜 𝓖) r) • a • v' :=
       IsScalarTower.smul_assoc ((algebraMap 𝕜 (𝓤 𝕜 𝓖)) r) a v'
@@ -419,11 +405,38 @@ def UniversalEnvelopingAlgebra.representation
           = representationAux 𝕜 𝓖 V X (representationAux 𝕜 𝓖 V Y v)
             - representationAux 𝕜 𝓖 V Y (representationAux 𝕜 𝓖 V X v)
     simp only [representationAux_apply, LieHom.map_lie]
-    set v' := moduleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v with def_v'
+    set v' := ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v with def_v'
     set a := (UniversalEnvelopingAlgebra.ι 𝕜 X) with def_a
     set b := (UniversalEnvelopingAlgebra.ι 𝕜 Y) with def_b
     change (a * b - b * a) • v' = a • (b • v') - b • (a • v')
     simp [sub_smul, mul_smul]
+
+end UniversalEnvelopingAlgebra
+
+
+
+section
+
+variable (𝕜 : Type*) [CommRing 𝕜]
+variable {A : Type*} [Semiring A] [Algebra 𝕜 A]
+variable (V : Type*) [AddCommGroup V] [Module A V]
+
+def ModuleOfModuleAlgebra.lsmul (a : A) :
+    ModuleOfModuleAlgebra 𝕜 A V →ₗ[𝕜] ModuleOfModuleAlgebra 𝕜 A V where
+  toFun v := ModuleOfModuleAlgebra.mkAddHom 𝕜 A V (a • ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v)
+  map_add' v₁ v₂ :=
+    smul_add a (ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v₁) (ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v₂)
+  map_smul' r v := by
+    change a • (algebraMap 𝕜 A r • (ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v))
+          = algebraMap 𝕜 A r • (a • (ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v))
+    simp [← smul_assoc]
+    congr 1
+    exact (Algebra.commutes r a).symm
+
+lemma ModuleOfModuleAlgebra.lsmul_apply (a : A) (v : ModuleOfModuleAlgebra 𝕜 A V) :
+    ModuleOfModuleAlgebra.lsmul 𝕜 V a v =
+      ModuleOfModuleAlgebra.mkAddHom 𝕜 A V (a • ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v) := by
+  rfl
 
 end
 

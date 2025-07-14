@@ -3,6 +3,7 @@
 import «VirasoroProject».CentralExtension
 import «VirasoroProject».CyclicTripleSum
 import «VirasoroProject».FockSpace
+import «VirasoroProject».FockSpaceSugawara
 import «VirasoroProject».HeisenbergAlgebra
 import «VirasoroProject».IsCentralExtension
 import «VirasoroProject».LieCohomologySmallDegree
