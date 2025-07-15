@@ -2,7 +2,7 @@
 
 [link to docs and blueprint](https://kkytola.github.io/VirasoroProject)
 
-This project is a Lean-formalization of topics related to the Virasoro algebra. The current scope is mainly:
+This project is a Lean-formalization of topics related to the Virasoro algebra. The original scope was mainly:
  * the construction of the Virasoro algebra as the (unique) 1-dimensional central extension of the Witt algebra. (`«VirasoroProject».VirasoroAlgebra`)
 
 To enable the construction, the project contains API development for
@@ -20,4 +20,12 @@ and finally
 As a rather trivial second application of the API of central extensions, the project defines also
  * the Heisenberg (Lie) algebra as the 1-dimensional central extension of a countably infinite-dimensional abelian Lie algebra associated with an explicit nonzero 2-cocycle. (`«VirasoroProject».HeisenbergAlgebra`)
 
-The main purpose of this mathematically less interesting second case is to enable the Sugawara construction, by which one can equip positive energy representations of the Heisenberg algebra with a representation of the Virasoro algebra also. But so far I have not had time to teach that to Lean.
+The main purpose of this mathematically less interesting second case is to enable a further result, the Sugawara construction, by which one can equip positive energy representations of the Heisenberg algebra with a representation of the Virasoro algebra also. Specifically, 
+ * it is proven (*by calculation!*) that the basic bosonic Sugawara construction equips any representation of the Heisenberg algebra satisfying a local truncation condition with a representation of the Virasoro algebra with central charge c=1. (`«VirasoroProject».Sugawara`)
+
+The project 
+ * defines a generalized notion of Verma modules and proves their universal property. (`«VirasoroProject».VermaModule`)
+
+The design choices of the Verma module definition may not be entirely uncontroversial, but so far this has been successfully applied to
+ * construct the charged Fock space representation of the Heisenberg algebra (`«VirasoroProject».FockSpace`)
+ * show that the Sugawara construction applies to the charged Fock space, making it a representation of the Virasoro algebra with central charge c=1, and the vacuum being a highest weight vector with highest weight 1/2*charge^2. (`«VirasoroProject».FockSpaceSugawara`)
