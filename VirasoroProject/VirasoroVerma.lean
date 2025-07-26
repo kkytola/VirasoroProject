@@ -6,205 +6,16 @@ Authors: Kalle Kytölä
 import Mathlib
 import VirasoroProject.VermaModule
 import VirasoroProject.VirasoroAlgebra
-import VirasoroProject.ToMathlib.LinearAlgebra.Basis.FinsumRepr
+import VirasoroProject.LieVerma
+import VirasoroProject.IndexTri
 
 
 
 namespace VirasoroProject
 
-
-
-section
-
-variable (𝕜 : Type*) [CommRing 𝕜]
-variable (𝓰 : Type*) [LieRing 𝓰] [LieAlgebra 𝕜 𝓰]
-
-structure TriangularDecomposition where
-  --subalg : SignType → LieSubalgebra 𝕜 𝓰
-  --directSum : DirectSum.IsInternal subalg
-  --commutative : ∀ (H₁ H₂ : subalg 0), ⁅H₁, H₂⁆ = 0
-  --nilpotent : ...
-  part : SignType → Submodule 𝕜 𝓰
-  directSum : DirectSum.IsInternal part
-
-namespace TriangularDecomposition
-
-variable {𝕜 𝓰} in
-def ofBasis {ι : Type*} [Nontrivial 𝕜] [NoZeroSMulDivisors 𝕜 𝓰]
-    (B : Basis ι 𝕜 𝓰) (Bp : SignType → Set ι)
-    (Bp_disj : Pairwise (fun ε₁ ε₂ ↦ Disjoint (Bp ε₁) (Bp ε₂)))
-    (Bp_cover : ⋃ ε, Bp ε = Set.univ) :
-    TriangularDecomposition 𝕜 𝓰 where
-  part ε := Submodule.span 𝕜 (B '' Bp ε)
-  directSum := by
-    rw [DirectSum.isInternal_submodule_iff_iSupIndep_and_iSup_eq_top]
-    constructor
-    · exact B.iSupIndep_submodule_span_of_pairwise_disjoint _ Bp_disj
-    · rw [Submodule.eq_top_iff']
-      intro X
-      have Xpart_mem (ε) : ∑ᶠ i ∈ Bp ε, B.repr X i • B i ∈ Submodule.span 𝕜 (B '' Bp ε) :=
-        finsum_mem_mem_span (fun i ↦ B i) (B.repr X) (Bp ε)
-      have X_eq :
-          X = ∑ᶠ i ∈ Bp 1, B.repr X i • B i + ∑ᶠ i ∈ Bp (-1), B.repr X i • B i
-              + ∑ᶠ i ∈ Bp 0, B.repr X i • B i := by
-        nth_rw 1 [← B.finsum_repr_smul_basis X]
-        have supp_finite_aux : (Function.support (fun i ↦ B.repr X i • B i)).Finite := by
-          apply (Finsupp.finite_support (B.repr X)).subset
-          intro i hi
-          simp only [Function.support, ne_eq, smul_eq_zero, not_or, Set.mem_setOf_eq] at hi ⊢
-          exact hi.1
-        have supp_finite (ε : SignType) := supp_finite_aux.inter_of_right (Bp ε)
-        rw [← finsum_mem_union' (Bp_disj (by simp)) (supp_finite 1) (supp_finite (-1))]
-        rw [← finsum_mem_union' ?_ ?_ (supp_finite 0)]
-        · have Bp_cover' : Bp 1 ∪ Bp (-1) ∪ Bp 0 = Set.univ := by
-            rw [← Bp_cover]
-            apply subset_antisymm
-            · refine Set.union_subset (Set.union_subset ?_ ?_) ?_ <;>
-              · exact Set.subset_iUnion_of_subset _ subset_rfl
-            · apply Set.iUnion_subset
-              intro ε
-              match ε with
-              | 1 => apply Set.subset_union_of_subset_left (by simp)
-              | 0 => simp
-              | -1 => apply Set.subset_union_of_subset_left (by simp)
-          simp [Bp_cover']
-        · exact Disjoint.union_left (Bp_disj (by simp)) (Bp_disj (by simp))
-        · exact Set.Finite.inter_of_right supp_finite_aux (Bp 1 ∪ Bp (-1))
-      rw [X_eq]
-      apply Submodule.add_mem _ (Submodule.add_mem _ ?_ ?_)
-      · exact Submodule.mem_iSup_of_mem 0 (Xpart_mem 0)
-      · exact Submodule.mem_iSup_of_mem 1 (Xpart_mem 1)
-      · exact Submodule.mem_iSup_of_mem (-1) (Xpart_mem (-1))
-
-variable {𝕜 𝓰} in
-/-- The parts of a triangular decomposition determined by a basis have natural bases by
-construction. -/
-noncomputable def ofBasis.basis_part {ι : Type*} [Nontrivial 𝕜] [NoZeroSMulDivisors 𝕜 𝓰]
-    (B : Basis ι 𝕜 𝓰) (Bp : SignType → Set ι)
-    (Bp_disj : Pairwise (fun ε₁ ε₂ ↦ Disjoint (Bp ε₁) (Bp ε₂)))
-    (Bp_cover : ⋃ ε, Bp ε = Set.univ) (ε : SignType) :
-    Basis (Bp ε) 𝕜 ((ofBasis B Bp Bp_disj Bp_cover).part ε) :=
-  Basis.basis_submodule_span B (Bp ε)
-
-variable {𝕜 𝓰}
-variable (tri : TriangularDecomposition 𝕜 𝓰)
-
-/-- The Cartan subalgebra of a given triangular decomposition of a Lie algebra. -/
-abbrev cartan := tri.part 0
-
-abbrev upper := tri.part 1
-
-abbrev lower := tri.part (-1)
-
-/-- Weights of a Lie algebra with triangular decomposition are functionals on the
-Cartan subalgebra. -/
-abbrev weight := tri.cartan →ₗ[𝕜] 𝕜
-
-variable {tri}
-
-/-- The data associated to a weight for the purpose of constructing a highest weight
-representation. -/
-noncomputable def weightHW (η : weight tri) (i : tri.cartan ⊕ tri.upper) :
-    𝓤 𝕜 𝓰 × 𝕜 := match i with
-  | Sum.inl H => ⟨ιUEA 𝕜 H, η H⟩
-  | Sum.inr E => ⟨ιUEA 𝕜 E, 0⟩
-
-/-- The Verma module of highest weight η. -/
-def VermaHW (η : weight tri) :=
-  VermaModule (weightHW η)
-
-variable (η : weight tri)
-
-/-- The highest weight vector of the Verma module of highest weight η. -/
-noncomputable def VermaHW.hwVec (η : weight tri) : VermaHW η :=
-  VermaModule.hwVec _
-
-noncomputable instance (η : weight tri) : AddCommGroup (VermaHW η) :=
-  instAddCommGroupVermaModule _
-
-noncomputable instance (η : weight tri) :
-    Module (𝓤 𝕜 𝓰) (VermaHW η) :=
-  instModuleVermaModule _
-
-noncomputable instance (η : weight tri) :
-    Module 𝕜 (VermaHW η) :=
-  moduleScalarOfModule 𝕜 (𝓤 𝕜 𝓰) (VermaHW η)
-
-instance (η : weight tri) :
-    IsScalarTower 𝕜 (𝓤 𝕜 𝓰) (VermaHW η) :=
-  isScalarTowerModuleScalarOfModule 𝕜 (𝓤 𝕜 𝓰) (VermaHW η)
-
-lemma VermaHW.smul_eq_algebraHom_smul {η : weight tri} (r : 𝕜) (v : VermaHW η) :
-    r • v = (algebraMap 𝕜 (𝓤 𝕜 𝓰) r) • v :=
-  rfl
-
-instance (η : weight tri) :
-    SMulCommClass 𝕜 (𝓤 𝕜 𝓰) (VermaHW η) where
-  smul_comm r a v := by
-    simp_rw [VermaHW.smul_eq_algebraHom_smul]
-    simp only [← smul_assoc, smul_eq_mul, Algebra.commutes r a]
-
-lemma VermaHW.hwVec_cyclic (η : weight tri) :
-    Submodule.span (𝓤 𝕜 𝓰) {VermaHW.hwVec η} = ⊤ :=
-  VermaModule.hwVec_cyclic _
-
-lemma VermaHW.upper_smul_hwVec (η : weight tri) {E : 𝓰} (hE : E ∈ tri.upper) :
-    ιUEA 𝕜 E • VermaHW.hwVec η = 0 := by
-  simpa [weightHW] using VermaModule.apply_hwVec_eq (weightHW η) (Sum.inr ⟨E, hE⟩)
-
-lemma VermaHW.cartan_smul_hwVec (η : weight tri) {H : 𝓰} (hH : H ∈ tri.cartan) :
-    ιUEA 𝕜 H • VermaHW.hwVec η = (η ⟨H, hH⟩) • VermaHW.hwVec η := by
-  simpa [weightHW] using VermaModule.apply_hwVec_eq (weightHW η) (Sum.inl ⟨H, hH⟩)
-
-end TriangularDecomposition
-
-end
-
-
-
 section VirasoroVerma
 
 variable (𝕜 : Type*) [Field 𝕜] [CharZero 𝕜]
-
-def VirasoroAlgebra.indexTri (ε : SignType) : Set (Option ℤ) := match ε with
-  | SignType.zero => {none, some 0}
-  | SignType.pos => some '' {n : ℤ | 0 < n}
-  | SignType.neg => some '' {n : ℤ | n < 0}
-
-lemma VirasoroAlgebra.pairwise_disjoint_indexTri :
-    Pairwise fun ε₁ ε₂ ↦ Disjoint (indexTri ε₁) (indexTri ε₂) := by
-  intro ε₁ ε₂ h
-  simp only [indexTri]
-  cases ε₁
-  · cases ε₂ <;> aesop
-  · cases ε₂
-    · aesop
-    · aesop
-    · apply Set.disjoint_image_image fun k hk l hl ↦ ?_
-      by_contra con
-      simp only [Set.mem_setOf_eq, Option.some.injEq] at hk hl con
-      linarith
-  · cases ε₂
-    · aesop
-    · apply Set.disjoint_image_image fun k hk l hl ↦ ?_
-      by_contra con
-      simp only [Set.mem_setOf_eq, Option.some.injEq] at hk hl con
-      linarith
-    · aesop
-
-lemma VirasoroAlgebra.iUnion_indexTri :
-    ⋃ ε, indexTri ε = Set.univ := by
-  · simp only [indexTri, Set.iUnion_eq_univ_iff]
-    intro i
-    match i with
-    | none => refine ⟨0, by decide⟩
-    | some n =>
-      by_cases hn0 : n = 0
-      · refine ⟨0, by simp [hn0]⟩
-      by_cases n_pos : 0 < n
-      · refine ⟨1, by simp [n_pos]⟩
-      · have n_neg : n < 0 := by grind
-        refine ⟨-1, by simp [n_neg]⟩
 
 open VirasoroAlgebra in
 /-- The triangular decomposition of the Virasoro algebra with upper and lower (essentially
@@ -249,11 +60,11 @@ noncomputable def VirasoroAlgebra.hw (c h : 𝕜) :
 
 /-- The Virasoro generator `C` as an element of the Cartan subalgebra. -/
 noncomputable def virasoroTri_cgen : (virasoroTri 𝕜).part 0 :=
-  ⟨.cgen 𝕜, Submodule.mem_span_of_mem (by simp [VirasoroAlgebra.indexTri])⟩
+  ⟨.cgen 𝕜, Submodule.mem_span_of_mem (by simp [indexTri])⟩
 
 /-- The Virasoro generator `L₀` as an element of the Cartan subalgebra. -/
 noncomputable def virasoroTri_lzero : (virasoroTri 𝕜).part 0 :=
-  ⟨.lgen 𝕜 0, Submodule.mem_span_of_mem (by simp [VirasoroAlgebra.indexTri])⟩
+  ⟨.lgen 𝕜 0, Submodule.mem_span_of_mem (by simp [indexTri])⟩
 
 @[simp] lemma virasoroTri_cgen_val :
     (virasoroTri_cgen 𝕜).val = .cgen 𝕜 :=
@@ -354,7 +165,5 @@ lemma VirasoroVerma.cgen_smul (c h : 𝕜) (v : VirasoroVerma 𝕜 c h) :
     _ _ (fun _ ↦ rfl) (hwVec_cyclic 𝕜 c h) (cgen_hwVec 𝕜 c h) v
 
 end VirasoroVerma
-
-
 
 end VirasoroProject
