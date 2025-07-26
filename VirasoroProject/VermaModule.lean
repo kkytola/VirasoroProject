@@ -290,7 +290,7 @@ lemma smul_eq_scalar_smul_of_central_of_mem_span
   suffices Submodule.span A {u} ≤ centralValueSubmodule M z_central ζ from this hv
   apply (Submodule.span_singleton_le_iff_mem u _).mpr
   exact (mem_centralValueSubmodule_iff ..).mpr hzu
-  -- *A shorter (and in some sensemore elementary) proof:*
+  -- *A shorter (and in some sense more elementary) proof:*
   --obtain ⟨a, hauv⟩ := Submodule.mem_span_singleton.mp hv
   --rw [← hauv, ← smul_assoc, smul_eq_mul, z_central a, ← smul_eq_mul, smul_assoc, hau]
   --exact smul_comm a ζ u
