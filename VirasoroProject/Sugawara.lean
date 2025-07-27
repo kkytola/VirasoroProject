@@ -784,13 +784,13 @@ central charge `c = 1` by the Sugawara construction. -/
 noncomputable def sugawaraRepresentation_of_representation_heisenbergAlgebra [CharZero 𝕜]
     (α : LieAlgebra.Representation 𝕜 𝕜 (HeisenbergAlgebra 𝕜) V)
     (hα : ∀ v, ∀ᶠ k in atTop, α (jgen _ k) v = 0) (hαc : α (kgen _) = 1) :
-    LieAlgebra.Representation 𝕜 𝕜 (VirasoroAlgebra 𝕜) V := by
-  apply sugawaraRepresentation hα
-  intro k l
-  simp [← LieAlgebra.Representation.apply_bracket_eq_commutator α (jgen _ k) (jgen _ l)]
-  by_cases hkl : k + l = 0
-  · simp [hkl, hαc]
-  · simp [hkl]
+    LieAlgebra.Representation 𝕜 𝕜 (VirasoroAlgebra 𝕜) V :=
+  sugawaraRepresentation hα <| by
+    intro k l
+    simp [← LieAlgebra.Representation.apply_bracket_eq_commutator α (jgen _ k) (jgen _ l)]
+    by_cases hkl : k + l = 0
+    · simp [hkl, hαc]
+    · simp [hkl]
 
 end heisenberg_representation
 

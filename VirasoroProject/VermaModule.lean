@@ -61,50 +61,21 @@ end cyclic_vectors
 
 
 
-section left_smul_linear_map
-
-variable (𝕜 : Type*) [CommRing 𝕜]
-variable {A : Type*} [Semiring A] [Algebra 𝕜 A]
-variable (V : Type*) [AddCommGroup V] [Module A V]
-
-def ModuleOfModuleAlgebra.lsmul (a : A) :
-    ModuleOfModuleAlgebra 𝕜 A V →ₗ[𝕜] ModuleOfModuleAlgebra 𝕜 A V where
-  toFun v := ModuleOfModuleAlgebra.mkAddHom 𝕜 A V (a • ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v)
-  map_add' v₁ v₂ :=
-    smul_add a (ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v₁) (ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v₂)
-  map_smul' r v := by
-    change a • (algebraMap 𝕜 A r • (ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v))
-          = algebraMap 𝕜 A r • (a • (ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v))
-    simp [← smul_assoc]
-    congr 1
-    exact (Algebra.commutes r a).symm
-
-lemma ModuleOfModuleAlgebra.lsmul_apply (a : A) (v : ModuleOfModuleAlgebra 𝕜 A V) :
-    ModuleOfModuleAlgebra.lsmul 𝕜 V a v =
-      ModuleOfModuleAlgebra.mkAddHom 𝕜 A V (a • ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v) := by
-  rfl
-
-end left_smul_linear_map
-
-
-
 section generalized_Verma_module
 
 variable {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A]
 variable {ι : Type*}
 
 /-- The left ideal used in the construction of a (generalized) Verma module for an algebra `A`:
-* `B ⊆ A` is a subset meant to act by scalar multiples on the highest weight vector
-  (a "Borel subalgebra").
-* `η : B → 𝕜` is a is a function giving those scalars ("highest weight" data). -/
+`η : ι → A × 𝕜` is an indexed collection of algebra elements and scalars by which they should act
+on the "highest weight vector". -/
 def vermaIdeal (η : ι → A × 𝕜) :
     Submodule A A :=
   Submodule.span A (Set.range <| fun (i : ι) ↦ (η i).1 - algebraMap 𝕜 A (η i).2)
 
-/-- The (generalied) Verma module of an algebra `S` associated to a function `η : s → 𝕜`:
-* `𝓝 ⊆ 𝓖` is a (nilpotent) Lie subalgebra meant to act as zero on the highest weight vector,
-* `𝓗 ⊆ 𝓖` is a (commutative) Lie subalgebra (Cartan subalgebra) meant to act by scalar
-  multiples determined by a functional `η : 𝓗 → 𝕜` on the highest weight vector. -/
+/-- The (generalied) Verma module of an algebra `A`:
+`η : ι → A × 𝕜` is an indexed collection of algebra elements and scalars by which they should act
+on the "highest weight vector". -/
 def VermaModule (η : ι → A × 𝕜) :=
   A ⧸ vermaIdeal η
 

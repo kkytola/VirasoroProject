@@ -182,10 +182,10 @@ charge `c`. -/
 instance (c h : 𝕜) : HasCentralCharge 𝕜 (VirasoroVerma 𝕜 c h) c :=
   ⟨fun v ↦ VirasoroVerma.cgen_smul 𝕜 c h v⟩
 
-private lemma upper_smul_eq_zero_of_forall_pos_lgen_smul_eq_zero (c h : 𝕜)
+private lemma upper_smul_eq_zero_of_forall_pos_lgen_smul_eq_zero
     {M : Type*} [AddCommGroup M] [Module (𝓤 𝕜 (VirasoroAlgebra 𝕜)) M] {v : M}
     (hwv_lpos : ∀ n > 0, ιUEA 𝕜 (VirasoroAlgebra.lgen 𝕜 n) • v = 0) :
-    ∀ {E} (hE : E ∈ (virasoroTri 𝕜).upper), (ιUEA 𝕜) E • v = 0 := by
+    ∀ {E} (_ : E ∈ (virasoroTri 𝕜).upper), (ιUEA 𝕜) E • v = 0 := by
   simp only [virasoroTri_upper]
   apply Submodule.span_induction
   · simpa only [Set.mem_image, Set.mem_setOf_eq, forall_exists_index, and_imp,
@@ -250,7 +250,7 @@ noncomputable def VirasoroVerma.universalMap {c h : 𝕜}
   apply @TriangularDecomposition.VermaHW.universalMap 𝕜 _ (VirasoroAlgebra 𝕜) _ _ (virasoroTri 𝕜)
         (VirasoroAlgebra.hw _ c h) M _ _ hwv ?_ ?_
   · exact cartan_smul_eq_of_cgen_smul_eq_of_lzero_smul_eq 𝕜 hwv_c hwv_lzero
-  · exact upper_smul_eq_zero_of_forall_pos_lgen_smul_eq_zero 𝕜 c h hwv_lpos
+  · exact upper_smul_eq_zero_of_forall_pos_lgen_smul_eq_zero 𝕜 hwv_lpos
 
 lemma VirasoroVerma.universalMap_hwVec (c h : 𝕜)
     (M : Type*) [AddCommGroup M] [Module (𝓤 𝕜 (VirasoroAlgebra 𝕜)) M] {hwv : M}

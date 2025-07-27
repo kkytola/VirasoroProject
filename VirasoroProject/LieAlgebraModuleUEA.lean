@@ -36,6 +36,10 @@ variable (V : Type*) [AddCommGroup V] [Module A V]
 def moduleScalarOfModule : Module 𝕜 V :=
   Module.compHom _ (algebraMap 𝕜 A)
 
+lemma moduleScalarOfModule.smul_def (r : 𝕜) (v : V) :
+    (moduleScalarOfModule 𝕜 A V).smul r v = algebraMap 𝕜 A r • v :=
+  rfl
+
 /-- When making any module over an algebra a module over the scalars, these form an
 `IsScalarTower`.
 
@@ -327,13 +331,15 @@ def UniversalEnvelopingAlgebra.representation
 
 section moduleUEA
 
+variable {𝕜 𝕂 : Type*} [CommRing 𝕜] [CommRing 𝕂]
+variable  {𝓖 : Type*} [LieRing 𝓖] [LieAlgebra 𝕜 𝓖]
+variable {V : Type*} [AddCommGroup V] [Module 𝕂 V] [Module 𝕜 V]
+variable [SMul 𝕜 𝕂] [IsScalarTower 𝕜 𝕂 V] [SMulCommClass 𝕂 𝕜 V]
+variable (ρ : LieAlgebra.Representation 𝕜 𝕂 𝓖 V)
+
 /-- A representation of a `𝕜`-Lie algebra `𝓖` on a vector space `V` defines a `𝓤 𝕜 𝓖`-module
 structure on `V`. -/
-noncomputable def LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra
-    {𝕜 𝕂 : Type*} [CommRing 𝕜] [CommRing 𝕂] {𝓖 : Type*} [LieRing 𝓖] [LieAlgebra 𝕜 𝓖]
-    {V : Type*} [AddCommGroup V] [Module 𝕂 V] [Module 𝕜 V]
-    [SMul 𝕜 𝕂] [IsScalarTower 𝕜 𝕂 V] [SMulCommClass 𝕂 𝕜 V]
-    (ρ : Representation 𝕜 𝕂 𝓖 V) :
+noncomputable def LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra :
     Module (𝓤 𝕜 𝓖) V where
   smul a v := UniversalEnvelopingAlgebra.lift 𝕜 ρ a v
   one_smul v := by
@@ -357,6 +363,20 @@ noncomputable def LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra
   zero_smul v := by
     change UniversalEnvelopingAlgebra.lift 𝕜 ρ 0 v = 0
     simp
+
+@[simp] lemma LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra_smul_eq
+    (a : 𝓤 𝕜 𝓖) (v : V) :
+    (LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra ρ).smul a v
+      = UniversalEnvelopingAlgebra.lift 𝕜 ρ a v :=
+  rfl
+
+/-- The defining property of the `𝓤 𝕜 𝓖`-module structure on a representation `V` of a
+`𝕜`-Lie algebra `𝓖`. -/
+lemma LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra_ιUEA_smul_eq
+    (X : 𝓖) (v : V) :
+    (LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra ρ).smul (ιUEA 𝕜 X) v = ρ X v := by
+  simp only [UniversalEnvelopingAlgebra.ι_apply, moduleUniversalEnvelopingAlgebra_smul_eq,
+             UniversalEnvelopingAlgebra.lift_ι_apply']
 
 end moduleUEA
 

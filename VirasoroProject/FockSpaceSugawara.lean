@@ -7,6 +7,7 @@ import Mathlib
 import VirasoroProject.Sugawara
 import VirasoroProject.FockSpace
 import VirasoroProject.VirasoroVerma
+import VirasoroProject.LieAlgebraModuleUEA
 
 namespace VirasoroProject
 
@@ -84,6 +85,17 @@ lemma sugawaraRepresentation_of_module_uea_heisenbergAlgebra_lgen_apply
     ((fun v ↦ htrunc ((ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) V) v)))
     (commutator_lsmul_jgen_of_module_uea_heisenbergAlgebra 𝕜 hc)
 
+open HeisenbergAlgebra Filter in
+lemma sugawaraRepresentation_of_module_uea_heisenbergAlgebra_cgen_apply
+    (htrunc : ∀ (v : V), ∀ᶠ (k : ℤ) in atTop, ιUEA 𝕜 (jgen 𝕜 k) • v = 0)
+    (hc : ∀ (v : V), ιUEA 𝕜 (kgen 𝕜) • v = v)
+    (v : ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) V) :
+    sugawaraRepresentation_of_module_uea_heisenbergAlgebra 𝕜 htrunc hc (.cgen 𝕜) v = v := by
+  have key := sugawaraRepresentation_cgen _
+    ((fun v ↦ htrunc ((ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) V) v)))
+    (commutator_lsmul_jgen_of_module_uea_heisenbergAlgebra 𝕜 hc)
+  simpa using congr_arg (fun A ↦ A v) key
+
 end auxiliary
 
 
@@ -95,40 +107,6 @@ noncomputable def sugawaraRepresentation (α : 𝕜) :
     LieAlgebra.Representation 𝕜 𝕜 (VirasoroAlgebra 𝕜) (ChargedFockSpace 𝕜 α) :=
   sugawaraRepresentation_of_module_uea_heisenbergAlgebra 𝕜 (V := ChargedFockSpace 𝕜 α)
       (fun _ ↦ eventually_jgen_smul_eq_zero ..) (fun _ ↦ ChargedFockSpace.kgen_smul ..)
-
---noncomputable def _root_.LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra :
---
---
---noncomputable def instModuleUniversalEnvelopingAlgebraVirasoroAlgebra (α : 𝕜) :
---    Module (𝓤 𝕜 (VirasoroAlgebra 𝕜)) (ChargedFockSpace 𝕜 α) where
---  --let φ := @UniversalEnvelopingAlgebra.lift 𝕜 (VirasoroAlgebra 𝕜) _ _ _
---  --  (Module.End 𝕜 (ChargedFockSpace 𝕜 α)) _ _ (sugawaraRepresentation 𝕜 α)
---  smul a v := @UniversalEnvelopingAlgebra.lift 𝕜 (VirasoroAlgebra 𝕜) _ _ _
---    (Module.End 𝕜 (ChargedFockSpace 𝕜 α)) _ _ (sugawaraRepresentation 𝕜 α) a v
---  one_smul v := sorry
---  mul_smul := sorry
---  smul_zero := sorry
---  smul_add := sorry
---  add_smul := sorry
---  zero_smul := sorry
---  --have key' := sugawaraRepresentation 𝕜 α
---  --let φ := @UniversalEnvelopingAlgebra.lift 𝕜 (VirasoroAlgebra 𝕜) _ _ _
---  --  (Module.End 𝕜 (ChargedFockSpace 𝕜 α)) _ _ (sugawaraRepresentation 𝕜 α)
---  --let φ := @UniversalEnvelopingAlgebra.lift 𝕜 (VirasoroAlgebra 𝕜) _ _ _
---  --  (Module.End 𝕜 (ChargedFockSpace 𝕜 α)) _ _ (sugawaraRepresentation 𝕜 α)
---  --exact?
---  --sorry
---
---#check UniversalEnvelopingAlgebra.lift
-
---#check HasCentralCharge 𝕜 (ChargedFockSpace 𝕜 α)
---
-----open HeisenbergAlgebra in
-----/-- The formula for the action of the Virasoro generators in the (basic) Sugawara
-----representation on the charged Fock space. -/
-----lemma sugawaraRepresentation_hasCentralCharge_one (α : 𝕜) :
-----    HasCentralCharge 𝕜 (ChargedFockSpace 𝕜 α) (1 : 𝕜) := by
-----  sorry
 
 open HeisenbergAlgebra in
 /-- The formula for the action of the Virasoro generators in the (basic) Sugawara
@@ -188,6 +166,46 @@ lemma sugawaraRepresentation_lgen_pos_apply_vacuum (α : 𝕜)
   convert smul_zero ..
   simp only [jgen_zero_smul]
   rw [smul_comm, jgen_pos_vacuum 𝕜 α n_pos, smul_zero]
+
+/-- The vacuum in the Fock space of charge α is annihilated by Lₙ for n > 0. -/
+@[simp] lemma sugawaraRepresentation_cgen_apply (α : 𝕜) (v : ChargedFockSpace 𝕜 α) :
+    sugawaraRepresentation 𝕜 α (.cgen 𝕜) v = v := by
+  simpa using sugawaraRepresentation_of_module_uea_heisenbergAlgebra_cgen_apply ..
+
+noncomputable instance instModuleUniversalEnvelopingAlgebraVirasoroAlgebra (α : 𝕜) :
+    Module (𝓤 𝕜 (VirasoroAlgebra 𝕜)) (ChargedFockSpace 𝕜 α) :=
+  LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra (sugawaraRepresentation 𝕜 α)
+
+@[simp] lemma sugawaraRepresentation_smul_eq {α : 𝕜}
+    (a : 𝓤 𝕜 (VirasoroAlgebra 𝕜)) (v : ChargedFockSpace 𝕜 α) :
+    a • v = UniversalEnvelopingAlgebra.lift 𝕜 (sugawaraRepresentation 𝕜 α) a v :=
+  rfl
+
+lemma sugawaraRepresentation_ιUEA_smul_eq {α : 𝕜}
+    (X : VirasoroAlgebra 𝕜) (v : ChargedFockSpace 𝕜 α) :
+    ιUEA 𝕜 X • v = (sugawaraRepresentation 𝕜 α) X v := by
+  simp only [UniversalEnvelopingAlgebra.ι_apply, sugawaraRepresentation_smul_eq,
+             UniversalEnvelopingAlgebra.lift_ι_apply']
+
+instance (α : 𝕜) : HasCentralCharge 𝕜 (ChargedFockSpace 𝕜 α) (1 : 𝕜) where
+  central_smul' v := by simp
+
+@[simp] lemma algebraMap_virasoro_smul_eq {α : 𝕜} (r : 𝕜) (v : ChargedFockSpace 𝕜 α) :
+    algebraMap 𝕜 (𝓤 𝕜 (VirasoroAlgebra 𝕜)) r • v = r • v := by
+  rw [Algebra.algebraMap_eq_smul_one r, sugawaraRepresentation_smul_eq]
+  simp
+
+/-- A Virasoro module map from the Verma module with `c = 1` and `h = α^2 / 2`
+to the charged Fock space of charge `α`. -/
+noncomputable def virasoroVerma_to_chargedFockSpace (α : 𝕜) :
+    VirasoroVerma 𝕜 1 (α^2/2) →ₗ[𝓤 𝕜 (VirasoroAlgebra 𝕜)] ChargedFockSpace 𝕜 α :=
+  VirasoroVerma.universalMap 𝕜 _ (hwv := vacuum 𝕜 α) (by simp)
+    (by
+      rw [sugawaraRepresentation_ιUEA_smul_eq, sugawaraRepresentation_lgen_zero_apply_vacuum]
+      rw [algebraMap_virasoro_smul_eq])
+    (by
+      intro n n_pos
+      simpa using sugawaraRepresentation_lgen_pos_apply_vacuum 𝕜 α n_pos)
 
 end ChargedFockSpace
 
