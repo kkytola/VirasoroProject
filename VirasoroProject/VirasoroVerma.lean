@@ -194,7 +194,7 @@ private lemma upper_smul_eq_zero_of_forall_pos_lgen_smul_eq_zero (c h : 𝕜)
   · intro E₁ E₂ _ _ hE₁ hE₂
     simp only [LieHom.map_add, add_smul, hE₁, hE₂, add_zero]
   · intro r E _ hE
-    have hE' : algebraMap 𝕜 (𝓤 𝕜 (VirasoroAlgebra 𝕜)) r • (ιUEA 𝕜 E • hwv) = 0 := by
+    have hE' : algebraMap 𝕜 (𝓤 𝕜 (VirasoroAlgebra 𝕜)) r • (ιUEA 𝕜 E • v) = 0 := by
       simp only [hE, smul_zero]
     simp only [LieHom.map_smul, ← hE', ← smul_assoc]
     congr 1

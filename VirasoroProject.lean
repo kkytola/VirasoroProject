@@ -7,6 +7,8 @@ import «VirasoroProject».FockSpaceSugawara
 import «VirasoroProject».HeisenbergAlgebra
 import «VirasoroProject».IndexTri
 import «VirasoroProject».IsCentralExtension
+import «VirasoroProject».LieAlgebraModuleUEA
+import «VirasoroProject».LieAlgebraRepresentationOfBasis
 import «VirasoroProject».LieCohomologySmallDegree
 import «VirasoroProject».LieVerma
 import «VirasoroProject».SectionSES

@@ -6,6 +6,7 @@ Authors: Kalle Kytölä
 import Mathlib
 import VirasoroProject.Sugawara
 import VirasoroProject.FockSpace
+import VirasoroProject.VirasoroVerma
 
 namespace VirasoroProject
 
@@ -94,6 +95,40 @@ noncomputable def sugawaraRepresentation (α : 𝕜) :
     LieAlgebra.Representation 𝕜 𝕜 (VirasoroAlgebra 𝕜) (ChargedFockSpace 𝕜 α) :=
   sugawaraRepresentation_of_module_uea_heisenbergAlgebra 𝕜 (V := ChargedFockSpace 𝕜 α)
       (fun _ ↦ eventually_jgen_smul_eq_zero ..) (fun _ ↦ ChargedFockSpace.kgen_smul ..)
+
+--noncomputable def _root_.LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra :
+--
+--
+--noncomputable def instModuleUniversalEnvelopingAlgebraVirasoroAlgebra (α : 𝕜) :
+--    Module (𝓤 𝕜 (VirasoroAlgebra 𝕜)) (ChargedFockSpace 𝕜 α) where
+--  --let φ := @UniversalEnvelopingAlgebra.lift 𝕜 (VirasoroAlgebra 𝕜) _ _ _
+--  --  (Module.End 𝕜 (ChargedFockSpace 𝕜 α)) _ _ (sugawaraRepresentation 𝕜 α)
+--  smul a v := @UniversalEnvelopingAlgebra.lift 𝕜 (VirasoroAlgebra 𝕜) _ _ _
+--    (Module.End 𝕜 (ChargedFockSpace 𝕜 α)) _ _ (sugawaraRepresentation 𝕜 α) a v
+--  one_smul v := sorry
+--  mul_smul := sorry
+--  smul_zero := sorry
+--  smul_add := sorry
+--  add_smul := sorry
+--  zero_smul := sorry
+--  --have key' := sugawaraRepresentation 𝕜 α
+--  --let φ := @UniversalEnvelopingAlgebra.lift 𝕜 (VirasoroAlgebra 𝕜) _ _ _
+--  --  (Module.End 𝕜 (ChargedFockSpace 𝕜 α)) _ _ (sugawaraRepresentation 𝕜 α)
+--  --let φ := @UniversalEnvelopingAlgebra.lift 𝕜 (VirasoroAlgebra 𝕜) _ _ _
+--  --  (Module.End 𝕜 (ChargedFockSpace 𝕜 α)) _ _ (sugawaraRepresentation 𝕜 α)
+--  --exact?
+--  --sorry
+--
+--#check UniversalEnvelopingAlgebra.lift
+
+--#check HasCentralCharge 𝕜 (ChargedFockSpace 𝕜 α)
+--
+----open HeisenbergAlgebra in
+----/-- The formula for the action of the Virasoro generators in the (basic) Sugawara
+----representation on the charged Fock space. -/
+----lemma sugawaraRepresentation_hasCentralCharge_one (α : 𝕜) :
+----    HasCentralCharge 𝕜 (ChargedFockSpace 𝕜 α) (1 : 𝕜) := by
+----  sorry
 
 open HeisenbergAlgebra in
 /-- The formula for the action of the Virasoro generators in the (basic) Sugawara
