@@ -13,8 +13,8 @@ that two central extensions are isomorphic if the corresponding cocycles differ 
 
 ## Main definitions
 
-* `LieTwoCocycle.CentralExtension`: The central extension of a Lie algebra 𝓖 by an abelian Lie
-  algebra 𝓐 defined by a 2-cocycle γ ∈ H²(𝓖,𝓐).
+* `LieTwoCocycle.CentralExtension`: The central extension of a Lie algebra 𝓰 by an abelian Lie
+  algebra 𝓪 defined by a 2-cocycle γ ∈ H²(𝓰,𝓪).
 * `LieTwoCocycle.CentralExtension.equiv_of_lieTwoCoboundary`: An isomorphism between the central
   extensions defined by two 2-cocycles which differ by a coboundary.
 
@@ -39,9 +39,9 @@ namespace VirasoroProject
 
 universe u
 variable (𝕜 : Type*) [CommRing 𝕜]
-variable (𝓖 𝓐 : Type u) [LieRing 𝓖] [AddCommGroup 𝓐] [LieAlgebra 𝕜 𝓖] [Module 𝕜 𝓐]
+variable (𝓰 𝓪 : Type u) [LieRing 𝓰] [AddCommGroup 𝓪] [LieAlgebra 𝕜 𝓰] [Module 𝕜 𝓪]
 
-variable {𝕜 𝓖 𝓐}
+variable {𝕜 𝓰 𝓪}
 
 section LieTwoCocycle.CentralExtension
 
@@ -52,9 +52,9 @@ namespace LieTwoCocycle
 set_option linter.unusedVariables false in
 /-- The underlying type of the central extension of Lie algebras determined by a Lie
 algebra 2-cocycle. -/
-def CentralExtension (γ : LieTwoCocycle 𝕜 𝓖 𝓐) := 𝓖 × 𝓐
+def CentralExtension (γ : LieTwoCocycle 𝕜 𝓰 𝓪) := 𝓰 × 𝓪
 
-variable {γ : LieTwoCocycle 𝕜 𝓖 𝓐}
+variable {γ : LieTwoCocycle 𝕜 𝓰 𝓪}
 
 namespace CentralExtension
 
@@ -62,7 +62,7 @@ namespace CentralExtension
     Z = W := Prod.ext hX hA
 
 /-- Coercion of an element in a central extension to a pair. -/
-def coeProd (Z : γ.CentralExtension) : 𝓖 × 𝓐 := Z
+def coeProd (Z : γ.CentralExtension) : 𝓰 × 𝓪 := Z
 
 instance : AddCommGroup (γ.CentralExtension) := Prod.instAddCommGroup
 
@@ -153,7 +153,7 @@ end CentralExtension -- namespace
 
 end LieTwoCocycle -- namespace
 
-variable (β : LieOneCocycle 𝕜 𝓖 𝓐)
+variable (β : LieOneCocycle 𝕜 𝓰 𝓪)
 variable (γ)
 
 /-- A Lie algebra homomorphism between two central extensions determined by cocycles
@@ -183,7 +183,7 @@ namespace LieTwoCocycle.CentralExtension
 /-- Annoyingly the dependent types make it difficult to identify central extensions with equal
 but not definitionally equal cocycles (e.g. `γ + (β₁ + β₂).bdry` vs. `(γ + β₁.bdry) + β₂.bdry`).
 This isomorphism allows to  -/
-def congr {γ₁ γ₂ : LieTwoCocycle 𝕜 𝓖 𝓐} (h : γ₁ = γ₂) :
+def congr {γ₁ γ₂ : LieTwoCocycle 𝕜 𝓰 𝓪} (h : γ₁ = γ₂) :
     γ₁.CentralExtension ≃ₗ⁅𝕜⁆ γ₂.CentralExtension where
   toFun := fun Z ↦ ⟨Z.1, Z.2⟩
   map_add' Z₁ Z₂ := rfl
@@ -200,23 +200,23 @@ def congr {γ₁ γ₂ : LieTwoCocycle 𝕜 𝓖 𝓐} (h : γ₁ = γ₂) :
     intro Z
     ext <;> dsimp only
 
-lemma congr_apply {γ₁ γ₂ : LieTwoCocycle 𝕜 𝓖 𝓐} (h : γ₁ = γ₂) (Z : γ₁.CentralExtension) :
+lemma congr_apply {γ₁ γ₂ : LieTwoCocycle 𝕜 𝓰 𝓪} (h : γ₁ = γ₂) (Z : γ₁.CentralExtension) :
     congr h Z = ⟨Z.1, Z.2⟩ := rfl
 
-@[simp] lemma congr_trans {γ₁ γ₂ γ₃ : LieTwoCocycle 𝕜 𝓖 𝓐} (h₁₂ : γ₁ = γ₂) (h₂₃ : γ₂ = γ₃) :
+@[simp] lemma congr_trans {γ₁ γ₂ γ₃ : LieTwoCocycle 𝕜 𝓰 𝓪} (h₁₂ : γ₁ = γ₂) (h₂₃ : γ₂ = γ₃) :
     (congr h₁₂).trans (congr h₂₃) = (congr (h₁₂.trans h₂₃)) :=
   rfl
 
-lemma congr_congr_symm {γ₁ γ₂ : LieTwoCocycle 𝕜 𝓖 𝓐} (h : γ₁ = γ₂) :
+lemma congr_congr_symm {γ₁ γ₂ : LieTwoCocycle 𝕜 𝓰 𝓪} (h : γ₁ = γ₂) :
     (congr h).trans (congr h.symm) = LieEquiv.refl :=
   rfl
 
-lemma hom_of_coboundary_refl (γ : LieTwoCocycle 𝕜 𝓖 𝓐) :
+lemma hom_of_coboundary_refl (γ : LieTwoCocycle 𝕜 𝓰 𝓪) :
     congr (Eq.refl γ) = LieEquiv.refl (R := 𝕜) (L₁ := γ.CentralExtension) :=
   rfl
 
-lemma hom_of_coboundary_add (γ₁ γ₂ γ₃ : LieTwoCocycle 𝕜 𝓖 𝓐)
-    (β₁ β₂ : LieOneCocycle 𝕜 𝓖 𝓐) (h₂ : γ₁ + β₁.bdry = γ₂) (h₃ : γ₂ + β₂.bdry = γ₃) :
+lemma hom_of_coboundary_add (γ₁ γ₂ γ₃ : LieTwoCocycle 𝕜 𝓰 𝓪)
+    (β₁ β₂ : LieOneCocycle 𝕜 𝓰 𝓪) (h₂ : γ₁ + β₁.bdry = γ₂) (h₃ : γ₂ + β₂.bdry = γ₃) :
     ((congr h₃).toLieHom.comp (β₂.bdryHom γ₂)).comp ((congr h₂).toLieHom.comp (β₁.bdryHom γ₁))
       = (congr (show γ₁ + (β₁ + β₂).bdry = γ₃ by rw [← h₃, ← h₂] ; ac_rfl)).toLieHom.comp
           ((β₁ + β₂).bdryHom γ₁) := by
@@ -228,8 +228,8 @@ lemma hom_of_coboundary_add (γ₁ γ₂ γ₃ : LieTwoCocycle 𝕜 𝓖 𝓐)
 
 /-- A Lie algebra isomorphism between two central extensions determined by cocycles
 which differ by a coboundary. -/
-noncomputable def equiv_of_lieTwoCoboundary {γ' : LieTwoCocycle 𝕜 𝓖 𝓐}
-    (h : γ' - γ ∈ LieTwoCoboundary 𝕜 𝓖 𝓐) :
+noncomputable def equiv_of_lieTwoCoboundary {γ' : LieTwoCocycle 𝕜 𝓰 𝓪}
+    (h : γ' - γ ∈ LieTwoCoboundary 𝕜 𝓰 𝓪) :
     (γ.CentralExtension) ≃ₗ⁅𝕜⁆ (γ'.CentralExtension) :=
   let β := h.choose
   have obs : γ + β.bdry = γ' := by

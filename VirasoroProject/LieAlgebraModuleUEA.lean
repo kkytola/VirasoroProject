@@ -236,7 +236,7 @@ end central_element_action
 section UniversalEnvelopingAlgebra
 
 variable (𝕜 : Type*) [CommRing 𝕜]
-variable (𝓖 : Type*) [LieRing 𝓖] [LieAlgebra 𝕜 𝓖]
+variable (𝓰 : Type*) [LieRing 𝓰] [LieAlgebra 𝕜 𝓰]
 
 @[inherit_doc UniversalEnvelopingAlgebra]
 abbrev 𝓤 := UniversalEnvelopingAlgebra
@@ -245,22 +245,22 @@ abbrev 𝓤 := UniversalEnvelopingAlgebra
 abbrev ιUEA := UniversalEnvelopingAlgebra.ι
 
 lemma UniversalEnvelopingAlgebra.mkAlgHom_range_eq_top :
-    (UniversalEnvelopingAlgebra.mkAlgHom 𝕜 𝓖).range = ⊤ := by
+    (UniversalEnvelopingAlgebra.mkAlgHom 𝕜 𝓰).range = ⊤ := by
   simp only [UniversalEnvelopingAlgebra.mkAlgHom, RingQuot.mkAlgHom]
   rw [AlgHom.range_eq_top]
-  exact RingQuot.mkRingHom_surjective (UniversalEnvelopingAlgebra.Rel 𝕜 𝓖)
+  exact RingQuot.mkRingHom_surjective (UniversalEnvelopingAlgebra.Rel 𝕜 𝓰)
 
-variable {𝕜 𝓖} in
+variable {𝕜 𝓰} in
 lemma UniversalEnvelopingAlgebra.mkAlgHom_surjective :
-    Function.Surjective (UniversalEnvelopingAlgebra.mkAlgHom 𝕜 𝓖) := by
-  simpa [← AlgHom.range_eq_top] using mkAlgHom_range_eq_top 𝕜 𝓖
+    Function.Surjective (UniversalEnvelopingAlgebra.mkAlgHom 𝕜 𝓰) := by
+  simpa [← AlgHom.range_eq_top] using mkAlgHom_range_eq_top 𝕜 𝓰
 
 lemma UniversalEnvelopingAlgebra.induction
-    (C : 𝓤 𝕜 𝓖 → Prop) (hAM : ∀ r, C (algebraMap 𝕜 (𝓤 𝕜 𝓖) r))
+    (C : 𝓤 𝕜 𝓰 → Prop) (hAM : ∀ r, C (algebraMap 𝕜 (𝓤 𝕜 𝓰) r))
     (hι : ∀ X, C (ιUEA 𝕜 X))
-    (hMul : ∀ a b, C a → C b → C (a * b)) (hAdd : ∀ a b, C a → C b → C (a + b)) (a : 𝓤 𝕜 𝓖) :
+    (hMul : ∀ a b, C a → C b → C (a * b)) (hAdd : ∀ a b, C a → C b → C (a + b)) (a : 𝓤 𝕜 𝓰) :
     C a := by
-  let C' : TensorAlgebra 𝕜 𝓖 → Prop := fun t ↦ C (UniversalEnvelopingAlgebra.mkAlgHom _ _ t)
+  let C' : TensorAlgebra 𝕜 𝓰 → Prop := fun t ↦ C (UniversalEnvelopingAlgebra.mkAlgHom _ _ t)
   suffices ∀ t, C' t by
     obtain ⟨t, ht⟩ := UniversalEnvelopingAlgebra.mkAlgHom_surjective a
     simpa only [← ht] using this t
@@ -275,9 +275,9 @@ lemma UniversalEnvelopingAlgebra.induction
     simpa only [C', map_add] using hAdd _ _ hta htb
 
 lemma UniversalEnvelopingAlgebra.central_of_forall_lie_eq_zero
-    {Z : 𝓖} (hZ : ∀ (X : 𝓖), ⁅Z, X⁆ = 0) (a : 𝓤 𝕜 𝓖) :
+    {Z : 𝓰} (hZ : ∀ (X : 𝓰), ⁅Z, X⁆ = 0) (a : 𝓤 𝕜 𝓰) :
     Commute (ιUEA 𝕜 Z) a := by
-  apply UniversalEnvelopingAlgebra.induction 𝕜 𝓖
+  apply UniversalEnvelopingAlgebra.induction 𝕜 𝓰
         (fun b ↦ Commute (UniversalEnvelopingAlgebra.ι 𝕜 Z) b)
   · intro r
     exact Algebra.commute_algebraMap_right r ((UniversalEnvelopingAlgebra.ι 𝕜) Z)
@@ -292,18 +292,18 @@ lemma UniversalEnvelopingAlgebra.central_of_forall_lie_eq_zero
 /-- If a central element of a Lie algebra acts as a scalar multiplication on a cyclic
 vector in a representation, then it acts as the same scalar on the whole representation. -/
 lemma UniversalEnvelopingAlgebra.smul_eq_of_cyclic_of_forall_lie_eq_zero
-    {Z : 𝓖} {ζ : 𝕜} (hZ : ∀ (X : 𝓖), ⁅Z, X⁆ = 0)
-    {V : Type*} [AddCommGroup V] [Module (𝓤 𝕜 𝓖) V]
-    {w : V} (w_cyclic : Submodule.span (𝓤 𝕜 𝓖) {w} = ⊤)
-    (hw : ιUEA 𝕜 Z • w = algebraMap 𝕜 (𝓤 𝕜 𝓖) ζ • w) (v : V) :
-    ιUEA 𝕜 Z • v = algebraMap 𝕜 (𝓤 𝕜 𝓖) ζ • v := by
-  have z_central (a : 𝓤 𝕜 𝓖) : Commute (ιUEA 𝕜 Z) a :=
+    {Z : 𝓰} {ζ : 𝕜} (hZ : ∀ (X : 𝓰), ⁅Z, X⁆ = 0)
+    {V : Type*} [AddCommGroup V] [Module (𝓤 𝕜 𝓰) V]
+    {w : V} (w_cyclic : Submodule.span (𝓤 𝕜 𝓰) {w} = ⊤)
+    (hw : ιUEA 𝕜 Z • w = algebraMap 𝕜 (𝓤 𝕜 𝓰) ζ • w) (v : V) :
+    ιUEA 𝕜 Z • v = algebraMap 𝕜 (𝓤 𝕜 𝓰) ζ • v := by
+  have z_central (a : 𝓤 𝕜 𝓰) : Commute (ιUEA 𝕜 Z) a :=
     UniversalEnvelopingAlgebra.central_of_forall_lie_eq_zero _ _ hZ _
-  have ζ_central (a : 𝓤 𝕜 𝓖) : Commute (algebraMap 𝕜 _ ζ) a :=
+  have ζ_central (a : 𝓤 𝕜 𝓰) : Commute (algebraMap 𝕜 _ ζ) a :=
     Algebra.commute_algebraMap_left ζ a
   let goodSubspace := LinearMap.ker (centralSMulHom z_central V - centralSMulHom ζ_central V)
   have good_iff (u : V) :
-      u ∈ goodSubspace ↔ ιUEA 𝕜 Z • u = algebraMap 𝕜 (𝓤 𝕜 𝓖) ζ • u := by
+      u ∈ goodSubspace ↔ ιUEA 𝕜 Z • u = algebraMap 𝕜 (𝓤 𝕜 𝓰) ζ • u := by
     simp only [LinearMap.mem_ker, LinearMap.sub_apply, goodSubspace]
     simpa only [centralSMulHom_apply] using sub_eq_zero
   rw [← good_iff]
@@ -316,28 +316,28 @@ open ModuleOfModuleAlgebra in
 /-- Any module `V` over the universal enveloping algebra of a Lie algebra is a representation of the
 Lie algebra.
 
-This is recorded on the type synonym `ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V` of `V`, in order to
+This is recorded on the type synonym `ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓰) V` of `V`, in order to
 make the `V` a `𝕜`-module and talk about a representation of a `𝕜`-Lie algebra on it. -/
 def UniversalEnvelopingAlgebra.representation
-    {V : Type*} [AddCommGroup V] [Module (𝓤 𝕜 𝓖) V] :
-    LieAlgebra.Representation 𝕜 𝕜 𝓖 (ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V) where
+    {V : Type*} [AddCommGroup V] [Module (𝓤 𝕜 𝓰) V] :
+    LieAlgebra.Representation 𝕜 𝕜 𝓰 (ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓰) V) where
   toFun X := lsmul 𝕜 V (ιUEA 𝕜 X)
   map_add' X Y := by
     ext v
     simp only [LinearMap.add_apply, LieHom.map_add]
-    exact Module.add_smul _ _ ((unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V) v)
+    exact Module.add_smul _ _ ((unMkAddHom 𝕜 (𝓤 𝕜 𝓰) V) v)
   map_smul' r X := by
     ext v
     simp only [lsmul_apply, LinearMap.smul_apply]
     simp only [LieHom.map_smul, RingHom.id_apply]
-    set v' := unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v with def_v'
+    set v' := unMkAddHom 𝕜 (𝓤 𝕜 𝓰) V v with def_v'
     set a := ιUEA 𝕜 X with def_a
-    have : ((algebraMap 𝕜 (𝓤 𝕜 𝓖) r) • a) • v' = algebraMap 𝕜 (𝓤 𝕜 𝓖) r • a • v' :=
-      IsScalarTower.smul_assoc ((algebraMap 𝕜 (𝓤 𝕜 𝓖)) r) a v'
+    have : ((algebraMap 𝕜 (𝓤 𝕜 𝓰) r) • a) • v' = algebraMap 𝕜 (𝓤 𝕜 𝓰) r • a • v' :=
+      IsScalarTower.smul_assoc ((algebraMap 𝕜 (𝓤 𝕜 𝓰)) r) a v'
     convert this using 1
     simp only [mkAddHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk, mk, smul_eq_mul]
     congr 1
-    exact algebra_compatible_smul (𝓤 𝕜 𝓖) r a
+    exact algebra_compatible_smul (𝓤 𝕜 𝓰) r a
   map_lie' := by
     intro X Y
     ext v
@@ -345,7 +345,7 @@ def UniversalEnvelopingAlgebra.representation
           = lsmul 𝕜 V (ιUEA 𝕜 X) (lsmul 𝕜 V (ιUEA 𝕜 Y) v)
             - lsmul 𝕜 V (ιUEA 𝕜 Y) (lsmul 𝕜 V (ιUEA 𝕜 X) v)
     simp only [LieHom.map_lie]
-    set v' := unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v with def_v'
+    set v' := unMkAddHom 𝕜 (𝓤 𝕜 𝓰) V v with def_v'
     set a := (ιUEA 𝕜 X) with def_a
     set b := (ιUEA 𝕜 Y) with def_b
     change (a * b - b * a) • v' = a • (b • v') - b • (a • v')
@@ -354,18 +354,18 @@ def UniversalEnvelopingAlgebra.representation
 section moduleUEA
 
 variable {𝕜 𝕂 : Type*} [CommRing 𝕜] [CommRing 𝕂]
-variable  {𝓖 : Type*} [LieRing 𝓖] [LieAlgebra 𝕜 𝓖]
+variable  {𝓰 : Type*} [LieRing 𝓰] [LieAlgebra 𝕜 𝓰]
 variable {V : Type*} [AddCommGroup V] [Module 𝕂 V] [Module 𝕜 V]
 variable [SMul 𝕜 𝕂] [IsScalarTower 𝕜 𝕂 V] [SMulCommClass 𝕂 𝕜 V]
-variable (ρ : LieAlgebra.Representation 𝕜 𝕂 𝓖 V)
+variable (ρ : LieAlgebra.Representation 𝕜 𝕂 𝓰 V)
 
-/-- A representation of a `𝕜`-Lie algebra `𝓖` on a vector space `V` defines a `𝓤 𝕜 𝓖`-module
+/-- A representation of a `𝕜`-Lie algebra `𝓰` on a vector space `V` defines a `𝓤 𝕜 𝓰`-module
 structure on `V`. -/
 noncomputable def LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra :
-    Module (𝓤 𝕜 𝓖) V where
+    Module (𝓤 𝕜 𝓰) V where
   smul a v := UniversalEnvelopingAlgebra.lift 𝕜 ρ a v
   one_smul v := by
-    change UniversalEnvelopingAlgebra.lift 𝕜 ρ (1 : 𝓤 𝕜 𝓖) v = v
+    change UniversalEnvelopingAlgebra.lift 𝕜 ρ (1 : 𝓤 𝕜 𝓰) v = v
     simp
   mul_smul a b v := by
     change UniversalEnvelopingAlgebra.lift 𝕜 ρ (a * b) v
@@ -387,15 +387,15 @@ noncomputable def LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra :
     simp
 
 @[simp] lemma LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra_smul_eq
-    (a : 𝓤 𝕜 𝓖) (v : V) :
+    (a : 𝓤 𝕜 𝓰) (v : V) :
     (LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra ρ).smul a v
       = UniversalEnvelopingAlgebra.lift 𝕜 ρ a v :=
   rfl
 
-/-- The defining property of the `𝓤 𝕜 𝓖`-module structure on a representation `V` of a
-`𝕜`-Lie algebra `𝓖`. -/
+/-- The defining property of the `𝓤 𝕜 𝓰`-module structure on a representation `V` of a
+`𝕜`-Lie algebra `𝓰`. -/
 lemma LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra_ιUEA_smul_eq
-    (X : 𝓖) (v : V) :
+    (X : 𝓰) (v : V) :
     (LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra ρ).smul (ιUEA 𝕜 X) v = ρ X v := by
   simp only [UniversalEnvelopingAlgebra.ι_apply, moduleUniversalEnvelopingAlgebra_smul_eq,
              UniversalEnvelopingAlgebra.lift_ι_apply']
