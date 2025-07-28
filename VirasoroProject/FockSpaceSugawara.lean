@@ -3,11 +3,45 @@ Copyright (c) 2025 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
-import Mathlib
-import VirasoroProject.Sugawara
 import VirasoroProject.FockSpace
+import VirasoroProject.Sugawara
 import VirasoroProject.VirasoroVerma
-import VirasoroProject.LieAlgebraModuleUEA
+
+/-!
+# Sugawara construction applied to the charged Fock space
+
+This file equips the charged Fock space representation of the Heisenberg algebra with the
+structure of a representation of the Virasoro algebra by applying the basic bosonic Sugawara
+construction.
+
+## Main definitions
+
+* `sugawaraRepresentation_of_module_uea_heisenbergAlgebra`: A variant of the Sugawara construction
+  where the hypothesis is that the space is a module over the universal enveloping algebra of
+  the Heisenberg algebra with local truncation condition.
+* `ChargedFockSpace.sugawaraRepresentation`: The representation of Virasoro algebra with
+  central charge `c=1` on the charged Fock space, obtained by the basic bosonic Sugawara
+  construction.
+* `ChargedFockSpace.instModuleUniversalEnvelopingAlgebraVirasoroAlgebra`: The charged Fock space
+  has the structure of a module over the universal enveloping algebra of the Virasoro algebra, by
+  the basic bosonic Sugawara construction.
+* `ChargedFockSpace.virasoroVerma_to_chargedFockSpace`: There is a Virasoro-module map from the
+  Virasoro Verma module with central charge `c = 1` and higest weight `h = α²/2` to the charged
+  Fock space with charge (`J₀`-eigenvalue) `α`, mapping the higest weight vector of the Verma
+  module to the vacuum vector of the Foc space.
+
+## Main statements
+
+* `ChargedFockSpace.sugawaraRepresentation_lgen_zero_apply_vacuum`: The vacuum in the charged Fock
+  space is an eigenvector of `L₀` with eigenvalue `α²/2`.
+* `ChargedFockSpace.sugawaraRepresentation_lgen_pos_apply_vacuum`: The vacuum in the charged Fock
+  space is annihilated by `Lₙ` for `n > 0`.
+
+## Tags
+
+Heisenberg algebra, Fock space, Virasoro algebra, Sugawara construction
+
+-/
 
 namespace VirasoroProject
 
@@ -167,7 +201,7 @@ lemma sugawaraRepresentation_lgen_pos_apply_vacuum (α : 𝕜)
   simp only [jgen_zero_smul]
   rw [smul_comm, jgen_pos_vacuum 𝕜 α n_pos, smul_zero]
 
-/-- The vacuum in the Fock space of charge α is annihilated by Lₙ for n > 0. -/
+/-- The central element of the Virasoro algebra acts as the identity on the charged Fock space. -/
 @[simp] lemma sugawaraRepresentation_cgen_apply (α : 𝕜) (v : ChargedFockSpace 𝕜 α) :
     sugawaraRepresentation 𝕜 α (.cgen 𝕜) v = v := by
   simpa using sugawaraRepresentation_of_module_uea_heisenbergAlgebra_cgen_apply ..

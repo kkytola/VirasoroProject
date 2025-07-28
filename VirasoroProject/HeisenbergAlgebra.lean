@@ -24,6 +24,8 @@ into representations of the Virasoro algebra by a Sugawara construction.)
 * `HeisenbergAlgebra.jgen`: The (commonly used) elements Jₖ, k ∈ ℤ, of the Heisenberg algebra.
 * `HeisenbergAlgebra.kgen`: The central element K of the Heisenberg algebra (commonly set
   to 1 in representations).
+* `HeisenbergAlgebra.basisJK`: The basis of the Heisenberg algebra consisting of `Jₖ` (`k ∈ ℤ`)
+  and `K`.
 
 ## Main statements
 

@@ -22,6 +22,7 @@ space of local fields.)
 * `VirasoroAlgebra`: The Virasoro algebra.
 * `VirasoroAlgebra.lgen`: The (commonly used) elements Lₙ, n ∈ ℤ, of the Virasoro algebra.
 * `VirasoroAlgebra.cgen`: The (commonly used) central element C of the Virasoro algebra.
+* `VirasoroAlgebra.basisLC`: The basis of the Virasoro algebra consisting of `Lₙ` (`n ∈ ℤ`) and `C`.
 * `VirasoroAlgebra.ofCentral` and `VirasoroAlgebra.toWittAlgebra`: The maps in the short exact
   sequence 0 ⟶ 𝕜 ⟶ VirasoroAlgebra ⟶ WittAlgebra ⟶ 0.
 

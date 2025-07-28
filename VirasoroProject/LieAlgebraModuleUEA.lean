@@ -3,17 +3,63 @@ Copyright (c) 2025 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
+import Mathlib.Algebra.Lie.UniversalEnveloping
+import Mathlib.GroupTheory.GroupAction.Ring
+import Mathlib.Order.CompletePartialOrder
 import VirasoroProject.LieAlgebraRepresentationOfBasis
-import Mathlib
 
 /-!
 # Modules over the universal enveloping algebra of a Lie algebra
 
-...
+This file contains some basics of the relationship between representations of a Lie algebra `𝓰` and
+modules over the universal enveloping algebra `𝓤 𝕜 𝓰`.
 
 ## Main definitions
 
-* ...
+As an auxiliary tool, we often need that any module `M` over a `𝕜`-algebra `A` is a module over `𝕜`.
+We need to be able to talk separately about left `A`-multiplication and left `𝕜`-multiplication
+on `M`, and more crucially yet, we need to be able to talk separately about `A`-module maps and
+`𝕜`-linear maps.
+
+* `ModuleOfModuleAlgebra`: This is a type synonym of the `A`-module `M` equipped with the instance
+  of a `𝕜`-module.
+* `ModuleOfModuleAlgebra.lsmul`: The left multiplication by an element `a ∈ A` defines a `𝕜`-linear
+  map `M → M`.
+* `centralSMulHom`: The left multiplication by a central element `z ∈ A` defines an `A`-module
+  map `M → M`.
+* `centralValueSubmodule`: Given a central element `z ∈ A` and a scalar `ζ ∈ 𝕜`, this is the
+  `A`-submodule of `M` consisting of vectors on which `z` acts as multiplication by `ζ`.
+
+The correspondence between representations of a Lie algebra `𝓰` and modules over the
+universal enveloping algebra `𝓤 𝕜 𝓰` consists of two directions:
+
+* `UniversalEnvelopingAlgebra.representation`: Any module `V` over `𝓤 𝕜 𝓰` gives rise to a
+  representation `𝓰 → End(V)` of the Lie algebra `𝓰` by restricting the module left multiplication
+  to `𝓰 ⊆ 𝓤 𝕜 𝓰`.
+* `LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra`: Any representation `𝓰 → End(V)` of
+  a Lie algebra `𝓰` over `𝕜` gives rise to a structure of a `𝓤 𝕜 𝓰`-module on `V` in such a way that
+  the representation defines the left multiplication by elements of `𝓰 ⊆ 𝓤 𝕜 𝓰`.
+
+## Main statements
+
+* `UniversalEnvelopingAlgebra.induction`: Induction principle for the universal enveloping algebra:
+  In order to prove a property for all elements of the universal enveloping algebra `𝓤 𝕜 𝓰` of a
+  Lie algebra `𝓰`, it is enough to prove that (1): the property holds for scalars `r ∈ 𝕜 ⊆ 𝓤 𝕜 𝓰`,
+  (2): the property holds for all Lie algebra elements `X ∈ 𝓰 ⊆ 𝓤 𝕜 𝓰`, (3): the property is
+  preserved under multiplication, and (4): the property is preserved under addition.
+* `UniversalEnvelopingAlgebra.central_of_forall_lie_eq_zero`: If `Z ∈ 𝓰` has vanishing Lie bracket
+  with all other elements of `𝓰`, then it is a central element in the universal enveloping
+  algebra `𝓤 𝕜 𝓰`.
+
+## Notation
+
+* `𝓤` is introduced as a notation for `UniversalEnvelopingAlgebra`.
+* `ιUEA` is introduced as a notation for the inclusion `𝓰 → 𝓤 𝕜 𝓰` (a Lie algebra homomorphism)
+  of a Lie algebra `𝓰` into its universal enveloping algebra `𝓤 𝕜 𝓰`.
+
+## Tags
+
+Lie algebra, universal enveloping algebra
 
 -/
 
@@ -103,6 +149,8 @@ variable (𝕜 : Type*) [CommRing 𝕜]
 variable {A : Type*} [Semiring A] [Algebra 𝕜 A]
 variable (V : Type*) [AddCommGroup V] [Module A V]
 
+/-- An element `a ∈ A` of a `𝕜`-algebra `A` defines a `𝕜`-linear map `V → V` by left
+multiplication. -/
 def ModuleOfModuleAlgebra.lsmul (a : A) :
     ModuleOfModuleAlgebra 𝕜 A V →ₗ[𝕜] ModuleOfModuleAlgebra 𝕜 A V where
   toFun v := ModuleOfModuleAlgebra.mkAddHom 𝕜 A V (a • ModuleOfModuleAlgebra.unMkAddHom 𝕜 A V v)
@@ -128,7 +176,8 @@ section central_element_action
 
 variable {R : Type*} [Semiring R]
 
-/-- In a module over a ring, left multiplication by a central element is a linear map. -/
+/-- In a module `M` over a ring `R`, left multiplication by a central element `z ∈ R` is an
+`R`-linear map `M → M`. -/
 def centralSMulHom {z : R} (z_central : ∀ a, z * a = a * z)
     (M : Type*) [AddCommMonoid M] [Module R M] :
     M →ₗ[R] M where
@@ -195,7 +244,6 @@ abbrev 𝓤 := UniversalEnvelopingAlgebra
 @[inherit_doc UniversalEnvelopingAlgebra.ι]
 abbrev ιUEA := UniversalEnvelopingAlgebra.ι
 
--- TODO: To Mathlib...
 lemma UniversalEnvelopingAlgebra.mkAlgHom_range_eq_top :
     (UniversalEnvelopingAlgebra.mkAlgHom 𝕜 𝓖).range = ⊤ := by
   simp only [UniversalEnvelopingAlgebra.mkAlgHom, RingQuot.mkAlgHom]
@@ -207,7 +255,6 @@ lemma UniversalEnvelopingAlgebra.mkAlgHom_surjective :
     Function.Surjective (UniversalEnvelopingAlgebra.mkAlgHom 𝕜 𝓖) := by
   simpa [← AlgHom.range_eq_top] using mkAlgHom_range_eq_top 𝕜 𝓖
 
--- TODO: To Mathlib...
 lemma UniversalEnvelopingAlgebra.induction
     (C : 𝓤 𝕜 𝓖 → Prop) (hAM : ∀ r, C (algebraMap 𝕜 (𝓤 𝕜 𝓖) r))
     (hι : ∀ X, C (ιUEA 𝕜 X))
@@ -265,33 +312,7 @@ lemma UniversalEnvelopingAlgebra.smul_eq_of_cyclic_of_forall_lie_eq_zero
   apply (Submodule.span_singleton_le_iff_mem ..).mpr
   exact (good_iff w).mpr hw
 
-/-- Auxiliary `𝕜`-linear map `V →ₗ[𝕜] V` defined by left multiplication by `X : 𝓖` in a module
-over `𝓤 𝕜 𝓖`. -/
-private def UniversalEnvelopingAlgebra.representationAux
-    (V : Type*) [AddCommGroup V] [Module (𝓤 𝕜 𝓖) V] (X : 𝓖) :
-    Module.End 𝕜 (ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V) where
-  toFun v :=
-    (ιUEA 𝕜 X) • (ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v)
-  map_add' v₁ v₂ :=
-    smul_add (ιUEA 𝕜 X) (ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v₁)
-                        (ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v₂)
-  map_smul' r v := by
-    change
-        (ιUEA 𝕜 X) • (algebraMap 𝕜 (𝓤 𝕜 𝓖) r
-              • (ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v))
-          = algebraMap 𝕜 (𝓤 𝕜 𝓖) r • (ιUEA 𝕜 X)
-              • (ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v)
-    simp only [← mul_smul]
-    congr 1
-    exact (Algebra.commutes r _).symm
-
-private lemma UniversalEnvelopingAlgebra.representationAux_apply
-    {V : Type*} [AddCommGroup V] [Module (𝓤 𝕜 𝓖) V] (X : 𝓖)
-    (v : ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V) :
-    representationAux 𝕜 𝓖 V X v =
-      (ιUEA 𝕜 X) • (ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v) := by
-  rfl
-
+open ModuleOfModuleAlgebra in
 /-- Any module `V` over the universal enveloping algebra of a Lie algebra is a representation of the
 Lie algebra.
 
@@ -300,30 +321,31 @@ make the `V` a `𝕜`-module and talk about a representation of a `𝕜`-Lie alg
 def UniversalEnvelopingAlgebra.representation
     {V : Type*} [AddCommGroup V] [Module (𝓤 𝕜 𝓖) V] :
     LieAlgebra.Representation 𝕜 𝕜 𝓖 (ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 𝓖) V) where
-  toFun := representationAux 𝕜 𝓖 V
+  toFun X := lsmul 𝕜 V (ιUEA 𝕜 X)
   map_add' X Y := by
     ext v
-    simp only [LinearMap.add_apply, representationAux_apply, LieHom.map_add]
-    exact Module.add_smul _ _ ((ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V) v)
+    simp only [LinearMap.add_apply, LieHom.map_add]
+    exact Module.add_smul _ _ ((unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V) v)
   map_smul' r X := by
     ext v
-    simp only [LinearMap.smul_apply, representationAux_apply]
+    simp only [lsmul_apply, LinearMap.smul_apply]
     simp only [LieHom.map_smul, RingHom.id_apply]
-    set v' := ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v with def_v'
+    set v' := unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v with def_v'
     set a := ιUEA 𝕜 X with def_a
     have : ((algebraMap 𝕜 (𝓤 𝕜 𝓖) r) • a) • v' = algebraMap 𝕜 (𝓤 𝕜 𝓖) r • a • v' :=
       IsScalarTower.smul_assoc ((algebraMap 𝕜 (𝓤 𝕜 𝓖)) r) a v'
     convert this using 1
+    simp only [mkAddHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk, mk, smul_eq_mul]
     congr 1
     exact algebra_compatible_smul (𝓤 𝕜 𝓖) r a
   map_lie' := by
     intro X Y
     ext v
-    change (representationAux 𝕜 𝓖 V ⁅X, Y⁆) v
-          = representationAux 𝕜 𝓖 V X (representationAux 𝕜 𝓖 V Y v)
-            - representationAux 𝕜 𝓖 V Y (representationAux 𝕜 𝓖 V X v)
-    simp only [representationAux_apply, LieHom.map_lie]
-    set v' := ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v with def_v'
+    change (lsmul 𝕜 V (ιUEA 𝕜 ⁅X, Y⁆)) v
+          = lsmul 𝕜 V (ιUEA 𝕜 X) (lsmul 𝕜 V (ιUEA 𝕜 Y) v)
+            - lsmul 𝕜 V (ιUEA 𝕜 Y) (lsmul 𝕜 V (ιUEA 𝕜 X) v)
+    simp only [LieHom.map_lie]
+    set v' := unMkAddHom 𝕜 (𝓤 𝕜 𝓖) V v with def_v'
     set a := (ιUEA 𝕜 X) with def_a
     set b := (ιUEA 𝕜 Y) with def_b
     change (a * b - b * a) • v' = a • (b • v') - b • (a • v')
