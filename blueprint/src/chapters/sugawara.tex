@@ -312,7 +312,7 @@ $\Joper_k \, v = 0$ for $k \gg 0$, i.e.,
   Lie brackets of the Heisenberg algebra basis elements.
 \end{proof}
 
-\begin{lemma}[]
+\begin{lemma}[Local truncation condition for the charged Fock space]
   \label{lem:TruncationForChargedFockSpace}
   \uses{def:ChargedFockSpace}
   \lean{VirasoroProject.ChargedFockSpace.eventually_jgen_smul_eq_zero}
@@ -322,6 +322,10 @@ $\Joper_k \, v = 0$ for $k \gg 0$, i.e.,
   Then there exists a $k_0 \in \bZ$ such that for all $k \ge k_0$ we have
   \begin{align*}
     J_k \, v = 0 .
+  \end{align*}
+
+  (In other words, the charged Fock space satisfies the local truncation condition
+  \tagHeiTrunc{} needed for the Sugawara construction.)
 \end{lemma}
 \begin{proof}
   \uses{lem:HeisenbergEventuallyCommute}
