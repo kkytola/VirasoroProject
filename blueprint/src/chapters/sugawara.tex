@@ -253,3 +253,122 @@ $\Joper_k \, v = 0$ for $k \gg 0$, i.e.,
   A direct consequence of the commutation relations in Lemma~\ref{lem:CommutatorSugawara}
   and a comparison with the Lie brackets in the basis of Definition~\ref{def:VirasoroBasis}.
 \end{proof}
+
+
+\section{Charged Fock spaces (Heisenberg Verma modules)}
+
+\begin{definition}[Triangular decomposition of the Heisenberg algebra]
+  \label{def:HeisenbergTriangular}
+  \uses{def:TriangularDecomposition, def:HeisenbergBasis}
+  \lean{VirasoroProject.heisenbergTri}
+  \leanok
+  A triangular decomposition
+  \begin{align*}
+    \hei = \hei^0 \oplus \hei^+ \oplus \hei^-
+  \end{align*}
+  of $\hei$ is defined so that $\hei^0$ is spanned by $J_0, K \in \hei$,
+  $\hei^+$ is spanned by $J_k$ for $k > 0$,
+  and $\hei^-$ is spanned by $J_k$ for $k < 0$.
+
+  (Without further comment, for the Heisenberg algebra we always use this
+  triangular decomposition.)
+\end{definition}
+
+\begin{definition}[Charged Fock space (Heisenberg Verma module)]
+  \label{def:ChargedFockSpace}
+  \uses{def:HeisenbergTriangular, def:LieVermaModule}
+  \lean{VirasoroProject.ChargedFockSpace}
+  \leanok
+  Let $\alpha \in \bbk$.
+  The \term{charged Fock space} of charge $\alpha$
+  is the Verma module $\Verma^{\eta}$ associated to the linear functional
+  $\eta \colon \hei^0 \to \bbk$ with
+  \begin{align*}
+    \eta(J_0) = \alpha, \quad \eta(K) = 1 .
+  \end{align*}
+
+  We denote the charged Fock space by $\FockSpace^{\alpha}$.
+  The highest weight vector $\VermaHWV^{\eta}$
+  is (also) called the \term{vacuum vector} of the charged Fock space,
+  and we denote it by $\FockVacuum^{\alpha}$.
+\end{definition}
+
+\begin{lemma}[Eventual commutation in the Heisenberg universal enveloping algebra]
+  \label{lem:HeisenbergEventuallyCommute}
+  \uses{def:HeisenbergBasis}
+  \lean{VirasoroProject.HeisenbergAlgebra.uea_eventually_commute_jgen}
+  \leanok
+  Let $a \in \UEA(\hei)$ be an arbitrary element of the universal enveloping
+  algebra of the Heisenberg algebra $\hei$. Then there exists a $k_0=k_0(a) \in \bZ$
+  such that for all $k \ge k_0$ we have
+  \begin{align*}
+    J_k a = a J_k .
+  \end{align*}
+\end{lemma}
+\begin{proof}
+  % \uses{}
+  \leanok
+  Clear by the induction principle of the universal enveloping algebra and
+  Lie brackets of the Heisenberg algebra basis elements.
+\end{proof}
+
+\begin{lemma}[]
+  \label{lem:TruncationForChargedFockSpace}
+  \uses{def:ChargedFockSpace}
+  \lean{VirasoroProject.ChargedFockSpace.eventually_jgen_smul_eq_zero}
+  \leanok
+  Let $\alpha \in \bbk$ and let $v \in \FockSpace^{\alpha}$ be a vector in
+  the charged Fock space with charge $\alpha$.
+  Then there exists a $k_0 \in \bZ$ such that for all $k \ge k_0$ we have
+  \begin{align*}
+    J_k \, v = 0 .
+\end{lemma}
+\begin{proof}
+  \uses{lem:HeisenbergEventuallyCommute}
+  \leanok
+  Straightforward by Lemma~\ref{lem:HeisenbergEventuallyCommute}
+  and the properties of the highest weight vector
+  (cyclicity and annihilation by the upper part).
+\end{proof}
+
+\begin{definition}[Virasoro action on the charged Fock space]
+  \label{def:ChargedFockSpaceSugawara}
+  \uses{lem:TruncationForChargedFockSpace, thm:SugawaraRepresentation}
+  \lean{VirasoroProject.ChargedFockSpace.sugawaraRepresentation,
+    VirasoroProject.ChargedFockSpace.instModuleUniversalEnvelopingAlgebraVirasoroAlgebra}
+  \leanok
+  By Lemma~\ref{lem:TruncationForChargedFockSpace}
+  the charged Fock space of charge $\alpha$
+  becomes a representation of the Virasoro algebra
+  $\vir$ with central charge $c = 1$ via the Sugawara construction
+  (Theorem~\ref{thm:SugawaraRepresentation}).
+\end{definition}
+
+\begin{lemma}[The vacuum of the charged Fock space is a highest weight vector]
+  \label{lem:VacuumHighestWeightVector}
+  \uses{def:ChargedFockSpaceSugawara, def:VirasoroVerma}
+  \lean{
+    VirasoroProject.ChargedFockSpace.sugawaraRepresentation_lgen_zero_apply_vacuum,
+    VirasoroProject.ChargedFockSpace.sugawaraRepresentation_lgen_pos_apply_vacuum,
+    VirasoroProject.ChargedFockSpace.virasoroVerma_to_chargedFockSpace}
+  \leanok
+  The vacuum vector $\FockVacuum^{\alpha}$ of the charged Fock space of
+  charge $\alpha \in \bbk$ satisfies
+  \begin{align*}
+    L_0 \, \FockVacuum^{\alpha} = \frac{\alpha^2}{2} \, \FockVacuum^{\alpha}
+    \qquad \text{and} \qquad
+    L_n \, \FockVacuum^{\alpha} = 0 \text{ for all } n > 0 .
+  \end{align*}
+
+  In particular (by the universal property of Verma modules) there exists a
+  Virasoro-module map
+  \begin{align*}
+    \Verma^{c=1,h=\alpha^2/2} \to \FockSpace^{\alpha}
+  \end{align*}
+  such that $\VermaHWV^{c=1,h=\alpha^2/2} \mapsto \FockVacuum^{\alpha}$.
+\end{lemma}
+\begin{proof}
+  \uses{lem:VermaUniversalProperty}
+  \leanok
+  Calculation.
+\end{proof}
