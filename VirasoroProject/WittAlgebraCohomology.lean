@@ -179,7 +179,8 @@ lemma exists_add_bdry_eq_smul_virasoroCocycle :
           = -((2 - ↑j)⁻¹ * ((1 + ↑j) * (r * ((↑j - 1) ^ 3 - (↑j - 1))))) := by
             simp [show (↑(j - 1) : 𝕜) = (↑j : 𝕜) - 1 by exact_mod_cast aux.symm]
         _ = r * -((2 - ↑j)⁻¹ * (↑j - 2) * (↑j ^ 3 - ↑j))  := by ring
-        _ = r * (↑j ^ 3 - ↑j)                             := by field_simp [not_zero, ← neg_mul]
+        _ = r * (↑j ^ 3 - ↑j)                             := by
+            field_simp ; rw [show ((j : 𝕜) - 2) = -(2 - j) by simp [neg_sub], mul_neg] ; simp
         _ = _                                             := by simp
   · -- The case n + m ≠ 0 is straightforward by the choice of the normalizing coboundary.
     suffices ((γ + (normalizingCocycle γ).bdry) ((lgen 𝕜) n)) ((lgen 𝕜) m) = 0 by

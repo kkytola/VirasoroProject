@@ -82,7 +82,7 @@ Definition~\ref{def:WittAlgebra}.
     {\gamma}_{\vir}(\ell_n,\ell_m) = \frac{n^3 - n}{12} \, \delta_{n+m,0}
   \end{align*}
   is
-  %a Lie algebra 2-cocycle, ${\gamma}_{\vir} \in C^2(\witt,\bbk)$.
+  %a Lie algebra 2-cocycle, ${\gamma}_{\vir} \in \Coc^2(\witt,\bbk)$.
   %We call ${\gamma}_{\vir}$
   called the \term{Virasoro cocycle}.
 \end{definition}
@@ -92,7 +92,7 @@ Definition~\ref{def:WittAlgebra}.
   \uses{def:VirasoroCocycle}
   \lean{VirasoroProject.WittAlgebra.virasoroCocycle}
   \leanok
-  The Virasoro cocycle is a 2-cocycle, ${\gamma}_{\vir} \in C^2(\witt,\bbk)$.
+  The Virasoro cocycle is a 2-cocycle, ${\gamma}_{\vir} \in \Coc^2(\witt,\bbk)$.
 \end{lemma}
 \begin{proof}
   % \uses{}
@@ -137,14 +137,14 @@ Definition~\ref{def:WittAlgebra}.
   \uses{lem:VirasoroCocycle_is_TwoCocycle, def:LieTwoCohomology}
   \lean{VirasoroProject.WittAlgebra.cohomologyClass_virasoroCocycle_ne_zero}
   \leanok
-  The cohomology class $[{\gamma}_{\vir}] \in H^2(\witt,\bbk)$
+  The cohomology class $[{\gamma}_{\vir}] \in \Coh^2(\witt,\bbk)$
   of the Virasoro cocycle is nonzero.
 \end{lemma}
 \begin{proof}
   % \uses{}
   \leanok
-  Assume, by way of contradiction, that ${\gamma}_{\vir} \in B^2(\witt,\bbk)$,
-  i.e., that ${\gamma}_{\vir} = \partial \beta$ for some $\beta \in C^1(\witt,\bbk)$.
+  Assume, by way of contradiction, that ${\gamma}_{\vir} \in \Cob^2(\witt,\bbk)$,
+  i.e., that ${\gamma}_{\vir} = \partial \beta$ for some $\beta \in \Coc^1(\witt,\bbk)$.
   Then, in particular, for every $n \in \bZ$ we would have
   \begin{align*}
     {\gamma}_{\vir}(\ell_n,\ell_{-n})
@@ -170,7 +170,7 @@ Definition~\ref{def:WittAlgebra}.
   \uses{lem:WittAlgebraIsLieAlgebra, def:LieTwoCocycle}
   \lean{VirasoroProject.WittAlgebra.add_lieTwoCocycle_apply_lgen_lgen_lgen_eq_zero}
   \leanok
-  For any Witt algebra 2-cocycle $\gamma \in C^2(\witt,\bbk)$ with coefficients
+  For any Witt algebra 2-cocycle $\gamma \in \Coc^2(\witt,\bbk)$ with coefficients
   in $\bbk$, we have
   \begin{align*}
        (m-k) \, \gamma \big( \ell_n , \ell_{m+k} \big)
@@ -192,7 +192,7 @@ Definition~\ref{def:WittAlgebra}.
   \uses{lem:WittAlgebraIsLieAlgebra, def:LieTwoCocycle}
   \lean{VirasoroProject.WittAlgebra.lieTwoCocycle_apply_lgen_lgen_eq_zero_of_add_ne_zero}
   \leanok
-  Let $\gamma \in C^2(\witt,\bbk)$ be a Witt algebra 2-cocycle such that
+  Let $\gamma \in \Coc^2(\witt,\bbk)$ be a Witt algebra 2-cocycle such that
   $\gamma (\ell_0 , \ell_n) = 0$ for all $n \in \bZ$.
   Then for any $n,m \in \bZ$ with $n+m \ne 0$, we have
   \begin{align*}
@@ -216,8 +216,8 @@ Definition~\ref{def:WittAlgebra}.
   \uses{def:VirasoroCocycle, def:LieTwoCoboundary}
   \lean{VirasoroProject.WittAlgebra.exists_add_bdry_eq_smul_virasoroCocycle}
   \leanok
-  For any 2-cocycle $\gamma \in C^2(\witt,\bbk)$, there exists
-  a coboundary $\partial \beta$ with $\beta \in C^1(\witt,\bbk)$
+  For any 2-cocycle $\gamma \in \Coc^2(\witt,\bbk)$, there exists
+  a coboundary $\partial \beta$ with $\beta \in \Coc^1(\witt,\bbk)$
   such that
   \begin{align*}
     \gamma + \partial \beta \; = \; r \cdot {\gamma}_{\vir}
@@ -227,8 +227,8 @@ Definition~\ref{def:WittAlgebra}.
 \begin{proof}
   \uses{lem:WittTwoCocycleSupport, lem:WittTwoCocycleEquation}
   \leanok
-  Let $\gamma \in C^2(\witt,\bbk)$ be a Witt algebra 2-cocycle.
-  Define a Witt algebra 1-cocycle $\beta \in C^1(\witt,\bbk)$ by linear extension of
+  Let $\gamma \in \Coc^2(\witt,\bbk)$ be a Witt algebra 2-cocycle.
+  Define a Witt algebra 1-cocycle $\beta \in \Coc^1(\witt,\bbk)$ by linear extension of
   \begin{align*}
     \beta (\ell_n) =
     \begin{cases}
@@ -299,11 +299,11 @@ Definition~\ref{def:WittAlgebra}.
   \uses{def:WittAlgebra, def:LieTwoCohomology, lem:VirasoroCocycle_is_TwoCocycle}
   \lean{VirasoroProject.WittAlgebra.rank_lieTwoCohomology_eq_one}
   \leanok
-  The Lie algebra 2-cohomology $H^2(\witt,\bbk)$ of the Witt
+  The Lie algebra 2-cohomology $\Coh^2(\witt,\bbk)$ of the Witt
   algebra $\witt$ with coefficients in $\bbk$ is one-dimensional
   and spanned by the class of the Virasoro cocycle ${\gamma}_{\vir}$,
   \begin{align*}
-    H^2(\witt,\bbk) \; = \; \bbk \cdot [{\gamma}_{\vir}] .
+    \Coh^2(\witt,\bbk) \; = \; \bbk \cdot [{\gamma}_{\vir}] .
   \end{align*}
 \end{lemma}
 \begin{proof}

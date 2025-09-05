@@ -164,17 +164,11 @@ lemma zMonomialF_eq (R : Type*) [Field R] [CharZero R] (d : ℕ) :
           + (∏ j ∈ range d, (n - j : R)) / d.factorial                                := ?_
       _ = (∏ j ∈ range (d + 1), (↑n - ↑j)) / ↑(d + 1).factorial + zMonomialF R d n    := ?_
     · simp only [Nat.factorial_succ, Nat.cast_mul, Nat.cast_add, Nat.cast_one]
+      simp only [prod_range_succ (fun a ↦ (n : R) - a), Int.cast_prod, Int.cast_sub, Int.cast_add,
+                 Int.cast_one, Int.cast_natCast]
       field_simp
-      simp only [← mul_assoc, ← add_mul, mul_eq_mul_right_iff, aux₀, or_false]
-      simp only [mul_assoc, mul_comm _ (d.factorial : R)]
-      rw [mul_right_inj' aux₀]
-      simp only [mul_left_inj' aux']
-      rw [prod_range_succ (fun a ↦ (n : R) - a), ← mul_add]
-      simp [show (n - d + (d + 1) : R) = n + 1 by ring, prod_range_succ']
-    · simp only [ihd, Int.cast_prod, Int.cast_sub, Int.cast_natCast, add_left_inj]
-      simp only [mul_comm _ (d.factorial : R)]
-      field_simp
-      exact Or.inl <| by simp [Nat.factorial_succ, mul_comm]
+      simp [sub_add, prod_range_succ']
+    · simp [ihd, mul_comm _ (d.factorial : R), Nat.factorial_succ, mul_comm]
 
 lemma zMonomialF_zero_eq (R : Type*) [Field R] (n : ℤ) :
     zMonomialF R 0 n = 1 := by

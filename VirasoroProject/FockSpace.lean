@@ -7,8 +7,6 @@ import VirasoroProject.HeisenbergAlgebra
 import VirasoroProject.IndexTri
 import VirasoroProject.LieVerma
 
-namespace VirasoroProject
-
 /-!
 # Verma modules for the Virasoro algebra
 
@@ -59,6 +57,10 @@ Heisenberg algebra, Fock space
 -/
 
 
+
+namespace VirasoroProject
+
+open Module
 
 section HasCharge
 

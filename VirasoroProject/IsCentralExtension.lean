@@ -166,6 +166,8 @@ section Basis
 
 namespace LieAlgebra.IsCentralExtension
 
+open Module
+
 universe u u'
 variable {𝕜 : Type u} [CommRing 𝕜]
 variable {𝓰 𝓪 𝓮 : Type u}

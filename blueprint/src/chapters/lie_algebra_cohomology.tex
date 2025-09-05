@@ -15,9 +15,9 @@ be zero).
   \begin{align*}
     \beta \colon \gLie \to \aLie .
   \end{align*}
-  The set of all such 1-cocycles is denoted by $C^1(\gLie, \aLie)$.
+  The set of all such 1-cocycles is denoted by $\Coc^1(\gLie, \aLie)$.
   %\begin{align*}
-  %  C^1(\gLie, \aLie) .
+  %  \Coc^1(\gLie, \aLie) .
   %\end{align*}
 \end{definition}
 
@@ -40,9 +40,9 @@ be zero).
     \gamma(X,[Y,Z]) = \; & \gamma([X,Y],Z) + \gamma(Y,[X,Z]) .
   \end{align}
 
-  The set of all such 2-cocycles is denoted by $C^2(\gLie, \aLie)$.
+  The set of all such 2-cocycles is denoted by $\Coc^2(\gLie, \aLie)$.
   %\begin{align*}
-  %  C^1(\gLie, \aLie) .
+  %  \Coc^1(\gLie, \aLie) .
   %\end{align*}
 \end{definition}
 
@@ -51,7 +51,7 @@ be zero).
   \uses{def:LieTwoCocycle}
   \lean{VirasoroProject.LieTwoCocycle.skew}
   \leanok
-  For any $\gamma \in C^2(\gLie,\aLie)$ and any $X,Y \in \gLie$,
+  For any $\gamma \in \Coc^2(\gLie,\aLie)$ and any $X,Y \in \gLie$,
   we have the skew-symmetry property
   \begin{align*}
     \gamma(X,Y) = - \gamma(Y,X) .
@@ -76,13 +76,13 @@ be zero).
   \uses{def:LieOneCocycle}
   \lean{VirasoroProject.LieOneCocycle.instModule}
   \leanok
-  The set $C^1(\gLie, \aLie)$ of 1-cocycles of $\gLie$ with
+  The set $\Coc^1(\gLie, \aLie)$ of 1-cocycles of $\gLie$ with
   coefficients in $\aLie$ forms a vector space over $\bbk$.
 \end{lemma}
 \begin{proof}
   % \uses{}
   \leanok
-  By definition, $C^1(\gLie, \aLie)$ is the space of
+  By definition, $\Coc^1(\gLie, \aLie)$ is the space of
   linear maps $\gLie \to \aLie$, and such linear maps form
   a vector space.
 \end{proof}
@@ -92,13 +92,13 @@ be zero).
   \uses{def:LieTwoCocycle}
   \lean{VirasoroProject.LieTwoCocycle.instModule}
   \leanok
-  The set $C^2(\gLie, \aLie)$ of 2-cocycles of $\gLie$ with
+  The set $\Coc^2(\gLie, \aLie)$ of 2-cocycles of $\gLie$ with
   coefficients in $\aLie$ forms a vector space over $\bbk$.
 \end{lemma}
 \begin{proof}
   % \uses{}
   \leanok
-  The conditions defining $C^2(\gLie, \aLie)$ are linear,
+  The conditions defining $\Coc^2(\gLie, \aLie)$ are linear,
   so this is staightforward.
 \end{proof}
 
@@ -107,7 +107,7 @@ be zero).
   \uses{lem:LieTwoCocycle_vectorSpace, lem:LieOneCocycle_vectorSpace}
   \lean{VirasoroProject.LieOneCocycle.bdryHom}
   \leanok
-  Given a 1-cocycle $\beta \in C^1(\gLie, \aLie)$, we define the
+  Given a 1-cocycle $\beta \in \Coc^1(\gLie, \aLie)$, we define the
   \term{coboundary} $\partial \beta$ of $\beta$ to be the bilinear map
   \begin{align*}
     \partial \beta \colon \; & \gLie \times \gLie \to \aLie \\
@@ -116,9 +116,9 @@ be zero).
   \begin{align*}
     \partial \beta (X, Y) = \; & \beta ([X,Y]) .
   \end{align*}
-  We then have $\partial \beta \in C^2(\gLie,\aLie)$.
-  The mapping $\partial \colon C^1(\gLie,\aLie) \to C^2(\gLie,\aLie)$
-  is linear. Its range is denoted $B^2(\gLie,\aLie) \subset C^2(\gLie,\aLie)$
+  We then have $\partial \beta \in \Coc^2(\gLie,\aLie)$.
+  The mapping $\partial \colon \Coc^1(\gLie,\aLie) \to \Coc^2(\gLie,\aLie)$
+  is linear. Its range is denoted $\Cob^2(\gLie,\aLie) \subset \Coc^2(\gLie,\aLie)$
   and called the set of \term{2-coboundaries} of the Lie algebra $\gLie$
   with coefficients in $\aLie$.
 \end{definition}
@@ -130,7 +130,7 @@ be zero).
   \leanok
   The vector space
   \begin{align*}
-    H^2(\gLie,\aLie) := C^2(\gLie,\aLie) \, / \, B^2(\gLie,\aLie)
+    \Coh^2(\gLie,\aLie) := \Coc^2(\gLie,\aLie) \, / \, \Cob^2(\gLie,\aLie)
   \end{align*}
   is called the \term{Lie algebra cohomology in degree 2} of $\gLie$
   with coefficients in $\aLie$.
@@ -144,19 +144,19 @@ be zero).
   If $\gLie$ is abelian, i.e., $[\gLie,\gLie] = 0$, then
   the canonical projection
   \begin{align*}
-    C^2(\gLie,\aLie) \to H^2(\gLie,\aLie)
+    \Coc^2(\gLie,\aLie) \to \Coh^2(\gLie,\aLie)
   \end{align*}
   %mapping a 2-cocycle $\gamma$ to its equivalence class
-  %$\gamma + B^2(\gLie,\aLie)$
+  %$\gamma + \Cob^2(\gLie,\aLie)$
   is a linear isomorphism.
 \end{lemma}
 \begin{proof}
   % \uses{}
   \leanok
   The projection is surjective by construction, so it suffices to show that it is also injective.
-  The kernel of the projection is $B^2(\gLie,\aLie) = \Ima \; \partial$.
+  The kernel of the projection is $\Cob^2(\gLie,\aLie) = \Ima \; \partial$.
   In view of Definition~\ref{def:LieTwoCoboundary},
-  abelianity of $\gLie$ implies $\partial \beta = 0$ for any $\beta \in C^1(\gLie,\aLie)$.
-  Therefore $B^2(\gLie,\aLie) = 0$, and the kernel of the projection is trivial,
+  abelianity of $\gLie$ implies $\partial \beta = 0$ for any $\beta \in \Coc^1(\gLie,\aLie)$.
+  Therefore $\Cob^2(\gLie,\aLie) = 0$, and the kernel of the projection is trivial,
   so the projection is indeed injective.
 \end{proof}

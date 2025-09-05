@@ -547,7 +547,8 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
                 have key := bosonic_sugawara_cc_calc 𝕜 n
                 rw [zPrimitive_apply_of_nonneg _ (by linarith)] at key
                 field_simp at key ⊢
-                rw [← sub_eq_add_neg, ← key]
+                rw [mul_comm _ 2, mul_assoc 2]
+                rw [← sub_eq_add_neg, ← key, mul_comm (2 : 𝕜)]
                 simp only [mul_assoc]
                 norm_num
                 rw [@Finset.sum_of_injOn ℕ ℤ 𝕜 _ (Finset.range n.toNat) (Finset.Ioc (-n) 0)
@@ -587,15 +588,28 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
                 have key' := bosonic_sugawara_cc_calc 𝕜 n
                 rw [zPrimitive_apply_of_nonpos _ (by linarith)] at key'
                 field_simp at key' ⊢
-                rw [← sub_eq_add_neg, ← key']
-                have aux (k : 𝕜) : (-k - 1) = -(k + 1) := by ring
-                simp only [aux, neg_mul, sub_neg_eq_add, neg_mul, mul_assoc,
-                           Finset.sum_neg_distrib, neg_mul, neg_neg]
-                norm_num
+                rw [mul_comm _ 2, mul_assoc 2, ← sub_eq_add_neg, ← key', mul_comm (2 : 𝕜)]
+                norm_cast
+                simp only [neg_mul, mul_assoc, Int.reduceMul]
+                --have aux (k : 𝕜) : (-k - 1) = -(k + 1) := by ring
+                have aux (k : ℤ) : (-k - 1) = -(k + 1) := by ring
+                simp only [aux, neg_mul, sub_neg_eq_add, neg_mul,
+                           Finset.sum_neg_distrib, neg_mul, neg_neg, mul_eq_mul_right_iff,
+                           OfNat.ofNat_ne_zero, or_false]
+                simp_rw [mul_comm (_ + n)]
+                --norm_num
                 have n_natAbs : -n = n.natAbs := by
                   simpa [hn] using (abs_of_neg <| not_le.mp hn).symm
-                rw [@Finset.sum_of_injOn ℕ ℤ 𝕜 _ (Finset.range n.natAbs) (Finset.Ioc 0 (-n))
-                      (fun x ↦ (↑x + 1) * (n + (x + 1))) (fun x ↦ (↑x + ↑n) * x)
+                --rw [@Finset.sum_of_injOn ℕ ℤ 𝕜 _ (Finset.range n.natAbs) (Finset.Ioc 0 (-n))
+                --      (fun x ↦ ((x : 𝕜) + 1) * (n + (x + 1))) (fun x ↦ (↑x + ↑n) * x)
+                --      (fun i ↦ i + 1)]
+                --have foo := @Finset.sum_of_injOn ℕ ℤ ℤ _ (Finset.range n.natAbs) (Finset.Ioc 0 (-n))
+                --      (fun x ↦ ((x : ℤ) + 1) * (n + (x + 1))) (fun x ↦ x * (↑x + ↑n))
+                --      (fun i ↦ i + 1) sorry sorry sorry sorry
+                --simp at foo
+                --rw [foo]
+                rw [@Finset.sum_of_injOn ℕ ℤ _ _ (Finset.range n.natAbs) (Finset.Ioc 0 (-n))
+                      (fun x ↦ (↑x + 1) * (n + (x + 1))) (fun x ↦ x * (↑x + ↑n))
                       (fun i ↦ i + 1) ..]
                 · intro i _ j _ hij
                   simpa using hij
@@ -616,7 +630,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
                         max_eq_left <| (Int.le_toNat (by linarith)).mpr (show 1 ≤ k by linarith)]
                     exact Int.toNat_of_nonneg (by linarith)
                 · intro k _
-                  simp ; ring
+                  simp only [mul_eq_mul_left_iff] ; left ; ring
               · intro i hi
                 simp [(Finset.mem_Ioc.mp hi).symm]
             · refine Function.support_subset_iff'.mpr ?_
@@ -642,9 +656,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
     simp only [neg_add_rev, neg_neg, hk₁, smul_zero, le_add_neg_iff_add_le, zero_add,
                add_neg_lt_iff_lt_add, lt_neg_add_iff_add_lt, neg_add_le_iff_le_add, smul_ite]
     grind
-  · have (k : ℤ) : n + m - (m - k) = n + k := by ring
-    simp_rw [← sub_eq_add_neg, this, Function.support_neg]
-    exact finite_support_smul_pairNO'_heiOper_apply heiTrunc heiComm ..
+  · simpa [← sub_eq_add_neg] using finite_support_smul_pairNO'_heiOper_apply heiTrunc heiComm ..
 
 end commutator_sugawaraGen
 
@@ -687,7 +699,6 @@ noncomputable def VirasoroAlgebra.representationOfCentralChargeOfL
           simp only [← smul_assoc, smul_eq_mul]
           congr 1
           field_simp
-          rw [mul_comm]
         · simp [hnm]
 
 lemma VirasoroAlgebra.representationOfCentralChargeOfL_cgen

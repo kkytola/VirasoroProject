@@ -46,6 +46,8 @@ Witt algebra
 
 namespace VirasoroProject
 
+open Module
+
 variable (𝕜 : Type*) [CommRing 𝕜]
 
 /-- The Witt algebra: an ∞-dimensional Lie algebra (polynomial vector fields on a circle). -/

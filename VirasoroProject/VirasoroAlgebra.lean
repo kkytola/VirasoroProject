@@ -174,6 +174,7 @@ noncomputable def lsection : WittAlgebra 𝕜 →ₗ[𝕜] VirasoroAlgebra 𝕜 
     lsection 𝕜 (WittAlgebra.lgen 𝕜 n) = lgen 𝕜 n :=
   rfl
 
+open Module in
 /-- The most commonly used basis of the Virasoro algebra, consisting of `Lₙ` (`n ∈ ℤ`)
 and the central element `C`. (Lean notation: `lgen _ n` and `cgen _`, respectively.) -/
 noncomputable def basisLC : Basis (Option ℤ) 𝕜 (VirasoroAlgebra 𝕜) :=

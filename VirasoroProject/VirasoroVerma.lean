@@ -51,6 +51,8 @@ Virasoro algebra, Verma module
 
 namespace VirasoroProject
 
+open Module
+
 section HasCentralCharge
 
 variable (𝕜 : Type*) [Field 𝕜] [CharZero 𝕜]

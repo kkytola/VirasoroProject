@@ -49,7 +49,9 @@ lemma finsum_mem_mem_span {ι R V : Type*}
   · suffices junk : ∑ᶠ i ∈ s, cfs i • vs i = 0 by simp [junk]
     exact finsum_mem_eq_zero_of_infinite (by simpa [and_comm] using h)
 
-lemma Basis.iSupIndep_submodule_span_of_pairwise_disjoint
+namespace Module.Basis
+
+lemma iSupIndep_submodule_span_of_pairwise_disjoint
     {R M ι κ : Type*} [Semiring R] [AddCommGroup M] [Module R M]
     (B : Basis ι R M) (Is : κ → Set ι)
     (Is_disj : Pairwise (fun k₁ k₂ ↦ Disjoint (Is k₁) (Is k₂))) :
@@ -66,7 +68,7 @@ lemma Basis.iSupIndep_submodule_span_of_pairwise_disjoint
   apply Finset.eq_empty_of_forall_notMem
   exact iSupIndep_iff_pairwiseDisjoint.mpr Is_disj k hvk hv'
 
-lemma Basis.finsum_repr_smul_basis {R M ι : Type*} [Semiring R] [Nontrivial R]
+lemma finsum_repr_smul_basis {R M ι : Type*} [Semiring R] [Nontrivial R]
     [AddCommGroup M] [Module R M] [NoZeroSMulDivisors R M] (B : Basis ι R M) (v : M) :
     ∑ᶠ i, B.repr v i • B i = v := by
   have obs : (Function.support fun i ↦ B.repr v i • B i).Finite := by
@@ -90,7 +92,7 @@ lemma Basis.finsum_repr_smul_basis {R M ι : Type*} [Semiring R] [Nontrivial R]
     rw [← not_imp_not, not_not] at hi
     exact hi (B.ne_zero i)
 
-lemma Basis.repr_finsum {R M ι : Type*} [Semiring R] [Nontrivial R]
+lemma repr_finsum {R M ι : Type*} [Semiring R] [Nontrivial R]
     [AddCommGroup M] [Module R M] [NoZeroSMulDivisors R M] (B : Basis ι R M) (cf : ι →₀ R) :
     B.repr (∑ᶠ i, cf i • B i) = cf := by
   convert show B.repr (B.repr.symm cf) = cf by simp
@@ -106,7 +108,7 @@ lemma Basis.repr_finsum {R M ι : Type*} [Semiring R] [Nontrivial R]
   ext i
   simp [Basis.ne_zero B i]
 
-lemma Basis.repr_finsum_mem_eq_ite {R M ι : Type*} [Semiring R] [Nontrivial R]
+lemma repr_finsum_mem_eq_ite {R M ι : Type*} [Semiring R] [Nontrivial R]
     [AddCommGroup M] [Module R M] [NoZeroSMulDivisors R M] (B : Basis ι R M) (cf : ι →₀ R)
     (I : Set ι) [DecidablePred fun i ↦ i ∈ I] (j : ι) :
     B.repr (∑ᶠ i ∈ I, cf i • B i) j = if j ∈ I then cf j else 0 := by
@@ -124,7 +126,7 @@ lemma Basis.repr_finsum_mem_eq_ite {R M ι : Type*} [Semiring R] [Nontrivial R]
   ext i
   by_cases hi : i ∈ I <;> simp [hi, aux i]
 
-noncomputable def _root_.Basis.basis_submodule_span {R M ι : Type*} [Semiring R] [Nontrivial R]
+noncomputable def basis_submodule_span {R M ι : Type*} [Semiring R] [Nontrivial R]
     [AddCommGroup M] [Module R M] [NoZeroSMulDivisors R M] (B : Basis ι R M) (I : Set ι) :
     Basis I R (Submodule.span R (B '' I)) :=
   let f : Submodule.span R (B '' I) →ₗ[R] (I →₀ R) := {
@@ -179,7 +181,7 @@ noncomputable def _root_.Basis.basis_submodule_span {R M ι : Type*} [Semiring R
   }⟩
 
 -- TODO: To Mathlib?
-@[simp] lemma _root_.Basis.basis_submodule_span_apply {R M ι : Type*}
+@[simp] lemma basis_submodule_span_apply {R M ι : Type*}
     [Semiring R] [Nontrivial R] [AddCommGroup M] [Module R M] [NoZeroSMulDivisors R M]
     (B : Basis ι R M) (I : Set ι) (i : I) :
     B.basis_submodule_span I i = B i.val := by
@@ -189,3 +191,5 @@ noncomputable def _root_.Basis.basis_submodule_span {R M ι : Type*} [Semiring R
   · simp
   · intro j hj
     simp [hj.symm]
+
+end Module.Basis

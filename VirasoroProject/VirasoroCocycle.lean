@@ -80,7 +80,7 @@ lemma virasoroCocycleBilin_eq_neg_flip :
   intro k
   simp only [cyclicTripleSumHom_apply, bracket_lgen_lgen', map_smul, smul_eq_mul,
              LinearMap.zero_apply]
-  simp only [virasoroCocycleBilin, Basis.constr_basis, mul_ite, mul_zero]
+  simp only [virasoroCocycleBilin, Module.Basis.constr_basis, mul_ite, mul_zero]
   rw [show n + (m + k) = n + m + k by ring,
       show m + (k + n) = n + m + k by ring,
       show k + (n + m) = n + m + k by ring]

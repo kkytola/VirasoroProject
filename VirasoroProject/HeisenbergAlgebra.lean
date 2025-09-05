@@ -45,6 +45,8 @@ Heisenberg algebra
 
 namespace VirasoroProject
 
+open Module
+
 section AbelianLieAlgebraOn
 
 /-! ### Abelian Lie algebra with a given basis -/

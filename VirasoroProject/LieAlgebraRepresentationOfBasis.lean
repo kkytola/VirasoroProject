@@ -27,6 +27,8 @@ namespace LieAlgebra
 
 section representation
 
+open Module
+
 /-- A representation of a `𝕜`-Lie algebra `𝓰` on a `𝕂`-vector space `V`. -/
 abbrev Representation (𝕜 𝕂 : Type*) [CommRing 𝕜] [CommRing 𝕂]
     (𝓰 : Type*) [LieRing 𝓰] [LieAlgebra 𝕜 𝓰]
@@ -61,16 +63,23 @@ noncomputable def representationOfBasisAux
     LieAlgebra.representationOfBasisAux B genOper (B i) = genOper i := by
   simp [LieAlgebra.representationOfBasisAux]
 
+variable {𝕂 : Type*} [Field 𝕂] {V : Type*} [AddCommGroup V] [Module 𝕂 V]
+    {𝓰 : Type*} [LieRing 𝓰] [LieAlgebra 𝕂 𝓰] {ι : Type*} (B : Basis ι 𝕂 𝓰)
+    {genOper : ι → (V →ₗ[𝕂] V)}
+    (genComm : ∀ i j, (genOper i).commutator (genOper j)
+      = LieAlgebra.representationOfBasisAux B genOper ⁅B i, B j⁆)
+
+open LieAlgebra in
 lemma representationOfBasisAux_property
     {𝕂 : Type*} [Field 𝕂] {V : Type*} [AddCommGroup V] [Module 𝕂 V]
     {𝓰 : Type*} [LieRing 𝓰] [LieAlgebra 𝕂 𝓰] {ι : Type*} (B : Basis ι 𝕂 𝓰)
     {genOper : ι → (V →ₗ[𝕂] V)}
     (genComm : ∀ i j, (genOper i).commutator (genOper j)
-      = LieAlgebra.representationOfBasisAux B genOper ⁅B i, B j⁆) :
-    (LieAlgebra.representationOfBasisAux B genOper).compRight.comp (LieAlgebra.bracketHom 𝕂 𝓰)
+      = representationOfBasisAux B genOper ⁅B i, B j⁆) :
+    ((representationOfBasisAux B genOper).compRight 𝕂).comp (bracketHom 𝕂 𝓰)
       = (LinearMap.commutatorBilin V).compl₁₂
-          (LieAlgebra.representationOfBasisAux B genOper)
-          (LieAlgebra.representationOfBasisAux B genOper) :=
+          (representationOfBasisAux B genOper)
+          (representationOfBasisAux B genOper) :=
   B.ext fun i ↦ B.ext fun j ↦ by simp [genComm i j]
 
 /-- A representation of a Lie algebra `𝓰` with basis `B` constructed from a collection of operators
@@ -92,16 +101,17 @@ noncomputable def representationOfBasis
 
 end representation
 
+open LieAlgebra in
 lemma representationOfBasis_property
     {𝕂 : Type*} [Field 𝕂] {V : Type*} [AddCommGroup V] [Module 𝕂 V]
-    {𝓰 : Type*} [LieRing 𝓰] [LieAlgebra 𝕂 𝓰] {ι : Type*} (B : Basis ι 𝕂 𝓰)
+    {𝓰 : Type*} [LieRing 𝓰] [LieAlgebra 𝕂 𝓰] {ι : Type*} (B : Module.Basis ι 𝕂 𝓰)
     {genOper : ι → (V →ₗ[𝕂] V)}
     (genComm : ∀ i j, (genOper i).commutator (genOper j)
-      = LieAlgebra.representationOfBasisAux B genOper ⁅B i, B j⁆) :
-    (LieAlgebra.representationOfBasis B genComm).compRight.comp (LieAlgebra.bracketHom 𝕂 𝓰)
+      = representationOfBasisAux B genOper ⁅B i, B j⁆) :
+    ((representationOfBasis B genComm).compRight 𝕂).comp (bracketHom 𝕂 𝓰)
       = (LinearMap.commutatorBilin V).compl₁₂
-          (LieAlgebra.representationOfBasis B genComm)
-          (LieAlgebra.representationOfBasis B genComm) := by
+          (representationOfBasis B genComm)
+          (representationOfBasis B genComm) := by
   exact representationOfBasisAux_property B genComm
 
 end LieAlgebra -- namespace

@@ -232,7 +232,7 @@ end LinearMap
 
 section basis
 
-open LinearMap
+open LinearMap Module
 
 variable {𝕜 : Type*} [Ring 𝕜]
 variable {U V W : Type*}
