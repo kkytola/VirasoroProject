@@ -43,14 +43,14 @@ section IsCentralExtension
 
 universe u
 variable {𝕜 : Type u} [CommRing 𝕜]
-variable {𝓰 𝓪 : Type u} [LieRing 𝓰] [LieAlgebra 𝕜 𝓰] [LieRing 𝓪] [LieAlgebra 𝕜 𝓪]
+variable {𝓰 𝓪 𝓮 : Type u} [LieRing 𝓰] [LieAlgebra 𝕜 𝓰] [LieRing 𝓪] [LieAlgebra 𝕜 𝓪]
+         [LieRing 𝓮] [LieAlgebra 𝕜 𝓮]
 
 /-- An extension `𝓮` of a Lie algebra `𝓰` by a Lie algebra `𝓪` is a short exact sequence
 `0 ⟶ 𝓪 ⟶ 𝓮 ⟶ 𝓰 ⟶ 0`. The class `LieAlgebra.IsExtension` bundles the maps `𝓪 ⟶ 𝓮` and
 `𝓮 ⟶ 𝓰` together with their trivial kernel and full range, respectively, and the exactness
 in the middle. -/
-class LieAlgebra.IsExtension (𝓮 : Type u) [LieRing 𝓮] [LieAlgebra 𝕜 𝓮]
-    (i : 𝓪 →ₗ⁅𝕜⁆ 𝓮) (p : 𝓮 →ₗ⁅𝕜⁆ 𝓰) : Prop where
+class LieAlgebra.IsExtension (i : 𝓪 →ₗ⁅𝕜⁆ 𝓮) (p : 𝓮 →ₗ⁅𝕜⁆ 𝓰) : Prop where
   ker_eq_bot : i.ker = ⊥
   range_eq_top : p.range = ⊤
   exact : i.range = p.ker
@@ -58,7 +58,7 @@ class LieAlgebra.IsExtension (𝓮 : Type u) [LieRing 𝓮] [LieAlgebra 𝕜 �
 /-- A central extension `𝓮` of a Lie algebra `𝓰` by a Lie algebra `𝓪` is an extension
 `0 ⟶ 𝓪 ⟶ 𝓮 ⟶ 𝓰 ⟶ 0` where the image of `𝓪` is contained in the centre of `𝓮`. -/
 class LieAlgebra.IsCentralExtension {𝓮 : Type u} [LieRing 𝓮] [LieAlgebra 𝕜 𝓮]
-    (i : 𝓪 →ₗ⁅𝕜⁆ 𝓮) (p : 𝓮 →ₗ⁅𝕜⁆ 𝓰) extends IsExtension 𝓮 i p where
+    (i : 𝓪 →ₗ⁅𝕜⁆ 𝓮) (p : 𝓮 →ₗ⁅𝕜⁆ 𝓰) extends IsExtension i p where
   central : ∀ (A : 𝓪), ∀ (E : 𝓮), ⁅i A, E⁆ = 0
 
 end IsCentralExtension
@@ -129,7 +129,7 @@ then `𝓮` is an extension of `𝓰` by `𝓪` in the sense that there is a sho
 `0 ⟶ 𝓪 ⟶ 𝓮 ⟶ 𝓰 ⟶ 0` where the two maps are `LieTwoCocycle.CentralExtension.emb` and
 `LieTwoCocycle.CentralExtension.proj`. -/
 instance isExtension [IsLieAbelian 𝓪] :
-    LieAlgebra.IsExtension _ (emb γ) (proj γ) where
+    LieAlgebra.IsExtension (emb γ) (proj γ) where
   ker_eq_bot := ker_emb_eq_bot γ
   range_eq_top := range_proj_eq_top γ
   exact := range_emb_eq_ker_proj γ
@@ -164,42 +164,35 @@ end LieTwoCocycle.CentralExtension -- section
 
 section Basis
 
-namespace LieAlgebra.IsCentralExtension
+namespace LieAlgebra.IsExtension
 
 open Module
 
 universe u u'
 variable {𝕜 : Type u} [CommRing 𝕜]
-variable {𝓰 𝓪 𝓮 : Type u}
-variable [LieRing 𝓰] [LieAlgebra 𝕜 𝓰] [LieRing 𝓪] [LieAlgebra 𝕜 𝓪] [LieRing 𝓮] [LieAlgebra 𝕜 𝓮]
+variable {𝓰 𝓪 𝓮 : Type u} [LieRing 𝓰] [LieAlgebra 𝕜 𝓰] [LieRing 𝓪] [LieAlgebra 𝕜 𝓪]
+         [LieRing 𝓮] [LieAlgebra 𝕜 𝓮]
+variable {i : 𝓪 →ₗ⁅𝕜⁆ 𝓮} {p : 𝓮 →ₗ⁅𝕜⁆ 𝓰} (ex : LieAlgebra.IsExtension i p)
+variable (σ : 𝓰 →ₗ[𝕜] 𝓮) (hσ : p.toLinearMap ∘ₗ σ = 1)
 
 /-- A basis of a central extension of Lie algebras constructed from a section and bases of the
 extending Lie algebras. -/
-noncomputable def basis
-    {i : 𝓪 →ₗ⁅𝕜⁆ 𝓮} {p : 𝓮 →ₗ⁅𝕜⁆ 𝓰} (cext : LieAlgebra.IsCentralExtension i p)
-    (σ : 𝓰 →ₗ[𝕜] 𝓮) (hσ : p.toLinearMap ∘ₗ σ = 1)
-    {ιA ιG  : Type u'} (basA : Basis ιA 𝕜 𝓪) (basG : Basis ιG 𝕜 𝓰) :
-    Basis (ιA ⊕ ιG) 𝕜 𝓮 := by
-  apply @ses_basis 𝕜 _ 𝓪 𝓮 𝓰 _ _ _ _ _ _ i.toLinearMap p.toLinearMap σ ιA ιG basA basG
-  · exact (LieSubmodule.mk_eq_bot_iff.mp cext.ker_eq_bot)
-  · exact congr_arg LieSubalgebra.toSubmodule cext.exact
-  · exact hσ
+noncomputable def basis {ιA ιG  : Type u'} (basA : Basis ιA 𝕜 𝓪) (basG : Basis ιG 𝕜 𝓰) :
+    Basis (ιA ⊕ ιG) 𝕜 𝓮 :=
+  ses_basis basA basG (LieSubmodule.mk_eq_bot_iff.mp ex.ker_eq_bot)
+    (congr_arg LieSubalgebra.toSubmodule ex.exact) hσ
 
-@[simp] lemma basis_eq_of_left
-    {i : 𝓪 →ₗ⁅𝕜⁆ 𝓮} {p : 𝓮 →ₗ⁅𝕜⁆ 𝓰} (cext : LieAlgebra.IsCentralExtension i p)
-    (σ : 𝓰 →ₗ[𝕜] 𝓮) (hσ : p.toLinearMap ∘ₗ σ = 1)
-    {ιA ιG  : Type u'} (basA : Basis ιA 𝕜 𝓪) (basG : Basis ιG 𝕜 𝓰) (ia : ιA):
-    basis cext σ hσ basA basG (Sum.inl ia) = i (basA ia) := by
+@[simp] lemma basis_eq_of_left {ιA ιG  : Type u'} (basA : Basis ιA 𝕜 𝓪) (basG : Basis ιG 𝕜 𝓰)
+    (ia : ιA) :
+    basis ex σ hσ basA basG (Sum.inl ia) = i (basA ia) := by
   simp [basis]
 
-@[simp] lemma basis_eq_of_right
-    {i : 𝓪 →ₗ⁅𝕜⁆ 𝓮} {p : 𝓮 →ₗ⁅𝕜⁆ 𝓰} (cext : LieAlgebra.IsCentralExtension i p)
-    (σ : 𝓰 →ₗ[𝕜] 𝓮) (hσ : p.toLinearMap ∘ₗ σ = 1)
-    {ιA ιG  : Type u'} (basA : Basis ιA 𝕜 𝓪) (basG : Basis ιG 𝕜 𝓰) (ig : ιG):
-    basis cext σ hσ basA basG (Sum.inr ig) = σ (basG ig) := by
+@[simp] lemma basis_eq_of_right {ιA ιG  : Type u'} (basA : Basis ιA 𝕜 𝓪) (basG : Basis ιG 𝕜 𝓰)
+    (ig : ιG):
+    basis ex σ hσ basA basG (Sum.inr ig) = σ (basG ig) := by
   simp [basis]
 
-end LieAlgebra.IsCentralExtension
+end LieAlgebra.IsExtension
 
 end Basis
 
