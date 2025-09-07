@@ -2,10 +2,10 @@ import Mathlib.Algebra.Lie.Basic
 
 universe u
 variable (𝕜 : Type*) [CommRing 𝕜]
-variable (𝓖 𝓐 : Type u) [LieRing 𝓖] [AddCommGroup 𝓐] [LieAlgebra 𝕜 𝓖] [Module 𝕜 𝓐]
+variable (𝓰 : Type u) [LieRing 𝓰] [LieAlgebra 𝕜 𝓰]
 
 /--  `⁅·,·⁆` as a bilinear map. -/
-def LieAlgebra.bracketHom : 𝓖 →ₗ[𝕜] 𝓖 →ₗ[𝕜] 𝓖 where
+def LieAlgebra.bracketHom : 𝓰 →ₗ[𝕜] 𝓰 →ₗ[𝕜] 𝓰 where
   toFun := fun X ↦ {
     toFun := fun Y ↦ ⁅X, Y⁆
     map_add' := by simp
@@ -14,7 +14,7 @@ def LieAlgebra.bracketHom : 𝓖 →ₗ[𝕜] 𝓖 →ₗ[𝕜] 𝓖 where
   map_smul' c X := by simp_all only [smul_lie, RingHom.id_apply] ; exact rfl
 
 @[simp]
-lemma LieAlgebra.bracketHom_apply {X Y : 𝓖} : LieAlgebra.bracketHom 𝕜 𝓖 X Y = ⁅X, Y⁆ := rfl
+lemma LieAlgebra.bracketHom_apply {X Y : 𝓰} : LieAlgebra.bracketHom 𝕜 𝓰 X Y = ⁅X, Y⁆ := rfl
 
 /-- Construct an isomorphism of Lie algebras from a pair of inverse Lie algebra homomorphisms. -/
 def LieEquiv.mk_of_comp_eq_id {R : Type*} {L L' : Type*} [CommRing R]
