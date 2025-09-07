@@ -47,17 +47,17 @@ variable {𝓰 𝓪 𝓮 : Type u} [LieRing 𝓰] [LieAlgebra 𝕜 𝓰] [LieRin
          [LieRing 𝓮] [LieAlgebra 𝕜 𝓮]
 
 /-- An extension `𝓮` of a Lie algebra `𝓰` by a Lie algebra `𝓪` is a short exact sequence
-`0 ⟶ 𝓪 ⟶ 𝓮 ⟶ 𝓰 ⟶ 0`. The class `LieAlgebra.IsExtension` bundles the maps `𝓪 ⟶ 𝓮` and
+`0 ⟶ 𝓪 ⟶ 𝓮 ⟶ 𝓰 ⟶ 0`. The structure `LieAlgebra.IsExtension` bundles the maps `𝓪 ⟶ 𝓮` and
 `𝓮 ⟶ 𝓰` together with their trivial kernel and full range, respectively, and the exactness
 in the middle. -/
-class LieAlgebra.IsExtension (i : 𝓪 →ₗ⁅𝕜⁆ 𝓮) (p : 𝓮 →ₗ⁅𝕜⁆ 𝓰) : Prop where
+structure LieAlgebra.IsExtension (i : 𝓪 →ₗ⁅𝕜⁆ 𝓮) (p : 𝓮 →ₗ⁅𝕜⁆ 𝓰) : Prop where
   ker_eq_bot : i.ker = ⊥
   range_eq_top : p.range = ⊤
   exact : i.range = p.ker
 
 /-- A central extension `𝓮` of a Lie algebra `𝓰` by a Lie algebra `𝓪` is an extension
 `0 ⟶ 𝓪 ⟶ 𝓮 ⟶ 𝓰 ⟶ 0` where the image of `𝓪` is contained in the centre of `𝓮`. -/
-class LieAlgebra.IsCentralExtension {𝓮 : Type u} [LieRing 𝓮] [LieAlgebra 𝕜 𝓮]
+structure LieAlgebra.IsCentralExtension {𝓮 : Type u} [LieRing 𝓮] [LieAlgebra 𝕜 𝓮]
     (i : 𝓪 →ₗ⁅𝕜⁆ 𝓮) (p : 𝓮 →ₗ⁅𝕜⁆ 𝓰) extends IsExtension i p where
   central : ∀ (A : 𝓪), ∀ (E : 𝓮), ⁅i A, E⁆ = 0
 
