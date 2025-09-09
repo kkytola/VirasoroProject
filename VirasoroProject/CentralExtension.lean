@@ -153,12 +153,12 @@ end CentralExtension -- namespace
 
 end LieTwoCocycle -- namespace
 
-variable (β : LieOneCocycle 𝕜 𝓰 𝓪)
+variable (β : LieOneCochain 𝕜 𝓰 𝓪)
 variable (γ)
 
 /-- A Lie algebra homomorphism between two central extensions determined by cocycles
 which differ by a coboundary. -/
-def LieOneCocycle.bdryHom :
+def LieOneCochain.bdryHom :
     (γ.CentralExtension) →ₗ⁅𝕜⁆ (γ + β.bdry).CentralExtension where
   toFun := fun Z ↦ ⟨Z.1, Z.2 + β Z.1⟩
   map_add' Z W := by
@@ -216,13 +216,13 @@ lemma hom_of_coboundary_refl (γ : LieTwoCocycle 𝕜 𝓰 𝓪) :
   rfl
 
 lemma hom_of_coboundary_add (γ₁ γ₂ γ₃ : LieTwoCocycle 𝕜 𝓰 𝓪)
-    (β₁ β₂ : LieOneCocycle 𝕜 𝓰 𝓪) (h₂ : γ₁ + β₁.bdry = γ₂) (h₃ : γ₂ + β₂.bdry = γ₃) :
+    (β₁ β₂ : LieOneCochain 𝕜 𝓰 𝓪) (h₂ : γ₁ + β₁.bdry = γ₂) (h₃ : γ₂ + β₂.bdry = γ₃) :
     ((congr h₃).toLieHom.comp (β₂.bdryHom γ₂)).comp ((congr h₂).toLieHom.comp (β₁.bdryHom γ₁))
       = (congr (show γ₁ + (β₁ + β₂).bdry = γ₃ by rw [← h₃, ← h₂] ; ac_rfl)).toLieHom.comp
           ((β₁ + β₂).bdryHom γ₁) := by
   ext Z
   · rfl
-  · simp only [LieTwoCocycle.CentralExtension.congr, Prod.mk.eta, LieOneCocycle.bdryHom,
+  · simp only [LieTwoCocycle.CentralExtension.congr, Prod.mk.eta, LieOneCochain.bdryHom,
                LieHom.comp_apply, LieHom.coe_mk]
     ac_rfl
 
@@ -233,9 +233,9 @@ noncomputable def equiv_of_lieTwoCoboundary {γ' : LieTwoCocycle 𝕜 𝓰 𝓪}
     (γ.CentralExtension) ≃ₗ⁅𝕜⁆ (γ'.CentralExtension) :=
   let β := h.choose
   have obs : γ + β.bdry = γ' := by
-    change γ + lieOneCocycle_bdryHom _ _ _ h.choose = γ' ; simp [h.choose_spec]
+    change γ + LieOneCochain_bdryHom _ _ _ h.choose = γ' ; simp [h.choose_spec]
   have obs' : γ' + -β.bdry = γ := by
-    change γ' - lieOneCocycle_bdryHom _ _ _ h.choose = γ ; simp [h.choose_spec]
+    change γ' - LieOneCochain_bdryHom _ _ _ h.choose = γ ; simp [h.choose_spec]
   LieEquiv.mk_of_comp_eq_id
       (f := (LieTwoCocycle.CentralExtension.congr obs).toLieHom.comp <| β.bdryHom γ)
       (g := (LieTwoCocycle.CentralExtension.congr obs').toLieHom.comp <| (-β).bdryHom γ')
@@ -243,7 +243,7 @@ noncomputable def equiv_of_lieTwoCoboundary {γ' : LieTwoCocycle 𝕜 𝓰 𝓪}
         convert LieTwoCocycle.CentralExtension.hom_of_coboundary_add γ γ' γ β (-β) obs obs'
         ext1 Z
         simp only [LieHom.coe_id, id_eq, LieTwoCocycle.CentralExtension.congr, Prod.mk.eta,
-                  LieOneCocycle.bdryHom, add_neg_cancel, LieHom.comp_apply, LieHom.coe_mk]
+                  LieOneCochain.bdryHom, add_neg_cancel, LieHom.comp_apply, LieHom.coe_mk]
         ext
         · rfl
         · simp only [left_eq_add] ; rfl)
@@ -251,7 +251,7 @@ noncomputable def equiv_of_lieTwoCoboundary {γ' : LieTwoCocycle 𝕜 𝓰 𝓪}
         convert LieTwoCocycle.CentralExtension.hom_of_coboundary_add γ' γ γ' (-β) β obs' obs
         ext1 Z
         simp only [LieHom.coe_id, id_eq, LieTwoCocycle.CentralExtension.congr, Prod.mk.eta,
-                  LieOneCocycle.bdryHom, LieHom.comp_apply, LieHom.coe_mk]
+                  LieOneCochain.bdryHom, LieHom.comp_apply, LieHom.coe_mk]
         ext
         · rfl
         · simp only [neg_add_cancel, left_eq_add] ; rfl)

@@ -17,12 +17,12 @@ cohomology in degree two, with coefficients in a vector space (an Abelian Lie al
 
 ## Main definitions
 
-* `LieOneCocycle`: The set C¹(𝓰,𝓪) of 1-cocycles of a Lie algebra 𝓰 with coefficients in a
+* `LieOneCochain`: The set C¹(𝓰,𝓪) of 1-cochains of a Lie algebra 𝓰 with coefficients in a
   vector space 𝓪.
-* `LieTwoCocycle`: The set C²(𝓰,𝓪) of 2-cocycles of a Lie algebra 𝓰 with coefficients in a
+* `LieTwoCocycle`: The set Z²(𝓰,𝓪) of 2-cocycles of a Lie algebra 𝓰 with coefficients in a
   vector space 𝓪.
-* `LieTwoCoboundary`: The subspace B²(𝓰,𝓪) ⊆ C²(𝓰,𝓪) of 2-coboundaries.
-* `LieTwoCohomology`: The 2-cohomology H²(𝓰,𝓪) := C²(𝓰,𝓪) ⧸ B²(𝓰,𝓪) of a Lie algebra 𝓰 with
+* `LieTwoCoboundary`: The subspace B²(𝓰,𝓪) ⊆ Z²(𝓰,𝓪) of 2-coboundaries.
+* `LieTwoCohomology`: The 2-cohomology H²(𝓰,𝓪) := Z²(𝓰,𝓪) ⧸ B²(𝓰,𝓪) of a Lie algebra 𝓰 with
   coefficients in a vector space 𝓪.
 
 ## Main statements
@@ -38,7 +38,7 @@ central extensions etc.)
 A reasonable thing to do would be to define Lie algebra cohomology in general degrees. But for
 concrete applications, the special case of degree two probably deserves its own API. Once a
 general definition is made, the API for the degree 2 case (especially central extensions)
-could be refactored. (But even in the current generality, clean-up is needed here.)
+could be refactored.
 
 ## Tags
 
@@ -52,55 +52,55 @@ universe u
 variable (𝕜 : Type*) [CommRing 𝕜]
 variable (𝓰 𝓪 : Type u) [LieRing 𝓰] [AddCommGroup 𝓪] [LieAlgebra 𝕜 𝓰] [Module 𝕜 𝓪]
 
-section LieOneCocycle
+section LieOneCochain
 
-/-! ### Lie algebra 1-cocycles -/
+/-! ### Lie algebra 1-cochains -/
 
-/-- Lie algebra 1-cocycles. -/
-@[ext] structure LieOneCocycle where
-  /-- The underlying linear map of a Lie algebra 1-cocycle. -/
+/-- Lie algebra 1-cochains. -/
+@[ext] structure LieOneCochain where
+  /-- The underlying linear map of a Lie algebra 1-cochain. -/
   toLinearMap : 𝓰 →ₗ[𝕜] 𝓪
 
-instance : Zero (LieOneCocycle 𝕜 𝓰 𝓪) where
+instance : Zero (LieOneCochain 𝕜 𝓰 𝓪) where
   zero := { toLinearMap := 0 }
 
-instance : Add (LieOneCocycle 𝕜 𝓰 𝓪) where
+instance : Add (LieOneCochain 𝕜 𝓰 𝓪) where
   add β β' := { toLinearMap := β.toLinearMap + β'.toLinearMap }
 
-instance : SMul 𝕜 (LieOneCocycle 𝕜 𝓰 𝓪) where
+instance : SMul 𝕜 (LieOneCochain 𝕜 𝓰 𝓪) where
   smul c β := { toLinearMap := c • β.toLinearMap }
 
-namespace LieOneCocycle
+namespace LieOneCochain
 
 @[simp]
-lemma toLinearMap_zero : (0 : LieOneCocycle 𝕜 𝓰 𝓪).toLinearMap = 0 := rfl
+lemma toLinearMap_zero : (0 : LieOneCochain 𝕜 𝓰 𝓪).toLinearMap = 0 := rfl
 
 @[simp]
-lemma toLinearMap_add (β β' : LieOneCocycle 𝕜 𝓰 𝓪) :
+lemma toLinearMap_add (β β' : LieOneCochain 𝕜 𝓰 𝓪) :
     (β + β').toLinearMap = β.toLinearMap + β'.toLinearMap := rfl
 
 @[simp]
-lemma toLinearMap_smul (c : 𝕜) (β : LieOneCocycle 𝕜 𝓰 𝓪) :
+lemma toLinearMap_smul (c : 𝕜) (β : LieOneCochain 𝕜 𝓰 𝓪) :
     (c • β).toLinearMap = c • β.toLinearMap := rfl
 
-instance : AddCommMonoid (LieOneCocycle 𝕜 𝓰 𝓪) where
+instance : AddCommMonoid (LieOneCochain 𝕜 𝓰 𝓪) where
   add_assoc β β' β'' := by
     ext1
-    simp only [LieOneCocycle.toLinearMap_add]
+    simp only [LieOneCochain.toLinearMap_add]
     exact add_assoc β.toLinearMap β'.toLinearMap β''.toLinearMap
   zero_add β := by ext1 ; simp
   add_zero β := by ext1 ; simp
   add_comm β β' := by
     ext1
-    simp only [LieOneCocycle.toLinearMap_add]
+    simp only [LieOneCochain.toLinearMap_add]
     exact AddCommMagma.add_comm β.toLinearMap β'.toLinearMap
   nsmul n β := { toLinearMap := n • β.toLinearMap }
   nsmul_zero β := by ext1 ; simp only [zero_smul] ; rfl
   nsmul_succ n β := by
     ext1
-    simpa only [LieOneCocycle.toLinearMap_add] using succ_nsmul β.toLinearMap n
+    simpa only [LieOneCochain.toLinearMap_add] using succ_nsmul β.toLinearMap n
 
-instance : Module 𝕜 (LieOneCocycle 𝕜 𝓰 𝓪) where
+instance : Module 𝕜 (LieOneCochain 𝕜 𝓰 𝓪) where
   one_smul β := by ext1 ; simp
   mul_smul c c' β := by ext1 ; simp ; exact mul_smul c c' β.toLinearMap
   smul_zero β := by ext1 ; simp
@@ -108,7 +108,7 @@ instance : Module 𝕜 (LieOneCocycle 𝕜 𝓰 𝓪) where
   add_smul c c' β := by ext1 ; simp ; exact Module.add_smul c c' β.toLinearMap
   zero_smul β := by ext1 ; simp
 
-instance : AddCommGroup (LieOneCocycle 𝕜 𝓰 𝓪) where
+instance : AddCommGroup (LieOneCochain 𝕜 𝓰 𝓪) where
   zero_add β := AddZeroClass.zero_add β
   add_zero β := AddZeroClass.add_zero β
   nsmul := HSMul.hSMul
@@ -127,17 +127,17 @@ instance : AddCommGroup (LieOneCocycle 𝕜 𝓰 𝓪) where
 
 variable {𝕜 𝓰 𝓪}
 
-instance : FunLike (LieOneCocycle 𝕜 𝓰 𝓪) 𝓰 𝓪 where
+instance : FunLike (LieOneCochain 𝕜 𝓰 𝓪) 𝓰 𝓪 where
   coe := fun β X ↦ β.toLinearMap X
   coe_injective' := fun β β' h ↦ by ext1 ; exact LinearMap.ext_iff.mpr (congrFun h)
 
-instance : LinearMapClass (LieOneCocycle 𝕜 𝓰 𝓪) 𝕜 𝓰 𝓪 where
+instance : LinearMapClass (LieOneCochain 𝕜 𝓰 𝓪) 𝕜 𝓰 𝓪 where
   map_add β X Y := β.toLinearMap.map_add X Y
   map_smulₛₗ β c X := LinearMap.CompatibleSMul.map_smul β.toLinearMap c X
 
-end LieOneCocycle -- namespace
+end LieOneCochain -- namespace
 
-end LieOneCocycle -- section
+end LieOneCochain -- section
 
 section LieTwoCocycle
 
@@ -181,8 +181,7 @@ lemma apply_smul₂ (c : 𝕜) (X Y : 𝓰) : γ X (c • Y) = c • γ X Y := b
 
 lemma skew (X Y : 𝓰) : -(γ Y X) = γ X Y := by
   have aux : γ (X + Y) X + γ (X + Y) Y = 0 := by
-    rw [← LieTwoCocycle.apply_add₂]
-    exact LieTwoCocycle.self γ
+    simpa only [← LieTwoCocycle.apply_add₂] using  LieTwoCocycle.self γ
   simpa [neg_eq_iff_add_eq_zero] using aux
 
 instance : Zero (LieTwoCocycle 𝕜 𝓰 𝓪) where
@@ -285,41 +284,41 @@ section LieTwoCoboundary
 
 variable {𝕜 𝓰 𝓪}
 
-/-- A Lie algebra 1-cocycle determines a bilinear map via the differential. -/
-def LieOneCocycle.bdry' (β : LieOneCocycle 𝕜 𝓰 𝓪) : 𝓰 →ₗ[𝕜] 𝓰 →ₗ[𝕜] 𝓪 where
+/-- A Lie algebra 1-cochain determines a bilinear map via the differential. -/
+def LieOneCochain.bdry' (β : LieOneCochain 𝕜 𝓰 𝓪) : 𝓰 →ₗ[𝕜] 𝓰 →ₗ[𝕜] 𝓪 where
   toFun := fun X ↦ β ∘ₗ LieAlgebra.bracketHom 𝕜 𝓰 X
   map_add' X₁ X₂ := by simp_all only [map_add] ; ext ; simp_all
   map_smul' c X := by simp_all only [LinearMapClass.map_smul, RingHom.id_apply] ; ext ; simp_all
 
-/-- A Lie algebra 1-cocycle linearly determines a bilinear map via the differential. -/
-def LieOneCocycle.bdryHom' : LieOneCocycle 𝕜 𝓰 𝓪 →ₗ[𝕜] 𝓰 →ₗ[𝕜] 𝓰 →ₗ[𝕜] 𝓪 where
-  toFun := fun β ↦ LieOneCocycle.bdry' β
+/-- A Lie algebra 1-cochain linearly determines a bilinear map via the differential. -/
+def LieOneCochain.bdryHom' : LieOneCochain 𝕜 𝓰 𝓪 →ₗ[𝕜] 𝓰 →ₗ[𝕜] 𝓰 →ₗ[𝕜] 𝓪 where
+  toFun := fun β ↦ LieOneCochain.bdry' β
   map_add' β₁ β₂ := by ext X Y; rfl
   map_smul' c Z := by ext X Y; rfl
 
-/-- The `∂` of a Lie algebra 1-cocycle as a Lie algebra 2-cocycle. -/
-def LieOneCocycle.bdry (β : LieOneCocycle 𝕜 𝓰 𝓪) : LieTwoCocycle 𝕜 𝓰 𝓪 where
-  toBilin := LieOneCocycle.bdryHom' β
-  self' X := by simp [LieOneCocycle.bdryHom', LieOneCocycle.bdry']
-  leibniz' X Y Z := by simp [LieOneCocycle.bdryHom', LieOneCocycle.bdry']
+/-- The `∂` of a Lie algebra 1-cochain as a Lie algebra 2-cocycle. -/
+def LieOneCochain.bdry (β : LieOneCochain 𝕜 𝓰 𝓪) : LieTwoCocycle 𝕜 𝓰 𝓪 where
+  toBilin := LieOneCochain.bdryHom' β
+  self' X := by simp [LieOneCochain.bdryHom', LieOneCochain.bdry']
+  leibniz' X Y Z := by simp [LieOneCochain.bdryHom', LieOneCochain.bdry']
 
 variable (𝕜 𝓰 𝓪)
 
-/-- The `∂` as a linear map from Lie algebra 1-cocycles to Lie algebra 2-cocycles. -/
-def lieOneCocycle_bdryHom : LieOneCocycle 𝕜 𝓰 𝓪 →ₗ[𝕜] LieTwoCocycle 𝕜 𝓰 𝓪 where
+/-- The `∂` as a linear map from Lie algebra 1-cochains to Lie algebra 2-cocycles. -/
+def LieOneCochain_bdryHom : LieOneCochain 𝕜 𝓰 𝓪 →ₗ[𝕜] LieTwoCocycle 𝕜 𝓰 𝓪 where
   toFun β := β.bdry
   map_add' _ _ := rfl
   map_smul' _ _ := rfl
 
-@[simp] lemma LieOneCocycle.neg_bdry (β : LieOneCocycle 𝕜 𝓰 𝓪) : (-β).bdry = -β.bdry := by
-  change lieOneCocycle_bdryHom 𝕜 𝓰 𝓪 (-β) = -lieOneCocycle_bdryHom 𝕜 𝓰 𝓪 β
+@[simp] lemma LieOneCochain.neg_bdry (β : LieOneCochain 𝕜 𝓰 𝓪) : (-β).bdry = -β.bdry := by
+  change LieOneCochain_bdryHom 𝕜 𝓰 𝓪 (-β) = -LieOneCochain_bdryHom 𝕜 𝓰 𝓪 β
   simp
 
-lemma LieOneCocycle.bdry_apply (β : LieOneCocycle 𝕜 𝓰 𝓪) (X Y : 𝓰) :
+lemma LieOneCochain.bdry_apply (β : LieOneCochain 𝕜 𝓰 𝓪) (X Y : 𝓰) :
     β.bdry X Y = β (⁅X, Y⁆) := rfl
 
 /-- Lie algebra 2-coboundaries as a vector space. -/
-abbrev LieTwoCoboundary := LinearMap.range (lieOneCocycle_bdryHom 𝕜 𝓰 𝓪)
+abbrev LieTwoCoboundary := LinearMap.range (LieOneCochain_bdryHom 𝕜 𝓰 𝓪)
 
 end LieTwoCoboundary -- section
 
@@ -333,14 +332,12 @@ def LieTwoCohomology := LieTwoCocycle 𝕜 𝓰 𝓪 ⧸ LieTwoCoboundary 𝕜 �
 namespace LieTwoCohomology
 
 /-- The 2-cohomology `H²(𝓰,𝓪)` is an additive commutative group. -/
-instance : AddCommGroup (LieTwoCohomology 𝕜 𝓰 𝓪) := by
-  change AddCommGroup (LieTwoCocycle 𝕜 𝓰 𝓪 ⧸ LieTwoCoboundary 𝕜 𝓰 𝓪)
-  exact Submodule.Quotient.addCommGroup (LieTwoCoboundary 𝕜 𝓰 𝓪)
+instance : AddCommGroup (LieTwoCohomology 𝕜 𝓰 𝓪) :=
+  Submodule.Quotient.addCommGroup (LieTwoCoboundary 𝕜 𝓰 𝓪)
 
 /-- The 2-cohomology `H²(𝓰,𝓪)` is a module over the scalar ring `𝕜`. -/
-instance : Module 𝕜 (LieTwoCohomology 𝕜 𝓰 𝓪) := by
-  change Module 𝕜 (LieTwoCocycle 𝕜 𝓰 𝓪 ⧸ LieTwoCoboundary 𝕜 𝓰 𝓪)
-  exact Submodule.Quotient.module' _
+instance : Module 𝕜 (LieTwoCohomology 𝕜 𝓰 𝓪) :=
+  Submodule.Quotient.module' _
 
 end LieTwoCohomology -- namespace
 
@@ -363,14 +360,14 @@ def cohomologyClass (γ : LieTwoCocycle 𝕜 𝓰 𝓪) : LieTwoCohomology 𝕜 
   LieTwoCocycle.toLieTwoCohomology _ _ _ γ
 
 /-- Adding a coboundary does not change the cohomology class. -/
-lemma cohomologyClass_add_bdry (γ : LieTwoCocycle 𝕜 𝓰 𝓪) (β : LieOneCocycle 𝕜 𝓰 𝓪) :
+lemma cohomologyClass_add_bdry (γ : LieTwoCocycle 𝕜 𝓰 𝓪) (β : LieOneCochain 𝕜 𝓰 𝓪) :
     (γ + β.bdry).cohomologyClass = γ.cohomologyClass := by
   simp only [cohomologyClass, map_add, add_eq_left]
-  apply (Submodule.Quotient.mk_eq_zero _).mpr <| LinearMap.mem_range.mpr ⟨β, rfl⟩
+  exact (Submodule.Quotient.mk_eq_zero _).mpr <| LinearMap.mem_range.mpr ⟨β, rfl⟩
 
 /-- A cocycle representing a trivial cohomology class is a coboundary. -/
 lemma exists_eq_bdry (γ : LieTwoCocycle 𝕜 𝓰 𝓪) (hγ : γ.cohomologyClass = 0) :
-    ∃ β : LieOneCocycle 𝕜 𝓰 𝓪, γ = β.bdry := by
+    ∃ β : LieOneCochain 𝕜 𝓰 𝓪, γ = β.bdry := by
   simp_rw [@Eq.comm (LieTwoCocycle 𝕜 𝓰 𝓪) γ _]
   simpa using (Submodule.Quotient.eq _).mp <|
     show γ.cohomologyClass = LieTwoCocycle.cohomologyClass 0 by rw [hγ] ; rfl
@@ -386,9 +383,9 @@ variable [IsLieAbelian 𝓰]
 variable {𝕜 𝓰 𝓪}
 
 /-- For abelian Lie algebras, a 2-coboundary is necessarily zero. -/
-lemma LieOneCocycle.bdry_apply_eq_zero_of_isLieAbelian (β : LieOneCocycle 𝕜 𝓰 𝓪) (X Y : 𝓰) :
+lemma LieOneCochain.bdry_apply_eq_zero_of_isLieAbelian (β : LieOneCochain 𝕜 𝓰 𝓪) (X Y : 𝓰) :
     β.bdry X Y = 0 := by
-  simp [LieOneCocycle.bdry_apply]
+  simp [LieOneCochain.bdry_apply]
 
 variable (𝕜 𝓰 𝓪)
 

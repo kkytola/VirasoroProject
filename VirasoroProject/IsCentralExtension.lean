@@ -19,9 +19,9 @@ characteristic predicate.
   central extension of a Lie algebra 𝓰 by an abelian Lie algebra 𝓪: there exists a short exact
   sequence 0 ⟶ 𝓪 ⟶ 𝓮 ⟶ 𝓰 ⟶ 0 of Lie algebras, where the image of 𝓪 is contained in the centre
   of 𝓮.
-* `LieTwoCocycle.CentralExtension.emb`: Given a 2-cocycle γ ∈ C²(𝓰,𝓪) and the correspondingly
+* `LieTwoCocycle.CentralExtension.emb`: Given a 2-cocycle γ ∈ Z²(𝓰,𝓪) and the correspondingly
   constructed central extension 𝓮, this is the map 𝓪 ⟶ 𝓮 in the short exact sequence.
-* `LieTwoCocycle.CentralExtension.proj`: Given a 2-cocycle γ ∈ C²(𝓰,𝓪) and the correspondingly
+* `LieTwoCocycle.CentralExtension.proj`: Given a 2-cocycle γ ∈ Z²(𝓰,𝓪) and the correspondingly
   constructed central extension 𝓮, this is the map 𝓮 ⟶ 𝓰 in the short exact sequence.
 
 ## Main statements
@@ -75,7 +75,7 @@ variable (γ : LieTwoCocycle 𝕜 𝓰 𝓪)
 
 namespace LieTwoCocycle.CentralExtension
 
-/-- If `𝓮` is the (central) extension of `𝓰` by `𝓪` defined by a 2-cocycle `γ ∈ C²(𝓰,𝓪)`,
+/-- If `𝓮` is the (central) extension of `𝓰` by `𝓪` defined by a 2-cocycle `γ ∈ Z²(𝓰,𝓪)`,
 then `LieTwoCocycle.CentralExtension.emb` gives the corresponding embedding `𝓪 ⟶ 𝓮`. -/
 def emb [IsLieAbelian 𝓪] : 𝓪 →ₗ⁅𝕜⁆ γ.CentralExtension where
   toFun := fun A ↦ ⟨0, A⟩
@@ -83,7 +83,7 @@ def emb [IsLieAbelian 𝓪] : 𝓪 →ₗ⁅𝕜⁆ γ.CentralExtension where
   map_smul' c A := by simp [smul_def]
   map_lie' := by intro A₁ A₂ ; simp [lie_def]
 
-/-- If `𝓮` is the (central) extension of `𝓰` by `𝓪` defined by a 2-cocycle `γ ∈ C²(𝓰,𝓪)`,
+/-- If `𝓮` is the (central) extension of `𝓰` by `𝓪` defined by a 2-cocycle `γ ∈ Z²(𝓰,𝓪)`,
 then `LieTwoCocycle.CentralExtension.proj` gives the corresponding projection `𝓮 ⟶ 𝓰`. -/
 def proj : γ.CentralExtension →ₗ⁅𝕜⁆ 𝓰 where
   toFun := fun ⟨X, _⟩ ↦ X
@@ -124,7 +124,7 @@ lemma range_emb_eq_ker_proj [IsLieAbelian 𝓪] :
         ↔ Z ∈ (LieTwoCocycle.CentralExtension.proj γ).ker
   rw [mem_range_emb_iff, mem_ker_proj_iff]
 
-/-- If `𝓮` is the (central) extension of `𝓰` by `𝓪` defined by a 2-cocycle `γ ∈ C²(𝓰,𝓪)`,
+/-- If `𝓮` is the (central) extension of `𝓰` by `𝓪` defined by a 2-cocycle `γ ∈ Z²(𝓰,𝓪)`,
 then `𝓮` is an extension of `𝓰` by `𝓪` in the sense that there is a short exact sequence
 `0 ⟶ 𝓪 ⟶ 𝓮 ⟶ 𝓰 ⟶ 0` where the two maps are `LieTwoCocycle.CentralExtension.emb` and
 `LieTwoCocycle.CentralExtension.proj`. -/
@@ -134,7 +134,7 @@ instance isExtension [IsLieAbelian 𝓪] :
   range_eq_top := range_proj_eq_top γ
   exact := range_emb_eq_ker_proj γ
 
-/-- If `𝓮` is the central extension of `𝓰` by `𝓪` defined by a 2-cocycle `γ ∈ C²(𝓰,𝓪)`,
+/-- If `𝓮` is the central extension of `𝓰` by `𝓪` defined by a 2-cocycle `γ ∈ Z²(𝓰,𝓪)`,
 then `𝓮` is a central extension of `𝓰` by `𝓪` in the sense that there is a short exact sequence
 `0 ⟶ 𝓪 ⟶ 𝓮 ⟶ 𝓰 ⟶ 0` where the two maps are `LieTwoCocycle.CentralExtension.emb` and
 `LieTwoCocycle.CentralExtension.proj` and the image of `𝓪` is contained in the centre of `𝓮`. -/

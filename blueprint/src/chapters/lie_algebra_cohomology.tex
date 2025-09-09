@@ -5,19 +5,19 @@ Fix also a vector space $\aLie$ over $\bbk$, (interpreted, when necessary,
 as an abelian Lie algebra, i.e., all Lie brackets in $\aLie$ are taken to
 be zero).
 
-\begin{definition}[Lie algebra 1-cocycle]
+\begin{definition}[Lie algebra 1-cochain]
   \label{def:LieOneCocycle}
   %\uses{}
   \lean{VirasoroProject.LieOneCocycle}
   \leanok
-  A \term{1-cocycle} of the Lie algebra $\gLie$ with coefficients in the vector
+  A \term{1-cochain} of the Lie algebra $\gLie$ with coefficients in the vector
   space $\aLie$ is a linear map
   \begin{align*}
     \beta \colon \gLie \to \aLie .
   \end{align*}
-  The set of all such 1-cocycles is denoted by $\Coc^1(\gLie, \aLie)$.
+  The set of all such 1-cochains is denoted by $\Coch^1(\gLie, \aLie)$.
   %\begin{align*}
-  %  \Coc^1(\gLie, \aLie) .
+  %  \Coch^1(\gLie, \aLie) .
   %\end{align*}
 \end{definition}
 
@@ -42,7 +42,7 @@ be zero).
 
   The set of all such 2-cocycles is denoted by $\Coc^2(\gLie, \aLie)$.
   %\begin{align*}
-  %  \Coc^1(\gLie, \aLie) .
+  %  \Coch^1(\gLie, \aLie) .
   %\end{align*}
 \end{definition}
 
@@ -71,18 +71,18 @@ be zero).
   and the asserted skew-symmetry equation follows.
 \end{proof}
 
-\begin{lemma}[Lie algebra 1-cocycles form a vector space]
+\begin{lemma}[Lie algebra 1-cochains form a vector space]
   \label{lem:LieOneCocycle_vectorSpace}
   \uses{def:LieOneCocycle}
   \lean{VirasoroProject.LieOneCocycle.instModule}
   \leanok
-  The set $\Coc^1(\gLie, \aLie)$ of 1-cocycles of $\gLie$ with
+  The set $\Coch^1(\gLie, \aLie)$ of 1-cochains of $\gLie$ with
   coefficients in $\aLie$ forms a vector space over $\bbk$.
 \end{lemma}
 \begin{proof}
   % \uses{}
   \leanok
-  By definition, $\Coc^1(\gLie, \aLie)$ is the space of
+  By definition, $\Coch^1(\gLie, \aLie)$ is the space of
   linear maps $\gLie \to \aLie$, and such linear maps form
   a vector space.
 \end{proof}
@@ -107,7 +107,7 @@ be zero).
   \uses{lem:LieTwoCocycle_vectorSpace, lem:LieOneCocycle_vectorSpace}
   \lean{VirasoroProject.LieOneCocycle.bdryHom}
   \leanok
-  Given a 1-cocycle $\beta \in \Coc^1(\gLie, \aLie)$, we define the
+  Given a 1-cochain $\beta \in \Coch^1(\gLie, \aLie)$, we define the
   \term{coboundary} $\partial \beta$ of $\beta$ to be the bilinear map
   \begin{align*}
     \partial \beta \colon \; & \gLie \times \gLie \to \aLie \\
@@ -117,7 +117,7 @@ be zero).
     \partial \beta (X, Y) = \; & \beta ([X,Y]) .
   \end{align*}
   We then have $\partial \beta \in \Coc^2(\gLie,\aLie)$.
-  The mapping $\partial \colon \Coc^1(\gLie,\aLie) \to \Coc^2(\gLie,\aLie)$
+  The mapping $\partial \colon \Coch^1(\gLie,\aLie) \to \Coc^2(\gLie,\aLie)$
   is linear. Its range is denoted $\Cob^2(\gLie,\aLie) \subset \Coc^2(\gLie,\aLie)$
   and called the set of \term{2-coboundaries} of the Lie algebra $\gLie$
   with coefficients in $\aLie$.
@@ -156,7 +156,7 @@ be zero).
   The projection is surjective by construction, so it suffices to show that it is also injective.
   The kernel of the projection is $\Cob^2(\gLie,\aLie) = \Ima \; \partial$.
   In view of Definition~\ref{def:LieTwoCoboundary},
-  abelianity of $\gLie$ implies $\partial \beta = 0$ for any $\beta \in \Coc^1(\gLie,\aLie)$.
+  abelianity of $\gLie$ implies $\partial \beta = 0$ for any $\beta \in \Coch^1(\gLie,\aLie)$.
   Therefore $\Cob^2(\gLie,\aLie) = 0$, and the kernel of the projection is trivial,
   so the projection is indeed injective.
 \end{proof}

@@ -144,7 +144,7 @@ Definition~\ref{def:WittAlgebra}.
   % \uses{}
   \leanok
   Assume, by way of contradiction, that ${\gamma}_{\vir} \in \Cob^2(\witt,\bbk)$,
-  i.e., that ${\gamma}_{\vir} = \partial \beta$ for some $\beta \in \Coc^1(\witt,\bbk)$.
+  i.e., that ${\gamma}_{\vir} = \partial \beta$ for some $\beta \in \Coch^1(\witt,\bbk)$.
   Then, in particular, for every $n \in \bZ$ we would have
   \begin{align*}
     {\gamma}_{\vir}(\ell_n,\ell_{-n})
@@ -217,7 +217,7 @@ Definition~\ref{def:WittAlgebra}.
   \lean{VirasoroProject.WittAlgebra.exists_add_bdry_eq_smul_virasoroCocycle}
   \leanok
   For any 2-cocycle $\gamma \in \Coc^2(\witt,\bbk)$, there exists
-  a coboundary $\partial \beta$ with $\beta \in \Coc^1(\witt,\bbk)$
+  a coboundary $\partial \beta$ with $\beta \in \Coch^1(\witt,\bbk)$
   such that
   \begin{align*}
     \gamma + \partial \beta \; = \; r \cdot {\gamma}_{\vir}
@@ -228,7 +228,7 @@ Definition~\ref{def:WittAlgebra}.
   \uses{lem:WittTwoCocycleSupport, lem:WittTwoCocycleEquation}
   \leanok
   Let $\gamma \in \Coc^2(\witt,\bbk)$ be a Witt algebra 2-cocycle.
-  Define a Witt algebra 1-cocycle $\beta \in \Coc^1(\witt,\bbk)$ by linear extension of
+  Define a Witt algebra 1-cochain $\beta \in \Coch^1(\witt,\bbk)$ by linear extension of
   \begin{align*}
     \beta (\ell_n) =
     \begin{cases}

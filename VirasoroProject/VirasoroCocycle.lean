@@ -121,9 +121,9 @@ lemma virasoroCocycle_apply_lgen_lgen (n m : ℤ) :
 
 variable {𝕜}
 
-lemma bdry_lgen_lgen_neg_eq (β : LieOneCocycle 𝕜 (WittAlgebra 𝕜) 𝕜) (n : ℤ) :
+lemma bdry_lgen_lgen_neg_eq (β : LieOneCochain 𝕜 (WittAlgebra 𝕜) 𝕜) (n : ℤ) :
     β.bdry (lgen 𝕜 n) (lgen 𝕜 (-n)) = 2 * n * β (lgen 𝕜 0) := by
-  simp [LieOneCocycle.bdry_apply, ← (two_mul (n : 𝕜))]
+  simp [LieOneCochain.bdry_apply, ← (two_mul (n : 𝕜))]
 
 variable (𝕜)
 
