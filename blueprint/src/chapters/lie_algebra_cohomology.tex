@@ -6,9 +6,9 @@ as an abelian Lie algebra, i.e., all Lie brackets in $\aLie$ are taken to
 be zero).
 
 \begin{definition}[Lie algebra 1-cochain]
-  \label{def:LieOneCocycle}
+  \label{def:LieOneCochain}
   %\uses{}
-  \lean{VirasoroProject.LieOneCocycle}
+  \lean{VirasoroProject.LieOneCochain}
   \leanok
   A \term{1-cochain} of the Lie algebra $\gLie$ with coefficients in the vector
   space $\aLie$ is a linear map
@@ -72,9 +72,9 @@ be zero).
 \end{proof}
 
 \begin{lemma}[Lie algebra 1-cochains form a vector space]
-  \label{lem:LieOneCocycle_vectorSpace}
-  \uses{def:LieOneCocycle}
-  \lean{VirasoroProject.LieOneCocycle.instModule}
+  \label{lem:LieOneCochain_vectorSpace}
+  \uses{def:LieOneCochain}
+  \lean{VirasoroProject.LieOneCochain.instModule}
   \leanok
   The set $\Coch^1(\gLie, \aLie)$ of 1-cochains of $\gLie$ with
   coefficients in $\aLie$ forms a vector space over $\bbk$.
@@ -104,8 +104,8 @@ be zero).
 
 \begin{definition}[Lie algebra 2-coboundary]
   \label{def:LieTwoCoboundary}
-  \uses{lem:LieTwoCocycle_vectorSpace, lem:LieOneCocycle_vectorSpace}
-  \lean{VirasoroProject.LieOneCocycle.bdryHom}
+  \uses{lem:LieTwoCocycle_vectorSpace, lem:LieOneCochain_vectorSpace}
+  \lean{VirasoroProject.LieOneCochain.bdryHom}
   \leanok
   Given a 1-cochain $\beta \in \Coch^1(\gLie, \aLie)$, we define the
   \term{coboundary} $\partial \beta$ of $\beta$ to be the bilinear map
