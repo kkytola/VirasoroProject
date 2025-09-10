@@ -180,4 +180,79 @@ lemma VermaModule.range_universalMap_eq_span (η : ι → A × 𝕜)
 end generalized_Verma_module
 
 
+section IsVerma
+
+variable {𝕜 A : Type*} [CommRing 𝕜] [Ring A] [Algebra 𝕜 A]
+variable {ι : Type*}
+
+universe u
+
+/-- The characteristic predicate of a Verma module. -/
+structure IsVermaModule (η : ι → A × 𝕜) (M : Type u) (hwv : M) [AddCommGroup M] [Module A M] where
+  hwv_prop : ∀ i, (η i).1 • hwv = algebraMap 𝕜 A (η i).2 • hwv
+  universal : ∀ (V : Type u) [AddCommGroup V] [Module A V] (v : V)
+                (_ : ∀ i, (η i).1 • v = algebraMap 𝕜 A (η i).2 • v),
+                ∃! (φ : M →ₗ[A] V), φ hwv = v
+
+/-- The universal map from a module satisfying the characteristic predicate of a Verma module. -/
+noncomputable def IsVermaModule.universalMap {η : ι → A × 𝕜} {M : Type u} {hwv : M}
+    [AddCommGroup M] [Module A M] (h : IsVermaModule η M hwv)
+    {V : Type u} [AddCommGroup V] [Module A V] {v : V}
+    (hv : ∀ i, (η i).1 • v = algebraMap 𝕜 A (η i).2 • v) :
+    M →ₗ[A] V :=
+  (h.universal V v hv).choose
+
+/-- The defining property of a universal map from a module satisfying the characteristic predicate
+of a Verma module. -/
+@[simp] lemma IsVermaModule.universalMap_hwv {η : ι → A × 𝕜} {M : Type u} {hwv : M}
+    [AddCommGroup M] [Module A M] (h : IsVermaModule η M hwv) {V : Type u}
+    [AddCommGroup V] [Module A V] {v : V} (hv : ∀ i, (η i).1 • v = algebraMap 𝕜 A (η i).2 • v) :
+    h.universalMap hv hwv = v :=
+  (h.universal V v hv).choose_spec.1
+
+/-- The uniqueness of the universal map from a module satisfying the characteristic predicate of a Verma module. -/
+lemma IsVermaModule.universalMap_unique {η : ι → A × 𝕜} {M : Type u} {hwv : M}
+    [AddCommGroup M] [Module A M] (h : IsVermaModule η M hwv) {V : Type u}
+    [AddCommGroup V] [Module A V] {v : V} (hv : ∀ i, (η i).1 • v = algebraMap 𝕜 A (η i).2 • v)
+    {ψ : M →ₗ[A] V} (hψ : ψ hwv = v) :
+    ψ = h.universalMap hv :=
+  (h.universal V v hv).choose_spec.2 ψ hψ
+
+lemma VermaModule.isVermaModule (η : ι → A × 𝕜) :
+    IsVermaModule η (VermaModule η) (hwVec η) := by
+  refine ⟨fun i ↦ apply_hwVec_eq η i, ?_⟩
+  intro V _ _ v hv
+  use universalMap η hv
+  refine ⟨universalMap_hwVec η hv, ?_⟩
+  intro ψ hψ
+  ext u
+  obtain ⟨a, hau⟩ : ∃ (a : A), a • hwVec η = u := by
+    have key := hwVec_cyclic η ▸ Submodule.mem_top (R := A) (x := u)
+    rwa [Submodule.mem_span_singleton] at key
+  simp [← hau, hψ]
+
+/-- Uniqueness up to isomorphism of a Verma module, phrased as the construction of an isomorphism
+between two modules that satisfy the characteristic predicate `IsVermaModule`. -/
+noncomputable def IsVermaModule.equiv_of_isVermaModule (η : ι → A × 𝕜) (M₁ M₂ : Type u) (hwv₁ : M₁) (hwv₂ : M₂)
+    [AddCommGroup M₁] [Module A M₁] [AddCommGroup M₂] [Module A M₂]
+    (h₁ : IsVermaModule η M₁ hwv₁) (h₂ : IsVermaModule η M₂ hwv₂) :
+    M₁ ≃ₗ[A] M₂ where
+  toFun := h₁.universalMap h₂.hwv_prop
+  map_add' := LinearMap.map_add (h₁.universalMap h₂.hwv_prop)
+  map_smul' := LinearMap.CompatibleSMul.map_smul (h₁.universalMap h₂.hwv_prop)
+  invFun := h₂.universalMap h₁.hwv_prop
+  left_inv := by
+    have obs := h₁.universalMap_unique h₁.hwv_prop
+                (ψ := h₂.universalMap h₁.hwv_prop ∘ₗ (h₁.universalMap h₂.hwv_prop)) (by simp)
+    have obs' := h₁.universalMap_unique h₁.hwv_prop (ψ := LinearMap.id) rfl
+    exact LinearMap.congr_fun (obs'.symm ▸ obs)
+  right_inv := by
+    have obs := h₂.universalMap_unique h₂.hwv_prop
+                (ψ := h₁.universalMap h₂.hwv_prop ∘ₗ (h₂.universalMap h₁.hwv_prop)) (by simp)
+    have obs' := h₂.universalMap_unique h₂.hwv_prop (ψ := LinearMap.id) rfl
+    exact LinearMap.congr_fun (obs'.symm ▸ obs)
+
+end IsVerma
+
+
 end VirasoroProject
