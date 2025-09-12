@@ -231,7 +231,7 @@ instance (α : 𝕜) : HasCentralCharge 𝕜 (ChargedFockSpace 𝕜 α) (1 : �
 
 /-- A Virasoro module map from the Verma module with `c = 1` and `h = α^2 / 2`
 to the charged Fock space of charge `α`. -/
-noncomputable def virasoroVerma_to_chargedFockSpace (α : 𝕜) :
+noncomputable def virasoroVermaToChargedFockSpace (α : 𝕜) :
     VirasoroVerma 𝕜 1 (α^2/2) →ₗ[𝓤 𝕜 (VirasoroAlgebra 𝕜)] ChargedFockSpace 𝕜 α :=
   VirasoroVerma.universalMap 𝕜 _ (hwv := vacuum 𝕜 α) (by simp)
     (by
@@ -240,6 +240,10 @@ noncomputable def virasoroVerma_to_chargedFockSpace (α : 𝕜) :
     (by
       intro n n_pos
       simpa using sugawaraRepresentation_lgen_pos_apply_vacuum 𝕜 α n_pos)
+
+theorem virasoroVermaToChargedFockSpace_hwVec (α : 𝕜) :
+    virasoroVermaToChargedFockSpace 𝕜 α (.hwVec 𝕜 _ _) = vacuum 𝕜 α := by
+  apply VirasoroVerma.universalMap_hwVec
 
 end ChargedFockSpace
 
