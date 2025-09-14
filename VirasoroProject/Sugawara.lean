@@ -10,6 +10,7 @@ import VirasoroProject.Commutator
 import VirasoroProject.LieAlgebraRepresentationOfBasis
 import VirasoroProject.ToMathlib.Topology.Algebra.Module.LinearMap.Defs
 import Mathlib
+import Calcify
 
 /-!
 # The bosonic Sugawara construction
@@ -377,6 +378,55 @@ lemma commutator_sugawaraGen_heiOper [CharZero 𝕜] (n m : ℤ) :
                smul_eq_zero, Classical.not_imp, not_or, and_imp]
     intro j hjm _ _
     linarith
+
+/-- `[L(n), J(m)] = -m • J(n+m)` -/
+lemma commutator_sugawaraGen_heiOper' [CharZero 𝕜] (n m : ℤ) :
+    (sugawaraGen heiTrunc n).commutator (heiOper m) = -m • heiOper (n + m) := by
+  ext v
+  suffices (2 : 𝕜) • ((sugawaraGen heiTrunc n).commutator (heiOper m)) v
+            = (2 : 𝕜) • (-m • heiOper (n + m)) v from
+    smul_cancel_of_non_zero_divisor _ (by aesop) this
+  let mₖ := (m : 𝕜)
+  calc (2 : 𝕜) • ((sugawaraGen heiTrunc n).commutator (heiOper m)) v
+      = ∑ᶠ (k : ℤ), ((pairNO heiOper (n - k) k).commutator (heiOper m)) v         := by
+        simp [commutator_sugawaraGen_apply_eq_finsum_commutator_apply]
+    _ = ∑ᶠ (k : ℤ), ((-mₖ * ((if k + m = 0 then 1 else 0)
+            + if n - k + m = 0 then 1 else 0)) • heiOper (k + (n - k) + m)) v     := by
+        simp_rw [commutator_heiPairNO_heiGen heiComm, mₖ]
+    _ = ∑ᶠ (k : ℤ), -((mₖ * ((if k + m = 0 then 1 else 0)
+            + if n - k + m = 0 then 1 else 0)) • (heiOper (n + m)) v)             := by simp
+    _ = ∑ᶠ (k : ℤ), -((if k + m = 0 then mₖ • (heiOper (n + m)) v else 0)
+                      + if n - k + m = 0 then mₖ • (heiOper (n + m)) v else 0)    := by
+        simp [mul_add, add_smul]
+    _ = -((∑ᶠ (i : ℤ), if i + m = 0 then mₖ • (heiOper (n + m)) v else 0)
+          + ∑ᶠ (i : ℤ), if n - i + m = 0 then mₖ • (heiOper (n + m)) v else 0)    := ?_
+    _ = -((if -m + m = 0 then mₖ • (heiOper (n + m)) v else 0)
+          + ∑ᶠ (i : ℤ), if n - i + m = 0 then mₖ • (heiOper (n + m)) v else 0)    := ?_
+    _ = -(mₖ • (heiOper (n + m)) v
+          + ∑ᶠ (i : ℤ), if n - i + m = 0 then mₖ • (heiOper (n + m)) v else 0)    := by simp
+    _ = -(mₖ • (heiOper (n + m)) v
+          + if n - (n + m) + m = 0 then mₖ • (heiOper (n + m)) v else 0)          := ?_
+    _ = -(mₖ • (heiOper (n + m)) v + mₖ • (heiOper (n + m)) v)                    := by simp
+    _ = (2 : 𝕜) • (-m • heiOper (n + m)) v                                        := by
+        simp [← two_smul 𝕜, mₖ]
+        norm_cast
+  · rw [finsum_neg_distrib, finsum_add_distrib]
+    · apply (show Set.Finite {-m} from Set.finite_singleton (-m)).subset
+      simp only [Set.subset_singleton_iff, Function.mem_support, ne_eq, ite_eq_right_iff,
+                 smul_eq_zero, Classical.not_imp, not_or, and_imp]
+      intro j hjm _ _
+      linarith
+    · apply (show Set.Finite {n + m} from Set.finite_singleton (n + m)).subset
+      simp only [Set.subset_singleton_iff, Function.mem_support, ne_eq, ite_eq_right_iff,
+                 smul_eq_zero, Classical.not_imp, not_or, and_imp]
+      intro j hjm _ _
+      linarith
+  · rw [finsum_eq_single _ (-m)]
+    · intro j hjm
+      simp [show j + m ≠ 0 by grind]
+  · rw [finsum_eq_single _ (n + m)]
+    · intro j hjnm
+      simp [show n - j + m ≠ 0 by intro con ; apply hjnm ; linarith]
 
 /-- `[L(n), J(m-k)J(k)] = -k • J(m-k)J(n+k) - (m-k) • J(n+m-k)J(k)` -/
 lemma commutator_sugawaraGen_heiOperPair [CharZero 𝕜] (n m k : ℤ) :
