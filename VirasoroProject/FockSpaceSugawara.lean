@@ -25,7 +25,7 @@ construction.
 * `ChargedFockSpace.instModuleUniversalEnvelopingAlgebraVirasoroAlgebra`: The charged Fock space
   has the structure of a module over the universal enveloping algebra of the Virasoro algebra, by
   the basic bosonic Sugawara construction.
-* `ChargedFockSpace.virasoroVerma_to_chargedFockSpace`: There is a Virasoro-module map from the
+* `ChargedFockSpace.virasoroVermaToChargedFockSpace`: There is a Virasoro-module map from the
   Virasoro Verma module with central charge `c = 1` and highest weight `h = α²/2` to the charged
   Fock space with charge (`J₀`-eigenvalue) `α`, mapping the highest weight vector of the Verma
   module to the vacuum vector of the Fock space.
