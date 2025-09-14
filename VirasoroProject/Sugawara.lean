@@ -595,7 +595,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
                              Int.lt_toNat, not_exists, not_and] at hk hk'
                   apply hk' (-k).toNat ?_
                   · simp [hk.2]
-                  · exact (le_of_eq (by simp [hk.2])).trans_lt (show -k < n by linarith)
+                  · omega
                 · intro k _
                   simp ; ring
               · intro i hi
@@ -608,13 +608,12 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
             simp only [obs, ↓reduceIte]
             rw [finsum_eq_sum_of_support_subset _ (s := Finset.Ioc 0 (-n)) ?_]
             · rw [Finset.sum_congr rfl (g := fun i ↦ (i + n) • i • v)]
-              · simp only [← smul_assoc]
-                rw [← Finset.sum_smul]
-                suffices ((2⁻¹ : 𝕜) * (∑ i ∈ Finset.Ioc 0 (-n), (i + n) * i)) • v
-                            = (((n : 𝕜) ^ 3 + (-n : 𝕜)) / 12) • v by
-                  rw [← this, ← smul_eq_mul, smul_assoc]
-                  congr 1
+              · have aux' (t : 𝕜) : t • ∑ i ∈ Finset.Ioc 0 (-n), (i + n) • i • v
+                                  = (t * (∑ i ∈ Finset.Ioc 0 (-n), (i + n) * i)) • v := by
+                  simp only [← smul_assoc]
+                  rw [← Finset.sum_smul, ← smul_eq_mul, smul_assoc]
                   norm_cast
+                rw [aux']
                 congr 1
                 have key' := bosonic_sugawara_cc_calc 𝕜 n
                 rw [zPrimitive_apply_of_nonpos _ (by linarith)] at key'
@@ -627,33 +626,22 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
                            Finset.sum_neg_distrib, neg_mul, neg_neg, mul_eq_mul_right_iff,
                            OfNat.ofNat_ne_zero, or_false]
                 simp_rw [mul_comm (_ + n)]
-                have n_natAbs : -n = n.natAbs := by
-                  simpa [hn] using (abs_of_neg <| not_le.mp hn).symm
+                have n_natAbs : -n = n.natAbs := by omega
                 rw [@Finset.sum_of_injOn ℕ ℤ _ _ (Finset.range n.natAbs) (Finset.Ioc 0 (-n))
                       (fun x ↦ (↑x + 1) * (n + (x + 1))) (fun x ↦ x * (↑x + ↑n))
-                      (fun i ↦ i + 1) ..]
-                · intro i _ j _ hij
-                  simpa using hij
+                      (fun i ↦ i + 1) (by aesop) ..]
                 · intro i hi
                   simp only [Finset.coe_range, Set.mem_Iio, Finset.coe_Ioc, Set.mem_Ioc,
                              Int.succ_ofNat_pos, true_and, n_natAbs] at hi ⊢
-                  exact Int.toNat_le.mp hi
+                  omega
                 · intro k hk hk'
                   exfalso
                   simp only [n_natAbs, Finset.mem_Ioc, Finset.coe_range,
                              Set.mem_image, Set.mem_Iio, not_exists, not_and] at hk hk'
-                  apply hk' (k - 1).toNat
-                  · simp only [Int.pred_toNat]
-                    exact (Nat.pred_lt (by simpa using hk.1)).trans_le (by simpa using hk.2)
-                  · simp only [Int.pred_toNat]
-                    norm_cast
-                    rw [Nat.sub_add_eq_max,
-                        max_eq_left <| (Int.le_toNat (by linarith)).mpr (show 1 ≤ k by linarith)]
-                    exact Int.toNat_of_nonneg (by linarith)
+                  exact hk' (k - 1).toNat (by omega) (by omega)
                 · intro k _
                   simp only [mul_eq_mul_left_iff] ; left ; ring
-              · intro i hi
-                simp [(Finset.mem_Ioc.mp hi).symm]
+              · aesop
             · refine Function.support_subset_iff'.mpr ?_
               intro k hk
               simp only [Finset.coe_Ioc, Set.mem_Ioc, and_comm] at hk
