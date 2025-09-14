@@ -10,7 +10,6 @@ import VirasoroProject.Commutator
 import VirasoroProject.LieAlgebraRepresentationOfBasis
 import VirasoroProject.ToMathlib.Topology.Algebra.Module.LinearMap.Defs
 import Mathlib
-import Calcify
 
 /-!
 # The bosonic Sugawara construction
@@ -356,14 +355,14 @@ lemma commutator_sugawaraGen_heiOper [CharZero 𝕜] (n m : ℤ) :
     smul_cancel_of_non_zero_divisor _ (by aesop) this
   let mₖ := (m : 𝕜)
   calc (2 : 𝕜) • ((sugawaraGen heiTrunc n).commutator (heiOper m)) v
-      = ∑ᶠ (k : ℤ), ((pairNO heiOper (n - k) k).commutator (heiOper m)) v         := by
+      = ∑ᶠ k, ((pairNO heiOper (n - k) k).commutator (heiOper m)) v               := by
         simp [commutator_sugawaraGen_apply_eq_finsum_commutator_apply]
-    _ = ∑ᶠ (k : ℤ), ((-mₖ * ((if k + m = 0 then 1 else 0)
+    _ = ∑ᶠ k, ((-mₖ * ((if k + m = 0 then 1 else 0)
             + if n - k + m = 0 then 1 else 0)) • heiOper (k + (n - k) + m)) v     := by
         simp_rw [commutator_heiPairNO_heiGen heiComm, mₖ]
-    _ = ∑ᶠ (k : ℤ), -((mₖ * ((if k + m = 0 then 1 else 0)
+    _ = ∑ᶠ k, -((mₖ * ((if k + m = 0 then 1 else 0)
             + if n - k + m = 0 then 1 else 0)) • (heiOper (n + m)) v)             := by simp
-    _ = ∑ᶠ (k : ℤ), -((if k + m = 0 then mₖ • (heiOper (n + m)) v else 0)
+    _ = ∑ᶠ k, -((if k + m = 0 then mₖ • (heiOper (n + m)) v else 0)
                       + if n - k + m = 0 then mₖ • (heiOper (n + m)) v else 0)    := by
         simp [mul_add, add_smul]
     _ = -((∑ᶠ (i : ℤ), if i + m = 0 then mₖ • (heiOper (n + m)) v else 0)
@@ -507,7 +506,7 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
   ext v
   rw [sugawaraGen_commutator_apply_eq_finsum_commutator_apply]
   simp only [heiOper_pairNO_eq_pairNO' heiComm]
-  have aux_commutator (k : ℤ) :
+  have aux_commutator (k) :
       ((sugawaraGen heiTrunc n).commutator (pairNO' heiOper (m - k) k)) v
         = -(m - k) • ((pairNO' heiOper (n + (m - k)) k) v
           + if 0 ≤ m - k ∧ m - k < -n ∧ n + m = 0 then -(n + (m - k)) • v else 0
@@ -526,18 +525,17 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
       rw [add_comm, ← add_assoc]
       congr 1
       · -- The dummy index reshuffling.
-        have dummy : ∑ᶠ (i : ℤ), -(i • (pairNO' heiOper (m + -i) (n + m + (i + -m))) v)
-            = ∑ᶠ (i : ℤ),
-                -((i - n) • (pairNO' heiOper (m + -(i - n)) (n + m + (i - n + -m))) v) := by
+        have dummy : ∑ᶠ i, -(i • (pairNO' heiOper (m + -i) (n + m + (i + -m))) v)
+            = ∑ᶠ i, -((i - n) • (pairNO' heiOper (m + -(i - n)) (n + m + (i - n + -m))) v) := by
           rw [← finsum_comp_equiv ⟨fun k ↦ k - n, fun k ↦ k + n, fun _ ↦ by simp, fun _ ↦ by simp⟩]
           rfl
         rw [dummy]
         rw [← smul_add, ← finsum_add_distrib]
         · have aux :
-              ∑ᶠ (i : ℤ), (-((i - n) • (pairNO' heiOper (m + -(i - n)) (n + m + (i - n + -m))) v)
-                           +(i + -m) • (pairNO' heiOper (n + m + -i) i) v)
-              = ∑ᶠ (i : ℤ), (n • (pairNO' heiOper (n + m + -i) i) v
-                            + -m • (pairNO' heiOper (n + m + -i) i) v) := by
+              ∑ᶠ i, (-((i - n) • (pairNO' heiOper (m + -(i - n)) (n + m + (i - n + -m))) v)
+                      +(i + -m) • (pairNO' heiOper (n + m + -i) i) v)
+              = ∑ᶠ i, (n • (pairNO' heiOper (n + m + -i) i) v
+                        + -m • (pairNO' heiOper (n + m + -i) i) v) := by
             simp only [neg_sub, add_sub_assoc', ← add_assoc]
             simp_rw [show ∀ k, n + m + k - n + -m = k by grind]
             simp_rw [show ∀ k, m + n - k = n + m - k by grind]
@@ -567,16 +565,19 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
             simp only [obs, ↓reduceIte]
             rw [finsum_eq_sum_of_support_subset _ (s := Finset.Ioc (-n) 0) ?_]
             · rw [Finset.sum_congr rfl (g := fun i ↦ -(i + n) • i • v)]
-              · simp only [← smul_assoc]
-                rw [← Finset.sum_smul]
-                suffices ((2⁻¹ : 𝕜) * (∑ i ∈ Finset.Ioc (-n) 0, -(i + n) * i)) • v
+              · suffices ((2⁻¹ : 𝕜) * (∑ i ∈ Finset.Ioc (-n) 0, -(i + n) * i)) • v
                             = (((n : 𝕜) ^ 3 + (-n : 𝕜)) / 12) • v by
-                  rw [← this, ← smul_eq_mul, smul_assoc]
-                  congr 1
-                  norm_cast
+                  have foo (t : 𝕜) : t • ∑ i ∈ Finset.Ioc (-n) 0, -(i + n) • i • v
+                                  = (t * (∑ i ∈ Finset.Ioc (-n) 0, -(i + n) * i)) • v := by
+                    simp only [← smul_assoc]
+                    rw [← Finset.sum_smul, ← smul_eq_mul, smul_assoc]
+                    norm_cast
+                  rw [foo, ← this, ← smul_eq_mul, smul_assoc]
                 congr 1
-                have key := bosonic_sugawara_cc_calc 𝕜 n
-                rw [zPrimitive_apply_of_nonneg _ (by linarith)] at key
+                have key : ∑ j ∈ Finset.range n.toNat, (j : 𝕜) * (n - j)
+                            = ((n : 𝕜) ^ 3 - n) / 6 := by
+                  rw [← bosonic_sugawara_cc_calc 𝕜 n]
+                  simp [zPrimitive_apply_of_nonneg _ (n := n) (by linarith)]
                 field_simp at key ⊢
                 rw [mul_comm _ 2, mul_assoc 2]
                 rw [← sub_eq_add_neg, ← key, mul_comm (2 : 𝕜)]
@@ -665,7 +666,9 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
     simp only [neg_add_rev, neg_neg, hk₁, smul_zero, le_add_neg_iff_add_le, zero_add,
                add_neg_lt_iff_lt_add, lt_neg_add_iff_add_lt, neg_add_le_iff_le_add, smul_ite]
     grind
-  · simpa [← sub_eq_add_neg] using finite_support_smul_pairNO'_heiOper_apply heiTrunc heiComm ..
+  · simp only [Function.support_fun_neg, ← sub_eq_add_neg]
+    convert finite_support_smul_pairNO'_heiOper_apply heiTrunc heiComm n m id v using 6 with k
+    omega
 
 end commutator_sugawaraGen
 
@@ -695,7 +698,7 @@ noncomputable def VirasoroAlgebra.representationOfCentralChargeOfL
     | some m =>
       simp only [ops, lComm, basisLC_some, lgen_bracket, map_add, map_smul]
       congr 1
-      · have obs (k : ℤ) : lgen 𝕂 k = (VirasoroAlgebra.basisLC 𝕂) (some k) := by simp
+      · have obs (k) : lgen 𝕂 k = (VirasoroAlgebra.basisLC 𝕂) (some k) := by simp
         rw [obs]
         simp only [LieAlgebra.representationOfBasisAux_apply_basis]
         ext v

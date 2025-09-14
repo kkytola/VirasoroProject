@@ -12,10 +12,6 @@ name = "mathlib"
 scope = "leanprover-community"
 
 [[require]]
-name = "calcify"
-git = "git@github.com:nomeata/lean-calcify.git"
-
-[[require]]
 name = "checkdecls"
 git = "https://github.com/PatrickMassot/checkdecls.git"
 
