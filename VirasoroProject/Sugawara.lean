@@ -507,9 +507,14 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
   ext v
   rw [sugawaraGen_commutator_apply_eq_finsum_commutator_apply]
   simp only [heiOper_pairNO_eq_pairNO' heiComm]
-  have aux_commutator (k : ℤ) :=
-    commutator_sugawaraGen_heiPairNO'_apply heiTrunc heiComm n m (m-k) v
-  simp only [show ∀ k, m - (m-k) = k by grind] at aux_commutator
+  have aux_commutator (k : ℤ) :
+      ((sugawaraGen heiTrunc n).commutator (pairNO' heiOper (m - k) k)) v
+        = -(m - k) • ((pairNO' heiOper (n + (m - k)) k) v
+          + if 0 ≤ m - k ∧ m - k < -n ∧ n + m = 0 then -(n + (m - k)) • v else 0
+          + if m - k < 0 ∧ -n ≤ m - k ∧ n + m = 0 then (n + (m - k)) • v else 0)
+          - k • (pairNO' heiOper (m - k) (n + m - (m - k))) v := by
+    simpa only [show ∀ k, m - (m-k) = k by grind] using
+      commutator_sugawaraGen_heiPairNO'_apply heiTrunc heiComm n m (m-k) v
   simp_rw [aux_commutator, sub_eq_add_neg, smul_add, ← add_assoc]
   rw [finsum_add_distrib]
   · simp only [neg_add_rev, neg_neg, le_add_neg_iff_add_le, zero_add, add_neg_lt_iff_lt_add,
@@ -521,15 +526,23 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
       rw [add_comm, ← add_assoc]
       congr 1
       · -- The dummy index reshuffling.
-        rw [← finsum_comp_equiv ⟨fun k ↦ k - n, fun k ↦ k + n, fun _ ↦ by simp, fun _ ↦ by simp⟩]
-        dsimp only [Equiv.coe_fn_mk]
+        have dummy : ∑ᶠ (i : ℤ), -(i • (pairNO' heiOper (m + -i) (n + m + (i + -m))) v)
+            = ∑ᶠ (i : ℤ),
+                -((i - n) • (pairNO' heiOper (m + -(i - n)) (n + m + (i - n + -m))) v) := by
+          rw [← finsum_comp_equiv ⟨fun k ↦ k - n, fun k ↦ k + n, fun _ ↦ by simp, fun _ ↦ by simp⟩]
+          rfl
+        rw [dummy]
         rw [← smul_add, ← finsum_add_distrib]
-        · simp only [neg_sub, add_sub_assoc', ← add_assoc]
-          simp_rw [show ∀ k, n + m + k - n + -m = k by grind]
-          simp_rw [show ∀ k, m + n - k = n + m - k by grind]
-          simp_rw [add_smul, sub_smul, ← add_assoc, neg_sub, sub_eq_add_neg]
-          simp_rw [neg_add_cancel_right]
-          rw [finsum_add_distrib]
+        · have aux :
+              ∑ᶠ (i : ℤ), (-((i - n) • (pairNO' heiOper (m + -(i - n)) (n + m + (i - n + -m))) v)
+                           +(i + -m) • (pairNO' heiOper (n + m + -i) i) v)
+              = ∑ᶠ (i : ℤ), (n • (pairNO' heiOper (n + m + -i) i) v
+                            + -m • (pairNO' heiOper (n + m + -i) i) v) := by
+            simp only [neg_sub, add_sub_assoc', ← add_assoc]
+            simp_rw [show ∀ k, n + m + k - n + -m = k by grind]
+            simp_rw [show ∀ k, m + n - k = n + m - k by grind]
+            simp [add_smul, ← add_assoc, sub_eq_add_neg]
+          rw [aux, finsum_add_distrib]
           · simp_rw [(Int.cast_smul_eq_zsmul 𝕜 _ _).symm, ← smul_finsum]
             rw [smul_add]
             congr 1 <;>
