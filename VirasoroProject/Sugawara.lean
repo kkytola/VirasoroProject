@@ -351,38 +351,6 @@ include heiTrunc
 lemma commutator_sugawaraGen_heiOper [CharZero 𝕜] (n m : ℤ) :
     (sugawaraGen heiTrunc n).commutator (heiOper m) = -m • heiOper (n + m) := by
   ext v
-  rw [commutator_sugawaraGen_apply_eq_finsum_commutator_apply]
-  simp_rw [commutator_heiPairNO_heiGen heiComm]
-  simp only [neg_mul, add_sub_cancel, neg_smul, LinearMap.neg_apply, LinearMap.smul_apply,
-             zsmul_eq_mul, Module.End.mul_apply, Module.End.intCast_apply]
-  simp only [mul_add, mul_ite, mul_one, mul_zero, add_smul, ite_smul, zero_smul]
-  rw [finsum_neg_distrib, finsum_add_distrib]
-  · rw [finsum_eq_single _ (-m)]
-    · simp only [neg_add_cancel, ↓reduceIte]
-      rw [finsum_eq_single _ (n + m)]
-      · simp only [sub_add_cancel_left, neg_add_cancel, ↓reduceIte]
-        simp only [← two_smul (R := 𝕜), ← smul_assoc, smul_eq_mul, smul_neg, ← mul_assoc, neg_inj]
-        simp [one_mul]
-        norm_cast
-      · intro j hjnm
-        simp [show n - j + m ≠ 0 by intro con ; apply hjnm ; linarith]
-    · intro j hjm
-      simp [show j + m ≠ 0 by grind]
-  · apply (show Set.Finite {-m} from Set.finite_singleton (-m)).subset
-    simp only [Set.subset_singleton_iff, Function.mem_support, ne_eq, ite_eq_right_iff,
-               smul_eq_zero, Classical.not_imp, not_or, and_imp]
-    intro j hjm _ _
-    linarith
-  · apply (show Set.Finite {n + m} from Set.finite_singleton (n + m)).subset
-    simp only [Set.subset_singleton_iff, Function.mem_support, ne_eq, ite_eq_right_iff,
-               smul_eq_zero, Classical.not_imp, not_or, and_imp]
-    intro j hjm _ _
-    linarith
-
-/-- `[L(n), J(m)] = -m • J(n+m)` -/
-lemma commutator_sugawaraGen_heiOper' [CharZero 𝕜] (n m : ℤ) :
-    (sugawaraGen heiTrunc n).commutator (heiOper m) = -m • heiOper (n + m) := by
-  ext v
   suffices (2 : 𝕜) • ((sugawaraGen heiTrunc n).commutator (heiOper m)) v
             = (2 : 𝕜) • (-m • heiOper (n + m)) v from
     smul_cancel_of_non_zero_divisor _ (by aesop) this
@@ -641,23 +609,13 @@ lemma commutator_sugawaraGen [CharZero 𝕜] (n m : ℤ) :
                 rw [mul_comm _ 2, mul_assoc 2, ← sub_eq_add_neg, ← key', mul_comm (2 : 𝕜)]
                 norm_cast
                 simp only [neg_mul, mul_assoc, Int.reduceMul]
-                --have aux (k : 𝕜) : (-k - 1) = -(k + 1) := by ring
                 have aux (k : ℤ) : (-k - 1) = -(k + 1) := by ring
                 simp only [aux, neg_mul, sub_neg_eq_add, neg_mul,
                            Finset.sum_neg_distrib, neg_mul, neg_neg, mul_eq_mul_right_iff,
                            OfNat.ofNat_ne_zero, or_false]
                 simp_rw [mul_comm (_ + n)]
-                --norm_num
                 have n_natAbs : -n = n.natAbs := by
                   simpa [hn] using (abs_of_neg <| not_le.mp hn).symm
-                --rw [@Finset.sum_of_injOn ℕ ℤ 𝕜 _ (Finset.range n.natAbs) (Finset.Ioc 0 (-n))
-                --      (fun x ↦ ((x : 𝕜) + 1) * (n + (x + 1))) (fun x ↦ (↑x + ↑n) * x)
-                --      (fun i ↦ i + 1)]
-                --have foo := @Finset.sum_of_injOn ℕ ℤ ℤ _ (Finset.range n.natAbs) (Finset.Ioc 0 (-n))
-                --      (fun x ↦ ((x : ℤ) + 1) * (n + (x + 1))) (fun x ↦ x * (↑x + ↑n))
-                --      (fun i ↦ i + 1) sorry sorry sorry sorry
-                --simp at foo
-                --rw [foo]
                 rw [@Finset.sum_of_injOn ℕ ℤ _ _ (Finset.range n.natAbs) (Finset.Ioc 0 (-n))
                       (fun x ↦ (↑x + 1) * (n + (x + 1))) (fun x ↦ x * (↑x + ↑n))
                       (fun i ↦ i + 1) ..]
