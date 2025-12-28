@@ -310,12 +310,12 @@ noncomputable def ses_basis (hf : ker f = ⊥) (hfg : range f = ker g) (hgσ : g
     toFun i := match i with
       | Sum.inl iu => ⟨true, iu⟩
       | Sum.inr ir => ⟨false, ir⟩
-    invFun j := if hj : j.1 then (Sum.inl (by
-        cases' j with jfst jsnd
-        simpa [show jfst = true from hj] using jsnd))
-      else (Sum.inr (by
-        cases' j with jfst jsnd
-        simpa [show jfst = false by simpa using hj] using jsnd))
+    invFun j := if hj : j.1 then (Sum.inl (by match j with
+        | ⟨true, iu⟩ => exact iu
+        | ⟨false, ir⟩ => contradiction))
+      else (Sum.inr (by match j with
+        | ⟨true, iu⟩ => contradiction
+        | ⟨false, ir⟩ => exact ir))
     left_inv i := match i with
       | Sum.inl iu => rfl
       | Sum.inr ir => rfl

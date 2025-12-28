@@ -283,7 +283,7 @@ lemma UniversalEnvelopingAlgebra.central_of_forall_lie_eq_zero
     exact Algebra.commute_algebraMap_right r ((UniversalEnvelopingAlgebra.ι 𝕜) Z)
   · intro X
     apply commute_iff_lie_eq.mpr
-    rw [← LieHom.map_lie, hZ X, LieHom.map_zero]
+    rw [← LieHom.map_lie, hZ X, map_zero]
   · intro a b ha hb
     exact Commute.mul_right ha hb
   · intro a b ha hb
@@ -324,20 +324,17 @@ def UniversalEnvelopingAlgebra.representation
   toFun X := lsmul 𝕜 V (ιUEA 𝕜 X)
   map_add' X Y := by
     ext v
-    simp only [LinearMap.add_apply, LieHom.map_add]
+    simp only [LinearMap.add_apply, map_add]
     exact Module.add_smul _ _ ((unMkAddHom 𝕜 (𝓤 𝕜 𝓰) V) v)
   map_smul' r X := by
     ext v
     simp only [lsmul_apply, LinearMap.smul_apply]
-    simp only [LieHom.map_smul, RingHom.id_apply]
+    simp only [map_smul, RingHom.id_apply]
     set v' := unMkAddHom 𝕜 (𝓤 𝕜 𝓰) V v with def_v'
     set a := ιUEA 𝕜 X with def_a
     have : ((algebraMap 𝕜 (𝓤 𝕜 𝓰) r) • a) • v' = algebraMap 𝕜 (𝓤 𝕜 𝓰) r • a • v' :=
       IsScalarTower.smul_assoc ((algebraMap 𝕜 (𝓤 𝕜 𝓰)) r) a v'
-    convert this using 1
-    simp only [mkAddHom, AddMonoidHom.coe_mk, ZeroHom.coe_mk, mk, smul_eq_mul]
-    congr 1
-    exact algebra_compatible_smul (𝓤 𝕜 𝓰) r a
+    exact this
   map_lie' := by
     intro X Y
     ext v

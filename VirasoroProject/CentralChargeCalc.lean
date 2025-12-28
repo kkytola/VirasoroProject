@@ -86,14 +86,15 @@ lemma eq_zPrimitive_of_eq_zero_of_forall_eq_add {R : Type*} [AddCommGroup R] {f 
     F = zPrimitive f := by
   have obsP : ∀ (n : ℕ), F n = zPrimitive f n := by
     intro n
-    induction' n with n ih
-    · simp [h0]
-    · aesop
+    induction n with
+    | zero => simp [h0]
+    | succ n ih => aesop
   have obsM : ∀ (n : ℕ), F (-n) = zPrimitive f (-n) := by
     intro n
-    induction' n with n ih
-    · simp [h0]
-    · have keyF := h1 (-(n + 1))
+    induction n with
+    | zero => simp [h0]
+    | succ n ih =>
+      have keyF := h1 (-(n + 1))
       have keyP := zPrimitive_succ f (-(n + 1))
       grind
   ext m
@@ -148,27 +149,29 @@ def zMonomialF (R : Type*) [AddCommGroup R] [One R] (d : ℕ) : ℤ → R := mat
 
 lemma zMonomialF_eq (R : Type*) [Field R] [CharZero R] (d : ℕ) :
     (zMonomialF R d) = (fun (n : ℤ) ↦ ((∏ j ∈ range d, (n - j : R)) / (Nat.factorial d : R))) := by
-  induction' d with d ihd
-  · funext n
+  induction d with
+  | zero =>
+    funext n
     simp [zMonomialF]
-  rw [zMonomialF, Eq.comm]
-  apply eq_zPrimitive_of_eq_zero_of_forall_eq_add
-  · simpa using Or.inl <| prod_eq_zero_iff.mpr ⟨0, by simp, by simp⟩
-  · intro n
-    have aux₀ : (d.factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
-    have aux₁: ((d+1).factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
-    have aux' : ((d+1) : R) ≠ 0 := by norm_cast
-    calc  (∏ j ∈ range (d + 1), ((↑(n + 1) : R) - j)) / (d + 1).factorial
-      _ = (∏ x ∈ range (d + 1), (n + 1 - x)) / (d + 1).factorial                      := by simp
-      _ = (∏ j ∈ range (d + 1), (n - j)) / ((d + 1) * d.factorial)
-          + (∏ j ∈ range d, (n - j : R)) / d.factorial                                := ?_
-      _ = (∏ j ∈ range (d + 1), (↑n - ↑j)) / ↑(d + 1).factorial + zMonomialF R d n    := ?_
-    · simp only [Nat.factorial_succ, Nat.cast_mul, Nat.cast_add, Nat.cast_one]
-      simp only [prod_range_succ (fun a ↦ (n : R) - a), Int.cast_prod, Int.cast_sub, Int.cast_add,
-                 Int.cast_one, Int.cast_natCast]
-      field_simp
-      simp [sub_add, prod_range_succ']
-    · simp [ihd, mul_comm _ (d.factorial : R), Nat.factorial_succ, mul_comm]
+  | succ d ihd =>
+    rw [zMonomialF, Eq.comm]
+    apply eq_zPrimitive_of_eq_zero_of_forall_eq_add
+    · simpa using Or.inl <| prod_eq_zero_iff.mpr ⟨0, by simp, by simp⟩
+    · intro n
+      have aux₀ : (d.factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
+      have aux₁: ((d+1).factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
+      have aux' : ((d+1) : R) ≠ 0 := by norm_cast
+      calc  (∏ j ∈ range (d + 1), ((↑(n + 1) : R) - j)) / (d + 1).factorial
+        _ = (∏ x ∈ range (d + 1), (n + 1 - x)) / (d + 1).factorial                      := by simp
+        _ = (∏ j ∈ range (d + 1), (n - j)) / ((d + 1) * d.factorial)
+            + (∏ j ∈ range d, (n - j : R)) / d.factorial                                := ?_
+        _ = (∏ j ∈ range (d + 1), (↑n - ↑j)) / ↑(d + 1).factorial + zMonomialF R d n    := ?_
+      · simp only [Nat.factorial_succ, Nat.cast_mul, Nat.cast_add, Nat.cast_one]
+        simp only [prod_range_succ (fun a ↦ (n : R) - a), Int.cast_prod, Int.cast_sub, Int.cast_add,
+                   Int.cast_one, Int.cast_natCast]
+        field_simp
+        simp [sub_add, prod_range_succ']
+      · simp [ihd, mul_comm _ (d.factorial : R), Nat.factorial_succ, mul_comm]
 
 lemma zMonomialF_zero_eq (R : Type*) [Field R] (n : ℤ) :
     zMonomialF R 0 n = 1 := by

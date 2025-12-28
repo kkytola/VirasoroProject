@@ -278,10 +278,10 @@ lemma HeisenbergAlgebra.uea_eventually_commute_jgen (a : 𝓤 𝕜 (HeisenbergAl
     · simp
     · intro a b a_mem b_mem ha hb
       filter_upwards [ha, hb] with k hka hkb
-      simpa only [LieHom.map_add] using Commute.add_right hka hkb
+      simpa only [map_add] using Commute.add_right hka hkb
     · intro r a a_mem ha
       filter_upwards [ha] with k hka
-      simpa only [LieHom.map_smul] using Commute.smul_right hka _
+      simpa only [map_smul] using Commute.smul_right hka _
   · intro a b ha hb
     filter_upwards [ha, hb] with k hka hkb using Commute.mul_right hka hkb
   · intro a b ha hb

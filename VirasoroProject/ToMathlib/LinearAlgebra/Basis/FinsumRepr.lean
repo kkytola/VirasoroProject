@@ -152,7 +152,7 @@ noncomputable def basis_submodule_span {R M ι : Type*} [Semiring R] [Nontrivial
     simp only [f, g, LinearMap.coe_mk, AddHom.coe_mk]
     classical
     have aux := B.repr_finsum_mem_eq_ite cf.extendDomain I i
-    simp only [Finsupp.extendDomain_toFun, dite_smul, zero_smul, Subtype.coe_prop, ↓reduceIte,
+    simp only [Finsupp.extendDomain_apply, dite_smul, zero_smul, Subtype.coe_prop, ↓reduceIte,
                ↓reduceDIte, Subtype.coe_eta] at aux
     simp [← aux, ← finsum_set_coe_eq_finsum_mem]
   have gof : g ∘ f = id := by

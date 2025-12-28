@@ -97,7 +97,7 @@ noncomputable def virasoroCocycle :
     LieTwoCocycle 𝕜 (WittAlgebra 𝕜) 𝕜 where
   toBilin := virasoroCocycleBilin 𝕜
   self' X := by
-    apply (self_eq_neg 𝕜 𝕜).mp
+    apply self_eq_neg.mp
     simpa only [LinearMap.neg_apply, LinearMap.coe_mk, AddHom.coe_mk]
       using LinearMap.congr_fun₂ (virasoroCocycleBilin_eq_neg_flip 𝕜) X X
   leibniz' X Y Z := by

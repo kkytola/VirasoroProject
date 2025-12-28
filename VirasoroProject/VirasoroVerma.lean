@@ -232,13 +232,12 @@ private lemma upper_smul_eq_zero_of_forall_pos_lgen_smul_eq_zero
                 forall_apply_eq_imp_iff₂] using hwv_lpos
   · simp
   · intro E₁ E₂ _ _ hE₁ hE₂
-    simp only [LieHom.map_add, add_smul, hE₁, hE₂, add_zero]
+    simp only [map_add, add_smul, hE₁, hE₂, add_zero]
   · intro r E _ hE
     have hE' : algebraMap 𝕜 (𝓤 𝕜 (VirasoroAlgebra 𝕜)) r • (ιUEA 𝕜 E • v) = 0 := by
       simp only [hE, smul_zero]
-    simp only [LieHom.map_smul, ← hE', ← smul_assoc]
-    congr 1
-    exact algebra_compatible_smul (𝓤 𝕜 (VirasoroAlgebra 𝕜)) r ((ιUEA 𝕜) E)
+    simp only [map_smul, ← hE', ← smul_assoc]
+    rfl
 
 private lemma cartan_smul_eq_of_cgen_smul_eq_of_lzero_smul_eq {c h : 𝕜}
     {M : Type*} [AddCommGroup M] [Module (𝓤 𝕜 (VirasoroAlgebra 𝕜)) M] {v : M}
@@ -252,27 +251,29 @@ private lemma cartan_smul_eq_of_cgen_smul_eq_of_lzero_smul_eq {c h : 𝕜}
   simp only [virasoroTri_cartan]
   apply Submodule.span_induction
   · intro X hX
-    cases' hX with X_eq X_eq'
-    · simp only [X_eq, hwv_c]
+    cases hX with
+    | inl X_eq_C =>
+      simp only [X_eq_C, hwv_c]
       congr 2
       exact (VirasoroAlgebra.hw_apply_cgen 𝕜 c h).symm
-    · simp only [Set.mem_singleton_iff] at X_eq'
-      simp only [X_eq', hwv_lzero]
+    | inr X_eq_L0 =>
+      simp only [Set.mem_singleton_iff] at X_eq_L0
+      simp only [X_eq_L0, hwv_lzero]
       congr 2
       exact (VirasoroAlgebra.hw_apply_lzero 𝕜 c h).symm
-  · simp only [LieHom.map_zero, zero_smul]
+  · simp only [map_zero, zero_smul]
     convert (zero_smul ..).symm
     convert algebraMap.coe_zero
     exact LinearMap.map_zero (VirasoroAlgebra.hw 𝕜 c h)
   · intro H₁ H₂ _ _ hH₁ hH₂
-    simp only [LieHom.map_add, add_smul, hH₁, hH₂]
+    simp only [map_add, add_smul, hH₁, hH₂]
     rw [← add_smul, ← map_add, ← map_add]
     rfl
   · intro r H H_mem hH
     have aux : (r • (ιUEA 𝕜) H) • v
                 = algebraMap 𝕜 (𝓤 𝕜 (VirasoroAlgebra 𝕜)) r • ((ιUEA 𝕜) H • v) := by
       simp only [← smul_assoc, smul_eq_mul, Algebra.smul_def r ((ιUEA 𝕜) H)]
-    simp only [LieHom.map_smul, aux, hH, ← smul_assoc]
+    simp only [map_smul, aux, hH, ← smul_assoc]
     congr 1
     rw [smul_eq_mul, ← map_mul]
     congr 1

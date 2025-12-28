@@ -133,55 +133,56 @@ lemma exists_add_bdry_eq_smul_virasoroCocycle :
         simp [show (-m : 𝕜)^3 = -((m : 𝕜)^3) by exact_mod_cast aux]
         ring
     intro k
-    induction' k using Nat.strong_induction_on with j hj
-    by_cases j_small : j ∈ ({0, 1, 2} : Finset ℕ)
-    · fin_cases j_small
-      · -- k = 0 case is true for any cocycle by skew-symmetry
-        simp
-      · -- k = 1 case follows due to the choice of the normalizing coboundary
-        convert add_bdry_normalizingCochain_apply_lgen_one γ
-        ring
-      · -- k = 2 case is what determines the choice of the multiplicative constant r
-        rw [hr]
-        norm_num
-        ring
-    · have j_large : 2 < j := by match j with
-        | 0 => contradiction | 1 => contradiction | 2 => contradiction
-        | j' + 3 => simp
-      -- For j ≥ 3, the coefficient (2-j) in a key recusive equation does not vanish.
-      have not_zero : (2 - j : 𝕜) ≠ 0 := by exact_mod_cast show (2 - j : ℤ) ≠ 0 by linarith
-      -- The key recursive equation is obtained by taking n = j, m = 1-j, k = -1
-      -- in the cocycle condition written in the basis `(ℓₙ)`.
-      -- This equation generally simplifies to
-      -- `0 = (2-j) * γ(j,-j) + (1+j) * γ(j-1,1-j) + (1-2j) * γ(1,-1)`
-      -- but the last term is zero for `γ₀` because of the normalizing coboundary.
-      set j' := j - 1 with hj'
-      have aux : (j - 1 : ℤ) = j' := (Int.natCast_pred_of_pos (by linarith)).symm
-      have aux' : (1 - j : ℤ) = -j' := by simp [← aux]
-      have eqn : ((2 - j : 𝕜)) * γ₀ (lgen 𝕜 j) (lgen 𝕜 (-j))
-                   + ((1 + j : 𝕜)) * γ₀ (lgen 𝕜 j') (lgen 𝕜 (-j')) = 0 := by
-        have eqn := add_lieTwoCocycle_apply_lgen_lgen_lgen_eq_zero γ₀ j (1-j) (-1)
-        simp only [Int.cast_sub, Int.cast_one, Int.cast_natCast, Int.reduceNeg, Int.cast_neg,
-                  sub_neg_eq_add, add_sub_cancel] at eqn
-        rw [← γ₀.skew (lgen 𝕜 (-1)), ← γ₀.skew (lgen 𝕜 (1 - j))] at eqn
-        have nothing : -(γ₀ ((lgen 𝕜) 1)) ((lgen 𝕜) (-1)) = 0 := by
-          simpa using hj 1 (by linarith)
-        grind
-      rw [hj j' (by linarith), hj'] at eqn
-      simp only [Int.cast_natCast] at eqn
-      rw [add_eq_zero_iff_eq_neg] at eqn
-      have solve := congr_arg (fun (z : 𝕜) ↦ (2 - j : 𝕜)⁻¹ * z) eqn
-      simp only [not_zero, isUnit_iff_ne_zero, ne_eq, not_false_eq_true, IsUnit.inv_mul_cancel_left,
-                 mul_neg] at solve
-      rw [solve, mul_div, mul_div, ← neg_div]
-      congr
-      calc -((2 - ↑j)⁻¹ * ((1 + ↑j) * (r * (↑(j - 1) ^ 3 - ↑(j - 1)))))
-          = -((2 - ↑j)⁻¹ * ((1 + ↑j) * (r * ((↑j - 1) ^ 3 - (↑j - 1))))) := by
-            simp [show (↑(j - 1) : 𝕜) = (↑j : 𝕜) - 1 by exact_mod_cast aux.symm]
-        _ = r * -((2 - ↑j)⁻¹ * (↑j - 2) * (↑j ^ 3 - ↑j))  := by ring
-        _ = r * (↑j ^ 3 - ↑j)                             := by
-            field_simp ; rw [show ((j : 𝕜) - 2) = -(2 - j) by simp [neg_sub], mul_neg] ; simp
-        _ = _                                             := by simp
+    induction k using Nat.strong_induction_on with
+    | h j hj =>
+      by_cases j_small : j ∈ ({0, 1, 2} : Finset ℕ)
+      · fin_cases j_small
+        · -- k = 0 case is true for any cocycle by skew-symmetry
+          simp
+        · -- k = 1 case follows due to the choice of the normalizing coboundary
+          convert add_bdry_normalizingCochain_apply_lgen_one γ
+          ring
+        · -- k = 2 case is what determines the choice of the multiplicative constant r
+          rw [hr]
+          norm_num
+          ring
+      · have j_large : 2 < j := by match j with
+          | 0 => contradiction | 1 => contradiction | 2 => contradiction
+          | j' + 3 => simp
+        -- For j ≥ 3, the coefficient (2-j) in a key recusive equation does not vanish.
+        have not_zero : (2 - j : 𝕜) ≠ 0 := by exact_mod_cast show (2 - j : ℤ) ≠ 0 by linarith
+        -- The key recursive equation is obtained by taking n = j, m = 1-j, k = -1
+        -- in the cocycle condition written in the basis `(ℓₙ)`.
+        -- This equation generally simplifies to
+        -- `0 = (2-j) * γ(j,-j) + (1+j) * γ(j-1,1-j) + (1-2j) * γ(1,-1)`
+        -- but the last term is zero for `γ₀` because of the normalizing coboundary.
+        set j' := j - 1 with hj'
+        have aux : (j - 1 : ℤ) = j' := (Int.natCast_pred_of_pos (by linarith)).symm
+        have aux' : (1 - j : ℤ) = -j' := by simp [← aux]
+        have eqn : ((2 - j : 𝕜)) * γ₀ (lgen 𝕜 j) (lgen 𝕜 (-j))
+                     + ((1 + j : 𝕜)) * γ₀ (lgen 𝕜 j') (lgen 𝕜 (-j')) = 0 := by
+          have eqn := add_lieTwoCocycle_apply_lgen_lgen_lgen_eq_zero γ₀ j (1-j) (-1)
+          simp only [Int.cast_sub, Int.cast_one, Int.cast_natCast, Int.reduceNeg, Int.cast_neg,
+                    sub_neg_eq_add, add_sub_cancel] at eqn
+          rw [← γ₀.skew (lgen 𝕜 (-1)), ← γ₀.skew (lgen 𝕜 (1 - j))] at eqn
+          have nothing : -(γ₀ ((lgen 𝕜) 1)) ((lgen 𝕜) (-1)) = 0 := by
+            simpa using hj 1 (by linarith)
+          grind
+        rw [hj j' (by linarith), hj'] at eqn
+        simp only [Int.cast_natCast] at eqn
+        rw [add_eq_zero_iff_eq_neg] at eqn
+        have solve := congr_arg (fun (z : 𝕜) ↦ (2 - j : 𝕜)⁻¹ * z) eqn
+        simp only [not_zero, isUnit_iff_ne_zero, ne_eq, not_false_eq_true, IsUnit.inv_mul_cancel_left,
+                   mul_neg] at solve
+        rw [solve, mul_div, mul_div, ← neg_div]
+        congr
+        calc -((2 - ↑j)⁻¹ * ((1 + ↑j) * (r * (↑(j - 1) ^ 3 - ↑(j - 1)))))
+            = -((2 - ↑j)⁻¹ * ((1 + ↑j) * (r * ((↑j - 1) ^ 3 - (↑j - 1))))) := by
+              simp [show (↑(j - 1) : 𝕜) = (↑j : 𝕜) - 1 by exact_mod_cast aux.symm]
+          _ = r * -((2 - ↑j)⁻¹ * (↑j - 2) * (↑j ^ 3 - ↑j))  := by ring
+          _ = r * (↑j ^ 3 - ↑j)                             := by
+              field_simp ; rw [show ((j : 𝕜) - 2) = -(2 - j) by simp [neg_sub], mul_neg] ; simp
+          _ = _                                             := by simp
   · -- The case n + m ≠ 0 is straightforward by the choice of the normalizing coboundary.
     suffices ((γ + (normalizingCochain γ).bdry) ((lgen 𝕜) n)) ((lgen 𝕜) m) = 0 by
       simpa [virasoroCocycle_apply_lgen_lgen, hnm]

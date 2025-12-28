@@ -67,7 +67,7 @@ private lemma commutator_lsmul_jgen_of_module_uea_heisenbergAlgebra
     have key := congr_arg (fun b ↦ b • w) <| (ιUEA 𝕜).map_lie (jgen 𝕜 k) (jgen 𝕜 l)
     rw [lie_jgen 𝕜 k l] at key
     by_cases hkl : k + l = 0
-    · simp only [hkl, ↓reduceIte, LieHom.map_smul] at key ⊢
+    · simp only [hkl, ↓reduceIte, map_smul] at key ⊢
       convert key.symm using 1
       · simp_rw [← smul_assoc, ← sub_smul]
         rfl
@@ -75,10 +75,8 @@ private lemma commutator_lsmul_jgen_of_module_uea_heisenbergAlgebra
             k • w = (algebraMap 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) ↑k • ιUEA 𝕜 (kgen 𝕜)) • w := by
           rw [smul_assoc, hc]
           simpa [map_intCast] using (Int.cast_smul_eq_zsmul (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) k w).symm
-        convert same using 1
-        congr 1
-        exact algebra_compatible_smul (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) (↑k) (ιUEA 𝕜 (kgen 𝕜))
-    · simp only [hkl, ↓reduceIte, LieHom.map_zero, zero_smul] at key ⊢
+        exact same
+    · simp only [hkl, ↓reduceIte, map_zero, zero_smul] at key ⊢
       simp_rw [← smul_assoc, ← sub_smul]
       convert key.symm using 1
   ext v
