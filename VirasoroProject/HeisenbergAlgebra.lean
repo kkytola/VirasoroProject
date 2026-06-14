@@ -131,7 +131,7 @@ noncomputable def heisenbergCocycle :
   toBilin := heisenbergCocycleBilin 𝕜
   self' X := by
     apply self_eq_neg.mp
-    simpa only [LinearMap.neg_apply, LinearMap.coe_mk, AddHom.coe_mk]
+    simpa only [LinearMap.neg_apply, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.flip_apply]
       using LinearMap.congr_fun₂ (heisenbergCocycleBilin_eq_neg_flip 𝕜) X X
   leibniz' X Y Z := by
     simp only [lie_def, map_zero, LinearMap.zero_apply, (lie_skew X Z).symm, neg_zero, add_zero]
@@ -231,7 +231,7 @@ lemma smul_def' (c : 𝕜) (X : HeisenbergAlgebra 𝕜) :
     (c • X).2 = c * X.2 := rfl
 
 /-- The Heisenberg algebra is a central extension of the Witt algebra. -/
-instance isCentralExtension : LieAlgebra.IsCentralExtension (ofCentral 𝕜) toAbelianLieAlgebraOn :=
+theorem isCentralExtension : LieAlgebra.IsCentralExtension (ofCentral 𝕜) toAbelianLieAlgebraOn :=
   LieTwoCocycle.CentralExtension.isCentralExtension _
 
 /-- The (commonly used) `Jₖ` elements of the Heisenberg algebra, for `k ∈ ℤ`. -/
@@ -270,7 +270,11 @@ lemma toAbelianLieAlgebraOn_kgen :
     · simp [kgen_eq']
     · simp [AbelianLieAlgebraOn.heisenbergCocycle_apply_jgen_jgen, kgen_eq', h]
   · simp [h]
-    apply ext' <;> simp [AbelianLieAlgebraOn.heisenbergCocycle_apply_jgen_jgen, h]
+    apply ext'
+    · rfl
+    · show AbelianLieAlgebraOn.heisenbergCocycle 𝕜 (AbelianLieAlgebraOn.jgen 𝕜 k)
+                                                     (AbelianLieAlgebraOn.jgen 𝕜 l) = 0
+      simp [AbelianLieAlgebraOn.heisenbergCocycle_apply_jgen_jgen, h]
 
 /-- A section of the standard projection from the Heisenberg algebra to the underlying
 abelian Lie algebra. -/

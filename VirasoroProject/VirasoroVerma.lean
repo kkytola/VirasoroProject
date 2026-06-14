@@ -130,22 +130,23 @@ noncomputable def virasoroTri_lzero : (virasoroTri 𝕜).part 0 :=
 open VirasoroAlgebra in
 lemma virasoroTri_cartan_basis_none_eq_cgen :
     (virasoroTri_cartan_basis 𝕜) ⟨none, Set.mem_insert none {some 0}⟩ = virasoroTri_cgen 𝕜 := by
-  ext
-  simp only [virasoroTri_cartan_basis, TriangularDecomposition.ofBasis.basis_part, indexTri,
-             virasoroTri_cgen_val]
-  convert (basisLC 𝕜).basis_submodule_span_apply {none, some 0} ⟨none, Set.mem_insert none {some 0}⟩
-  simp
+  apply Subtype.ext
+  simp only [virasoroTri_cgen_val]
+  have h := Module.Basis.basis_submodule_span_apply (VirasoroAlgebra.basisLC 𝕜) {none, some 0}
+             ⟨none, Set.mem_insert none {some 0}⟩
+  simp only [VirasoroAlgebra.basisLC_none] at h
+  exact h
 
 open VirasoroAlgebra in
 lemma virasoroTri_cartan_basis_some_eq_lzero :
     (virasoroTri_cartan_basis 𝕜) ⟨some 0, by exact Set.mem_insert_of_mem none rfl⟩
       = virasoroTri_lzero 𝕜 := by
-  ext
-  simp only [virasoroTri_cartan_basis, TriangularDecomposition.ofBasis.basis_part, indexTri,
-             virasoroTri_lzero_val]
-  convert (basisLC 𝕜).basis_submodule_span_apply {none, some 0}
-          ⟨some 0, Set.mem_insert_of_mem none rfl⟩
-  simp
+  apply Subtype.ext
+  simp only [virasoroTri_lzero_val]
+  have h := Module.Basis.basis_submodule_span_apply (VirasoroAlgebra.basisLC 𝕜) {none, some 0}
+             ⟨some 0, Set.mem_insert_of_mem none rfl⟩
+  simp only [VirasoroAlgebra.basisLC_some] at h
+  exact h
 
 lemma virasoroTri_cgen_mem_cartan :
     .cgen 𝕜 ∈ (virasoroTri 𝕜).cartan := by

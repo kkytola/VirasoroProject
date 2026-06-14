@@ -92,10 +92,10 @@ def ofBasis {ι : Type*} [Nontrivial 𝕜] [NoZeroSMulDivisors 𝕜 𝓰]
               + ∑ᶠ i ∈ Bp 0, B.repr X i • B i := by
         nth_rw 1 [← B.finsum_repr_smul_basis X]
         have supp_finite_aux : (Function.support (fun i ↦ B.repr X i • B i)).Finite := by
-          apply (Finsupp.finite_support (B.repr X)).subset
+          apply (Finsupp.hasFiniteSupport (B.repr X)).subset
           intro i hi
-          simp only [Function.support, ne_eq, smul_eq_zero, not_or, Set.mem_setOf_eq] at hi ⊢
-          exact hi.1
+          simp only [Function.mem_support, ne_eq] at hi ⊢
+          exact fun h ↦ hi (h ▸ zero_smul _ _)
         have supp_finite (ε : SignType) := supp_finite_aux.inter_of_right (Bp ε)
         rw [← finsum_mem_union' (Bp_disj (by simp)) (supp_finite 1) (supp_finite (-1))]
         rw [← finsum_mem_union' ?_ ?_ (supp_finite 0)]
@@ -193,11 +193,16 @@ lemma VermaHW.hwVec_cyclic (η : weight tri) :
 
 lemma VermaHW.upper_smul_hwVec (η : weight tri) {E : 𝓰} (hE : E ∈ tri.upper) :
     ιUEA 𝕜 E • VermaHW.hwVec η = 0 := by
-  simpa [weightHW] using VermaModule.apply_hwVec_eq (weightHW η) (Sum.inr ⟨E, hE⟩)
+  have h := VermaModule.apply_hwVec_eq (weightHW η) (Sum.inr ⟨E, hE⟩)
+  simp only [weightHW, map_zero, zero_smul] at h
+  exact h
 
 lemma VermaHW.cartan_smul_hwVec (η : weight tri) {H : 𝓰} (hH : H ∈ tri.cartan) :
     ιUEA 𝕜 H • VermaHW.hwVec η = (η ⟨H, hH⟩) • VermaHW.hwVec η := by
-  simpa [weightHW] using VermaModule.apply_hwVec_eq (weightHW η) (Sum.inl ⟨H, hH⟩)
+  rw [VermaHW.smul_eq_algebraHom_smul]
+  have h := VermaModule.apply_hwVec_eq (weightHW η) (Sum.inl ⟨H, hH⟩)
+  simp only [weightHW] at h
+  exact h
 
 noncomputable def VermaHW.universalMap (η : weight tri)
     (M : Type*) [AddCommGroup M] [Module (𝓤 𝕜 𝓰) M] {hwv : M}

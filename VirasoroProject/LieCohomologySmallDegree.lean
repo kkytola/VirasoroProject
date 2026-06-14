@@ -129,11 +129,13 @@ variable {𝕜 𝓰 𝓪}
 
 instance : FunLike (LieOneCochain 𝕜 𝓰 𝓪) 𝓰 𝓪 where
   coe := fun β X ↦ β.toLinearMap X
-  coe_injective' := fun β β' h ↦ by ext1 ; exact LinearMap.ext_iff.mpr (congrFun h)
+  coe_injective := fun β β' h ↦ by ext1 ; exact LinearMap.ext_iff.mpr (congrFun h)
 
 instance : LinearMapClass (LieOneCochain 𝕜 𝓰 𝓪) 𝕜 𝓰 𝓪 where
   map_add β X Y := β.toLinearMap.map_add X Y
   map_smulₛₗ β c X := LinearMap.CompatibleSMul.map_smul β.toLinearMap c X
+
+@[simp] lemma zero_apply (X : 𝓰) : (0 : LieOneCochain 𝕜 𝓰 𝓪) X = 0 := rfl
 
 end LieOneCochain -- namespace
 
@@ -154,7 +156,7 @@ namespace LieTwoCocycle
 
 instance : FunLike (LieTwoCocycle 𝕜 𝓰 𝓪) 𝓰 (𝓰 →ₗ[𝕜] 𝓪) where
   coe := fun γ X ↦ LieTwoCocycle.toBilin γ X
-  coe_injective' := by
+  coe_injective := by
     intro γ γ' h
     ext
     exact congrFun (congrArg DFunLike.coe (congrFun h _)) _
@@ -368,9 +370,11 @@ lemma cohomologyClass_add_bdry (γ : LieTwoCocycle 𝕜 𝓰 𝓪) (β : LieOneC
 /-- A cocycle representing a trivial cohomology class is a coboundary. -/
 lemma exists_eq_bdry (γ : LieTwoCocycle 𝕜 𝓰 𝓪) (hγ : γ.cohomologyClass = 0) :
     ∃ β : LieOneCochain 𝕜 𝓰 𝓪, γ = β.bdry := by
-  simp_rw [@Eq.comm (LieTwoCocycle 𝕜 𝓰 𝓪) γ _]
-  simpa using (Submodule.Quotient.eq _).mp <|
-    show γ.cohomologyClass = LieTwoCocycle.cohomologyClass 0 by rw [hγ] ; rfl
+  have hmem : γ ∈ LieTwoCoboundary 𝕜 𝓰 𝓪 := by
+    rw [← Submodule.Quotient.mk_eq_zero]
+    exact_mod_cast hγ
+  obtain ⟨β, hβ⟩ := hmem
+  exact ⟨β, hβ.symm⟩
 
 end LieTwoCocycle -- namespace
 
@@ -385,7 +389,7 @@ variable {𝕜 𝓰 𝓪}
 /-- For abelian Lie algebras, a 2-coboundary is necessarily zero. -/
 lemma LieOneCochain.bdry_apply_eq_zero_of_isLieAbelian (β : LieOneCochain 𝕜 𝓰 𝓪) (X Y : 𝓰) :
     β.bdry X Y = 0 := by
-  simp [LieOneCochain.bdry_apply]
+  simp [LieOneCochain.bdry_apply, trivial_lie_zero]
 
 variable (𝕜 𝓰 𝓪)
 
@@ -400,7 +404,9 @@ lemma LieTwoCoboundary.eq_bot_of_isLieAbelian :
 trivial kernel. -/
 lemma LieTwoCocycle.ker_toLieTwoCohomology_eq_bot_of_isLieAbelian :
     LinearMap.ker (LieTwoCocycle.toLieTwoCohomology 𝕜 𝓰 𝓪) = ⊥ := by
-  rw [LieTwoCocycle.toLieTwoCohomology, Submodule.ker_mkQ]
+  have : LinearMap.ker (toLieTwoCohomology 𝕜 𝓰 𝓪) = LieTwoCoboundary 𝕜 𝓰 𝓪 :=
+    Submodule.ker_mkQ _
+  rw [this]
   exact LieTwoCoboundary.eq_bot_of_isLieAbelian 𝕜 𝓰 𝓪
 
 /-- For abelian Lie algebras, the map from 2-cocycles to their cohomology classes is a linear

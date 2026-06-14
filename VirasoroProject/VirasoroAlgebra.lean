@@ -112,7 +112,7 @@ lemma smul_def' (c : 𝕜) (X : VirasoroAlgebra 𝕜) :
     (c • X).2 = c * X.2 := rfl
 
 /-- The Virasoro algebra is a central extension of the Witt algebra. -/
-instance isCentralExtension : LieAlgebra.IsCentralExtension (ofCentral 𝕜) toWittAlgebra :=
+theorem isCentralExtension : LieAlgebra.IsCentralExtension (ofCentral 𝕜) toWittAlgebra :=
   LieTwoCocycle.CentralExtension.isCentralExtension _
 
 /-- The (commonly used) `Lₙ` elements of the Virasoro algebra, for `n ∈ ℤ`. -/

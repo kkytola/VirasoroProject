@@ -141,7 +141,7 @@ lemma exists_add_bdry_eq_smul_virasoroCocycle :
           simp
         · -- k = 1 case follows due to the choice of the normalizing coboundary
           convert add_bdry_normalizingCochain_apply_lgen_one γ
-          ring
+          all_goals norm_num
         · -- k = 2 case is what determines the choice of the multiplicative constant r
           rw [hr]
           norm_num
@@ -205,8 +205,9 @@ theorem rank_lieTwoCohomology_eq_one :
     obtain ⟨r, hr⟩ := exists_add_bdry_eq_smul_virasoroCocycle γ
     use r
     convert (LinearMap.congr_arg (f := LieTwoCocycle.toLieTwoCohomology 𝕜 ..) hr).symm
-    rw [← hγ']
-    exact (LieTwoCocycle.cohomologyClass_add_bdry γ (normalizingCochain γ)).symm
+    · simp [LieTwoCocycle.cohomologyClass, map_smul]
+    · rw [← hγ']
+      exact (LieTwoCocycle.cohomologyClass_add_bdry γ (normalizingCochain γ)).symm
 
 end WittAlgebra -- namespace
 

@@ -141,22 +141,23 @@ noncomputable def heisenbergTri_jzero : (heisenbergTri 𝕜).part 0 :=
 open HeisenbergAlgebra in
 lemma heisenbergTri_cartan_basis_none_eq_kgen :
     (heisenbergTri_cartan_basis 𝕜) ⟨none, Set.mem_insert none {some 0}⟩ = heisenbergTri_kgen 𝕜 := by
-  ext
-  simp only [heisenbergTri_cartan_basis, TriangularDecomposition.ofBasis.basis_part, indexTri,
-             heisenbergTri_kgen_val]
-  convert (basisJK 𝕜).basis_submodule_span_apply {none, some 0} ⟨none, Set.mem_insert none {some 0}⟩
-  simp
+  apply Subtype.ext
+  simp only [heisenbergTri_kgen_val]
+  have h := Module.Basis.basis_submodule_span_apply (HeisenbergAlgebra.basisJK 𝕜) {none, some 0}
+             ⟨none, Set.mem_insert none {some 0}⟩
+  simp only [HeisenbergAlgebra.basisJK_none] at h
+  exact h
 
 open HeisenbergAlgebra in
 lemma heisenbergTri_cartan_basis_some_eq_jzero :
     (heisenbergTri_cartan_basis 𝕜) ⟨some 0, by exact Set.mem_insert_of_mem none rfl⟩
       = heisenbergTri_jzero 𝕜 := by
-  ext
-  simp only [heisenbergTri_cartan_basis, TriangularDecomposition.ofBasis.basis_part, indexTri,
-             heisenbergTri_jzero_val]
-  convert (basisJK 𝕜).basis_submodule_span_apply {none, some 0}
-          ⟨some 0, Set.mem_insert_of_mem none rfl⟩
-  simp
+  apply Subtype.ext
+  simp only [heisenbergTri_jzero_val]
+  have h := Module.Basis.basis_submodule_span_apply (HeisenbergAlgebra.basisJK 𝕜) {none, some 0}
+             ⟨some 0, Set.mem_insert_of_mem none rfl⟩
+  simp only [HeisenbergAlgebra.basisJK_some] at h
+  exact h
 
 lemma heisenbergTri_kgen_mem_cartan :
     .kgen 𝕜 ∈ (heisenbergTri 𝕜).cartan := by
