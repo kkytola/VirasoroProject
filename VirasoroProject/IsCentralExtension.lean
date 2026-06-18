@@ -81,7 +81,10 @@ def emb [IsLieAbelian 𝓪] : 𝓪 →ₗ⁅𝕜⁆ γ.CentralExtension where
   toFun := fun A ↦ ⟨0, A⟩
   map_add' A₁ A₂ := by simp [add_def]
   map_smul' c A := by simp [smul_def]
-  map_lie' := by intro A₁ A₂ ; simp [lie_def]
+  map_lie' := by
+    intro A₁ A₂
+    simp only [lie_def, lie_zero, map_zero]
+    exact Prod.ext rfl (trivial_lie_zero 𝓪 𝓪 A₁ A₂)
 
 /-- If `𝓮` is the (central) extension of `𝓰` by `𝓪` defined by a 2-cocycle `γ ∈ Z²(𝓰,𝓪)`,
 then `LieTwoCocycle.CentralExtension.proj` gives the corresponding projection `𝓮 ⟶ 𝓰`. -/
@@ -113,9 +116,8 @@ lemma mem_range_emb_iff [IsLieAbelian 𝓪] (Z : γ.CentralExtension) :
 lemma mem_ker_proj_iff (Z : γ.CentralExtension) :
     Z ∈ (LieTwoCocycle.CentralExtension.proj γ).ker ↔ Z.1 = 0 := by
   rw [LieHom.mem_ker]
-  refine ⟨?_, ?_⟩
-  · intro h ; simpa [proj]
-  · intro h ; simpa only [proj, LieHom.coe_mk] using h
+  obtain ⟨X, A⟩ := Z
+  simp [proj]
 
 lemma range_emb_eq_ker_proj [IsLieAbelian 𝓪] :
     (LieTwoCocycle.CentralExtension.emb γ).range = (LieTwoCocycle.CentralExtension.proj γ).ker := by
@@ -128,7 +130,7 @@ lemma range_emb_eq_ker_proj [IsLieAbelian 𝓪] :
 then `𝓮` is an extension of `𝓰` by `𝓪` in the sense that there is a short exact sequence
 `0 ⟶ 𝓪 ⟶ 𝓮 ⟶ 𝓰 ⟶ 0` where the two maps are `LieTwoCocycle.CentralExtension.emb` and
 `LieTwoCocycle.CentralExtension.proj`. -/
-instance isExtension [IsLieAbelian 𝓪] :
+theorem isExtension [IsLieAbelian 𝓪] :
     LieAlgebra.IsExtension (emb γ) (proj γ) where
   ker_eq_bot := ker_emb_eq_bot γ
   range_eq_top := range_proj_eq_top γ
@@ -138,7 +140,7 @@ instance isExtension [IsLieAbelian 𝓪] :
 then `𝓮` is a central extension of `𝓰` by `𝓪` in the sense that there is a short exact sequence
 `0 ⟶ 𝓪 ⟶ 𝓮 ⟶ 𝓰 ⟶ 0` where the two maps are `LieTwoCocycle.CentralExtension.emb` and
 `LieTwoCocycle.CentralExtension.proj` and the image of `𝓪` is contained in the centre of `𝓮`. -/
-instance isCentralExtension [IsLieAbelian 𝓪] (γ : LieTwoCocycle 𝕜 𝓰 𝓪) :
+theorem isCentralExtension [IsLieAbelian 𝓪] (γ : LieTwoCocycle 𝕜 𝓰 𝓪) :
     LieAlgebra.IsCentralExtension (emb γ) (proj γ) where
   __ := LieTwoCocycle.CentralExtension.isExtension γ
   central := by

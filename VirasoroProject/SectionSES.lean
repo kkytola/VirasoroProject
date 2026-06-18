@@ -125,9 +125,9 @@ short exact sequence `1 ⟶ U ⟶ V ⟶ W ⟶ 1`. -/
     (hf : f.ker = ⊥) (hfg : f.range = g.ker) (hgσ : g.comp σ = MonoidHom.id _) :
     V →* U where
   toFun := @corrector U V W _ _ _ f g σ.toFun hfg
-    (by ext w ; convert congrFun (congrArg DFunLike.coe hgσ) w)
+    (by ext w ; exact DFunLike.congr_fun hgσ w)
   map_one' := corrector_one hf hfg ..
-  map_mul' := corrector_mul hf hfg (by ext w ; convert congrFun (congrArg DFunLike.coe hgσ) w)
+  map_mul' := corrector_mul hf hfg (by ext w ; exact DFunLike.congr_fun hgσ w)
 
 @[to_additive] lemma correctorHom_eq_iff {σ : W →* V}
     (hf : f.ker = ⊥) (hfg : f.range = g.ker) (hgσ : g.comp σ = MonoidHom.id _)
@@ -135,13 +135,13 @@ short exact sequence `1 ⟶ U ⟶ V ⟶ W ⟶ 1`. -/
     correctorHom hf hfg hgσ v = u ↔ v = σ (g v) * f u := by
   refine corrector_eq_iff hf hfg ?_ v u
   ext w
-  exact congrFun (congrArg DFunLike.coe hgσ) w
+  exact DFunLike.congr_fun hgσ w
 
 @[to_additive] lemma image_correctorHom_eq_self_of_mem_ker {σ : W →* V} (hf : f.ker = ⊥)
     (hfg : f.range = g.ker) (hgσ : g.comp σ = MonoidHom.id _) {v : V} (hv : v ∈ g.ker) :
     f (correctorHom hf hfg hgσ v) = v := by
   apply image_corrector_eq_self_of_mem_ker hfg ?_ hv
-  ext w ; convert congrFun (congrArg DFunLike.coe hgσ) w
+  ext w ; exact DFunLike.congr_fun hgσ w
 
 end MonoidHom
 
@@ -191,7 +191,7 @@ lemma correctorHom_smul (hf : f.toAddMonoidHom.ker = ⊥)
     (hgσ : g.toAddMonoidHom.comp σ.toAddMonoidHom = AddMonoidHom.id _) (c : 𝕜) (v : V) :
     correctorHom hf hfg hgσ (c • v) = c • correctorHom hf hfg hgσ v := by
   simp only [correctorHom, ZeroHom.toFun_eq_coe, toZeroHom_coe, toAddMonoidHom_coe]
-  have aux : ↑g ∘ σ = _root_.id := by ext w ; convert congrFun (congrArg DFunLike.coe hgσ) w
+  have aux : ↑g ∘ σ = _root_.id := by ext w ; exact DFunLike.congr_fun hgσ w
   apply unique_corrector hf (c • v) _ _ (corrector_spec hfg aux (c • v))
   nth_rw 1 [corrector_spec hfg aux v]
   simp
@@ -203,7 +203,7 @@ noncomputable def corrector (hf : ker f = ⊥) (hfg : range f = ker g) (hgσ : g
   toFun := @AddMonoidHom.correctorHom U V W _ _ _ f g σ
       (congr_arg Submodule.toAddSubgroup hf)
       (congr_arg Submodule.toAddSubgroup hfg)
-      (by ext w ; convert congrFun (congrArg DFunLike.coe hgσ) w)
+      (by ext w ; exact DFunLike.congr_fun hgσ w)
   map_add' := AddMonoidHom.map_add (AddMonoidHom.correctorHom _ _ _)
   map_smul' := by apply correctorHom_smul
 
@@ -211,21 +211,21 @@ noncomputable def corrector (hf : ker f = ⊥) (hfg : range f = ker g) (hgσ : g
 lemma corrector_spec (hf : ker f = ⊥) (hfg : range f = ker g) (hgσ : g ∘ₗ σ = 1) (v : V) :
     v = σ (g v) + f (corrector hf hfg hgσ v) :=
   @AddMonoidHom.corrector_spec U V W _ _ _ f g σ (congr_arg Submodule.toAddSubgroup hfg)
-    (by ext w ; convert congrFun (congrArg DFunLike.coe hgσ) w) v
+    (by ext w ; exact DFunLike.congr_fun hgσ w) v
 
 lemma corrector_eq_iff (hf : ker f = ⊥) (hfg : range f = ker g) (hgσ : g ∘ₗ σ = 1) (v : V) (u : U) :
     corrector hf hfg hgσ v = u ↔ v = σ (g v) + f u := by
   apply AddMonoidHom.corrector_eq_iff
   · exact congr_arg Submodule.toAddSubgroup hf
   · exact congr_arg Submodule.toAddSubgroup hfg
-  · ext w ; convert congrFun (congrArg DFunLike.coe hgσ) w
+  · ext w ; exact DFunLike.congr_fun hgσ w
 
 lemma image_corrector_eq_self_of_mem_ker {σ : W →ₗ[𝕜] V} (hf : ker f = ⊥)
     (hfg : range f = ker g) (hgσ : g ∘ₗ σ = 1) {v : V} (hv : v ∈ ker g) :
     f (corrector hf hfg hgσ v) = v :=
   @AddMonoidHom.image_correctorHom_eq_self_of_mem_ker U V W _ _ _ f g σ
     (congr_arg Submodule.toAddSubgroup hf) (congr_arg Submodule.toAddSubgroup hfg)
-    (by ext w ; convert congrFun (congrArg DFunLike.coe hgσ) w) v hv
+    (by ext w ; exact DFunLike.congr_fun hgσ w) v hv
 
 end LinearMap
 
@@ -327,11 +327,13 @@ noncomputable def ses_basis (hf : ker f = ⊥) (hfg : range f = ker g) (hgσ : g
     (iu : ιU) :
     ses_basis basU basW hf hfg hgσ (Sum.inl iu) = f (basU iu) := by
   simp [ses_basis, ses_basis']
+  rfl
 
 @[simp] lemma ses_basis_eq_of_right (hf : ker f = ⊥) (hfg : range f = ker g) (hgσ : g ∘ₗ σ = 1)
     (iw : ιW) :
     ses_basis basU basW hf hfg hgσ (Sum.inr iw) = σ (basW iw) := by
   simp [ses_basis, ses_basis']
+  rfl
 
 end basis
 

@@ -77,11 +77,20 @@ private lemma commutator_lsmul_jgen_of_module_uea_heisenbergAlgebra
           simpa [map_intCast] using (Int.cast_smul_eq_zsmul (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) k w).symm
         exact same
     · simp only [hkl, ↓reduceIte, map_zero, zero_smul] at key ⊢
-      simp_rw [← smul_assoc, ← sub_smul]
-      convert key.symm using 1
+      simp only [Ring.lie_def, sub_smul, mul_smul] at key
+      exact key.symm
   ext v
-  convert key v using 1
-  by_cases hkl : k + l = 0 <;> simp [hkl, Int.cast_smul_eq_zsmul]
+  have hkv := key v
+  by_cases hkl : k + l = 0
+  · simp only [hkl, ↓reduceIte] at hkv
+    simp only [hkl, ↓reduceIte, LinearMap.commutator, LinearMap.sub_apply,
+               Module.End.mul_apply, LinearMap.smul_apply, Module.End.one_apply]
+    rw [Int.cast_smul_eq_zsmul]
+    exact hkv
+  · simp only [hkl, ↓reduceIte] at hkv
+    simp only [hkl, ↓reduceIte, LinearMap.commutator, LinearMap.sub_apply,
+               Module.End.mul_apply, LinearMap.zero_apply]
+    exact hkv
 
 open HeisenbergAlgebra Filter in
 -- TODO: Generalize to `kgen` acting as `κ • 1`, maybe.
@@ -123,9 +132,10 @@ lemma sugawaraRepresentation_of_module_uea_heisenbergAlgebra_cgen_apply
     (hc : ∀ (v : V), ιUEA 𝕜 (kgen 𝕜) • v = v)
     (v : ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) V) :
     sugawaraRepresentation_of_module_uea_heisenbergAlgebra 𝕜 htrunc hc (.cgen 𝕜) v = v := by
-  have key := sugawaraRepresentation_cgen _
-    ((fun v ↦ htrunc ((ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) V) v)))
-    (commutator_lsmul_jgen_of_module_uea_heisenbergAlgebra 𝕜 hc)
+  have key : sugawaraRepresentation_of_module_uea_heisenbergAlgebra 𝕜 htrunc hc (.cgen 𝕜) = 1 :=
+    sugawaraRepresentation_cgen _
+      ((fun v ↦ htrunc ((ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) V) v)))
+      (commutator_lsmul_jgen_of_module_uea_heisenbergAlgebra 𝕜 hc)
   simpa using congr_arg (fun A ↦ A v) key
 
 end auxiliary
@@ -202,7 +212,7 @@ lemma sugawaraRepresentation_lgen_pos_apply_vacuum (α : 𝕜)
 /-- The central element of the Virasoro algebra acts as the identity on the charged Fock space. -/
 @[simp] lemma sugawaraRepresentation_cgen_apply (α : 𝕜) (v : ChargedFockSpace 𝕜 α) :
     sugawaraRepresentation 𝕜 α (.cgen 𝕜) v = v := by
-  simpa using sugawaraRepresentation_of_module_uea_heisenbergAlgebra_cgen_apply ..
+  exact sugawaraRepresentation_of_module_uea_heisenbergAlgebra_cgen_apply ..
 
 noncomputable instance instModuleUniversalEnvelopingAlgebraVirasoroAlgebra (α : 𝕜) :
     Module (𝓤 𝕜 (VirasoroAlgebra 𝕜)) (ChargedFockSpace 𝕜 α) :=
