@@ -8,6 +8,8 @@ import Mathlib.GroupTheory.GroupAction.Ring
 import Mathlib.Order.CompletePartialOrder
 import VirasoroProject.LieAlgebraRepresentationOfBasis
 
+attribute [local instance 100] LieRing.ofAssociativeRing
+
 /-!
 # Modules over the universal enveloping algebra of a Lie algebra
 
@@ -246,9 +248,8 @@ abbrev ιUEA := UniversalEnvelopingAlgebra.ι
 
 lemma UniversalEnvelopingAlgebra.mkAlgHom_range_eq_top :
     (UniversalEnvelopingAlgebra.mkAlgHom 𝕜 𝓰).range = ⊤ := by
-  simp only [UniversalEnvelopingAlgebra.mkAlgHom, RingQuot.mkAlgHom]
   rw [AlgHom.range_eq_top]
-  exact RingQuot.mkRingHom_surjective (UniversalEnvelopingAlgebra.Rel 𝕜 𝓰)
+  exact RingCon.mkₐ_surjective _
 
 variable {𝕜 𝓰} in
 lemma UniversalEnvelopingAlgebra.mkAlgHom_surjective :

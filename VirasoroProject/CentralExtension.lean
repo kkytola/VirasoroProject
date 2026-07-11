@@ -94,18 +94,28 @@ open LinearMapClass RingHom in
 /-- The Lie bracket in a central extension defined by a Lie algebra 2-cocycle. -/
 def bracket : γ.CentralExtension
       →ₗ[𝕜] γ.CentralExtension →ₗ[𝕜] γ.CentralExtension where
-  toFun := fun ⟨X,_⟩ ↦ {
-    toFun := fun ⟨Y,_⟩ ↦ ⟨⁅X,Y⁆, γ X Y⟩
-    map_add' := by intros ; simp_all only [lie_add, map_add] ; rfl
-    map_smul' := by intros ; simp_all only [lie_smul, map_smul, id_apply] ; rfl }
+  toFun := fun Z ↦ {
+    toFun := fun W ↦ ⟨⁅Z.1, W.1⁆, γ Z.1 W.1⟩
+    map_add' := by
+      intro W₁ W₂
+      ext
+      · simp [lie_add]
+      · simp [map_add]
+    map_smul' := by
+      intro c W
+      ext
+      · simp [lie_smul]
+      · simp [map_smul] }
   map_add' := by
-    intros
-    simp_all only [add_lie, map_add, LinearMap.add_apply]
-    rfl
+    intro Z₁ Z₂
+    ext W
+    · simp [add_lie]
+    · simp [map_add]
   map_smul' := by
-    intros
-    simp_all only [smul_lie, map_smul, LinearMap.smul_apply, id_apply]
-    rfl
+    intro c Z
+    ext W
+    · simp [smul_lie]
+    · simp [map_smul]
 
 @[simp] lemma bracket_apply (Z W : γ.CentralExtension) :
     γ.bracket Z W = ⟨⁅Z.fst, W.fst⁆, γ Z.fst W.fst⟩ := rfl
@@ -234,7 +244,8 @@ noncomputable def equiv_of_lieTwoCoboundary {γ' : LieTwoCocycle 𝕜 𝓰 𝓪}
   let β := h.choose
   have obs : γ + β.bdry = γ' := by
     change γ + LieOneCochain_bdryHom _ _ _ h.choose = γ' ; simp [h.choose_spec]
-  have obs' : γ' + -β.bdry = γ := by
+  have obs' : γ' + (-β).bdry = γ := by
+    rw [LieOneCochain.neg_bdry]
     change γ' - LieOneCochain_bdryHom _ _ _ h.choose = γ ; simp [h.choose_spec]
   LieEquiv.mk_of_comp_eq_id
       (f := (LieTwoCocycle.CentralExtension.congr obs).toLieHom.comp <| β.bdryHom γ)

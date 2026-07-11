@@ -7,6 +7,8 @@ import Mathlib.Algebra.Lie.OfAssociative
 import VirasoroProject.Commutator
 import VirasoroProject.ToMathlib.Algebra.Lie.Basic
 
+attribute [local instance 100] LieRing.ofAssociativeRing
+
 /-!
 # Constructing representations of Lie algebras from operators corresponding to a basis
 

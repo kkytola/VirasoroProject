@@ -3,9 +3,12 @@ Copyright (c) 2024 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
+import Mathlib.Algebra.Lie.OfAssociative
 import VirasoroProject.IsCentralExtension
 import VirasoroProject.ToMathlib.Algebra.Lie.Abelian
 import VirasoroProject.VirasoroCocycle
+
+attribute [local instance 100] LieRing.ofAssociativeRing
 
 /-!
 # The Virasoro algebra
@@ -63,24 +66,24 @@ lemma ext' {X Y : VirasoroAlgebra 𝕜} (h₁ : X.1 = Y.1) (h₂ : X.2 = Y.2) :
   LieTwoCocycle.CentralExtension.ext h₁ h₂
 
 /-- The Virasoro algebra is a Lie ring. -/
-noncomputable instance : LieRing (VirasoroAlgebra 𝕜) :=
+@[reducible] noncomputable instance : LieRing (VirasoroAlgebra 𝕜) :=
   LieTwoCocycle.CentralExtension.instLieRing _
 
 /-- The Virasoro algebra is a Lie algebra. -/
-noncomputable instance : LieAlgebra 𝕜 (VirasoroAlgebra 𝕜) :=
+@[reducible] noncomputable instance : LieAlgebra 𝕜 (VirasoroAlgebra 𝕜) :=
   LieTwoCocycle.CentralExtension.instLieAlgebra _
 
 variable {𝕜}
 
 /-- The projection from Virasoro algebra to Witt algebra. -/
-noncomputable def toWittAlgebra : VirasoroAlgebra 𝕜 →ₗ⁅𝕜⁆ WittAlgebra 𝕜 :=
-  LieTwoCocycle.CentralExtension.proj (WittAlgebra.virasoroCocycle 𝕜)
+noncomputable def toWittAlgebra : VirasoroAlgebra 𝕜 →ₗ⁅𝕜⁆ WittAlgebra 𝕜 := by
+  exact LieTwoCocycle.CentralExtension.proj (WittAlgebra.virasoroCocycle 𝕜)
 
 variable (𝕜)
 
 /-- The embedding of central elements to Virasoro algebra. -/
-noncomputable def ofCentral : 𝕜 →ₗ⁅𝕜⁆ VirasoroAlgebra 𝕜 :=
-  LieTwoCocycle.CentralExtension.emb (WittAlgebra.virasoroCocycle 𝕜)
+noncomputable def ofCentral : 𝕜 →ₗ⁅𝕜⁆ VirasoroAlgebra 𝕜 := by
+  exact LieTwoCocycle.CentralExtension.emb (WittAlgebra.virasoroCocycle 𝕜)
 
 lemma bracket_def' (X Y : VirasoroAlgebra 𝕜) :
     ⁅X, Y⁆ = ⟨⁅toWittAlgebra X, toWittAlgebra Y⁆,
@@ -112,7 +115,7 @@ lemma smul_def' (c : 𝕜) (X : VirasoroAlgebra 𝕜) :
     (c • X).2 = c * X.2 := rfl
 
 /-- The Virasoro algebra is a central extension of the Witt algebra. -/
-instance isCentralExtension : LieAlgebra.IsCentralExtension (ofCentral 𝕜) toWittAlgebra :=
+theorem isCentralExtension : LieAlgebra.IsCentralExtension (ofCentral 𝕜) toWittAlgebra :=
   LieTwoCocycle.CentralExtension.isCentralExtension _
 
 /-- The (commonly used) `Lₙ` elements of the Virasoro algebra, for `n ∈ ℤ`. -/

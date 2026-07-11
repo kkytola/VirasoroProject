@@ -3,9 +3,12 @@ Copyright (c) 2025 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
+import Mathlib.Algebra.Lie.OfAssociative
 import VirasoroProject.FockSpace
 import VirasoroProject.Sugawara
 import VirasoroProject.VirasoroVerma
+
+attribute [local instance 100] LieRing.ofAssociativeRing
 
 /-!
 # Sugawara construction applied to the charged Fock space
@@ -79,9 +82,12 @@ private lemma commutator_lsmul_jgen_of_module_uea_heisenbergAlgebra
     · simp only [hkl, ↓reduceIte, map_zero, zero_smul] at key ⊢
       simp_rw [← smul_assoc, ← sub_smul]
       convert key.symm using 1
+      rw [smul_eq_mul, smul_eq_mul, LieRing.of_associative_ring_bracket]
   ext v
   convert key v using 1
-  by_cases hkl : k + l = 0 <;> simp [hkl, Int.cast_smul_eq_zsmul]
+  all_goals first
+    | rfl
+    | (by_cases hkl : k + l = 0 <;> simp [hkl, Int.cast_smul_eq_zsmul] <;> rfl)
 
 open HeisenbergAlgebra Filter in
 -- TODO: Generalize to `kgen` acting as `κ • 1`, maybe.
@@ -123,6 +129,7 @@ lemma sugawaraRepresentation_of_module_uea_heisenbergAlgebra_cgen_apply
     (hc : ∀ (v : V), ιUEA 𝕜 (kgen 𝕜) • v = v)
     (v : ModuleOfModuleAlgebra 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) V) :
     sugawaraRepresentation_of_module_uea_heisenbergAlgebra 𝕜 htrunc hc (.cgen 𝕜) v = v := by
+  unfold sugawaraRepresentation_of_module_uea_heisenbergAlgebra
   have key := sugawaraRepresentation_cgen _
     ((fun v ↦ htrunc ((ModuleOfModuleAlgebra.unMkAddHom 𝕜 (𝓤 𝕜 (HeisenbergAlgebra 𝕜)) V) v)))
     (commutator_lsmul_jgen_of_module_uea_heisenbergAlgebra 𝕜 hc)
@@ -202,7 +209,8 @@ lemma sugawaraRepresentation_lgen_pos_apply_vacuum (α : 𝕜)
 /-- The central element of the Virasoro algebra acts as the identity on the charged Fock space. -/
 @[simp] lemma sugawaraRepresentation_cgen_apply (α : 𝕜) (v : ChargedFockSpace 𝕜 α) :
     sugawaraRepresentation 𝕜 α (.cgen 𝕜) v = v := by
-  simpa using sugawaraRepresentation_of_module_uea_heisenbergAlgebra_cgen_apply ..
+  unfold sugawaraRepresentation
+  exact sugawaraRepresentation_of_module_uea_heisenbergAlgebra_cgen_apply ..
 
 noncomputable instance instModuleUniversalEnvelopingAlgebraVirasoroAlgebra (α : 𝕜) :
     Module (𝓤 𝕜 (VirasoroAlgebra 𝕜)) (ChargedFockSpace 𝕜 α) :=

@@ -95,10 +95,14 @@ instance : AddCommMonoid (LieOneCochain 𝕜 𝓰 𝓪) where
     simp only [LieOneCochain.toLinearMap_add]
     exact AddCommMagma.add_comm β.toLinearMap β'.toLinearMap
   nsmul n β := { toLinearMap := n • β.toLinearMap }
-  nsmul_zero β := by ext1 ; simp only [zero_smul] ; rfl
+  nsmul_zero β := by
+    ext1
+    show (0 : ℕ) • β.toLinearMap = 0
+    exact zero_smul _ _
   nsmul_succ n β := by
     ext1
-    simpa only [LieOneCochain.toLinearMap_add] using succ_nsmul β.toLinearMap n
+    show (n + 1) • β.toLinearMap = n • β.toLinearMap + β.toLinearMap
+    exact succ_nsmul β.toLinearMap n
 
 instance : Module 𝕜 (LieOneCochain 𝕜 𝓰 𝓪) where
   one_smul β := by ext1 ; simp
@@ -117,9 +121,19 @@ instance : AddCommGroup (LieOneCochain 𝕜 𝓰 𝓪) where
   neg β := (-1 : 𝕜) • β
   sub β₁ β₂ := β₁ + (-1 : 𝕜) • β₂
   zsmul k β := (k : 𝕜) • β
-  zsmul_zero' β := by simp only [Int.cast_zero, zero_smul]
-  zsmul_succ' k β := by simp [add_smul]
-  zsmul_neg' k β := by simp [add_smul, smul_smul, add_comm]
+  zsmul_zero' β := by
+    show ((0 : ℤ) : 𝕜) • β = 0
+    simp
+  zsmul_succ' k β := by
+    show ((k.succ : ℤ) : 𝕜) • β = ((k : ℤ) : 𝕜) • β + β
+    push_cast
+    rw [add_smul, one_smul]
+  zsmul_neg' k β := by
+    show ((Int.negSucc k : ℤ) : 𝕜) • β = (-1 : 𝕜) • (((k.succ : ℤ) : 𝕜) • β)
+    rw [smul_smul]
+    congr 1
+    push_cast
+    ring
   neg_add_cancel β := by
     nth_rewrite 2 [← one_smul 𝕜 β]
     simp only [← add_smul, neg_add_cancel, zero_smul]
@@ -129,7 +143,7 @@ variable {𝕜 𝓰 𝓪}
 
 instance : FunLike (LieOneCochain 𝕜 𝓰 𝓪) 𝓰 𝓪 where
   coe := fun β X ↦ β.toLinearMap X
-  coe_injective' := fun β β' h ↦ by ext1 ; exact LinearMap.ext_iff.mpr (congrFun h)
+  coe_injective := fun β β' h ↦ by ext1 ; exact LinearMap.ext_iff.mpr (congrFun h)
 
 instance : LinearMapClass (LieOneCochain 𝕜 𝓰 𝓪) 𝕜 𝓰 𝓪 where
   map_add β X Y := β.toLinearMap.map_add X Y
@@ -154,7 +168,7 @@ namespace LieTwoCocycle
 
 instance : FunLike (LieTwoCocycle 𝕜 𝓰 𝓪) 𝓰 (𝓰 →ₗ[𝕜] 𝓪) where
   coe := fun γ X ↦ LieTwoCocycle.toBilin γ X
-  coe_injective' := by
+  coe_injective := by
     intro γ γ' h
     ext
     exact congrFun (congrArg DFunLike.coe (congrFun h _)) _
@@ -227,10 +241,14 @@ instance : AddCommMonoid (LieTwoCocycle 𝕜 𝓰 𝓪) where
     { toBilin := n • γ.toBilin
       self' := fun X ↦ by simp only [LinearMap.smul_apply, γ.self', smul_zero]
       leibniz' := fun X Y Z ↦ by simp only [LinearMap.smul_apply, γ.leibniz' X Y Z, smul_add] }
-  nsmul_zero γ := by ext1 ; simp only [zero_smul] ; rfl
+  nsmul_zero γ := by
+    ext1
+    show (0 : ℕ) • γ.toBilin = 0
+    exact zero_smul _ _
   nsmul_succ n γ := by
     ext1
-    simpa only [LieTwoCocycle.toBilin_add] using succ_nsmul γ.toBilin n
+    show (n + 1) • γ.toBilin = n • γ.toBilin + γ.toBilin
+    exact succ_nsmul γ.toBilin n
 
 instance : Module 𝕜 (LieTwoCocycle 𝕜 𝓰 𝓪) where
   one_smul γ := by ext1 ; simp
@@ -250,9 +268,19 @@ instance [LieAlgebra 𝕜 𝓰] [AddCommGroup 𝓪] [Module 𝕜 𝓪] :
   neg γ := (-1 : 𝕜) • γ
   sub γ₁ γ₂ := γ₁ + (-1 : 𝕜) • γ₂
   zsmul k γ := (k : 𝕜) • γ
-  zsmul_zero' γ := by simp only [Int.cast_zero, zero_smul]
-  zsmul_succ' k γ := by simp [add_smul]
-  zsmul_neg' k γ := by simp [add_smul, smul_smul, add_comm]
+  zsmul_zero' γ := by
+    show ((0 : ℤ) : 𝕜) • γ = 0
+    simp
+  zsmul_succ' k γ := by
+    show ((k.succ : ℤ) : 𝕜) • γ = ((k : ℤ) : 𝕜) • γ + γ
+    push_cast
+    rw [add_smul, one_smul]
+  zsmul_neg' k γ := by
+    show ((Int.negSucc k : ℤ) : 𝕜) • γ = (-1 : 𝕜) • (((k.succ : ℤ) : 𝕜) • γ)
+    rw [smul_smul]
+    congr 1
+    push_cast
+    ring
   neg_add_cancel γ := by
     nth_rewrite 2 [← one_smul 𝕜 γ]
     simp only [← add_smul, neg_add_cancel, zero_smul]
@@ -369,7 +397,7 @@ lemma cohomologyClass_add_bdry (γ : LieTwoCocycle 𝕜 𝓰 𝓪) (β : LieOneC
 lemma exists_eq_bdry (γ : LieTwoCocycle 𝕜 𝓰 𝓪) (hγ : γ.cohomologyClass = 0) :
     ∃ β : LieOneCochain 𝕜 𝓰 𝓪, γ = β.bdry := by
   simp_rw [@Eq.comm (LieTwoCocycle 𝕜 𝓰 𝓪) γ _]
-  simpa using (Submodule.Quotient.eq _).mp <|
+  simpa [LieOneCochain_bdryHom] using (Submodule.Quotient.eq _).mp <|
     show γ.cohomologyClass = LieTwoCocycle.cohomologyClass 0 by rw [hγ] ; rfl
 
 end LieTwoCocycle -- namespace
@@ -385,7 +413,7 @@ variable {𝕜 𝓰 𝓪}
 /-- For abelian Lie algebras, a 2-coboundary is necessarily zero. -/
 lemma LieOneCochain.bdry_apply_eq_zero_of_isLieAbelian (β : LieOneCochain 𝕜 𝓰 𝓪) (X Y : 𝓰) :
     β.bdry X Y = 0 := by
-  simp [LieOneCochain.bdry_apply]
+  simp [LieOneCochain.bdry_apply, trivial_lie_zero 𝓰 𝓰 X Y]
 
 variable (𝕜 𝓰 𝓪)
 
@@ -400,7 +428,8 @@ lemma LieTwoCoboundary.eq_bot_of_isLieAbelian :
 trivial kernel. -/
 lemma LieTwoCocycle.ker_toLieTwoCohomology_eq_bot_of_isLieAbelian :
     LinearMap.ker (LieTwoCocycle.toLieTwoCohomology 𝕜 𝓰 𝓪) = ⊥ := by
-  rw [LieTwoCocycle.toLieTwoCohomology, Submodule.ker_mkQ]
+  show LinearMap.ker (LieTwoCoboundary 𝕜 𝓰 𝓪).mkQ = ⊥
+  rw [Submodule.ker_mkQ]
   exact LieTwoCoboundary.eq_bot_of_isLieAbelian 𝕜 𝓰 𝓪
 
 /-- For abelian Lie algebras, the map from 2-cocycles to their cohomology classes is a linear

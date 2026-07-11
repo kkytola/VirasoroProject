@@ -3,10 +3,13 @@ Copyright (c) 2024 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
+import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.LinearAlgebra.Basis.Bilinear
 import VirasoroProject.IsCentralExtension
 import VirasoroProject.ToMathlib.Algebra.Lie.Abelian
 import VirasoroProject.ToMathlib.LinearAlgebra.Basis.Defs
+
+attribute [local instance 100] LieRing.ofAssociativeRing
 
 /-!
 # Heisenberg algebra
@@ -131,7 +134,7 @@ noncomputable def heisenbergCocycle :
   toBilin := heisenbergCocycleBilin 𝕜
   self' X := by
     apply self_eq_neg.mp
-    simpa only [LinearMap.neg_apply, LinearMap.coe_mk, AddHom.coe_mk]
+    simpa only [LinearMap.neg_apply, LinearMap.coe_mk, AddHom.coe_mk, LinearMap.flip_apply]
       using LinearMap.congr_fun₂ (heisenbergCocycleBilin_eq_neg_flip 𝕜) X X
   leibniz' X Y Z := by
     simp only [lie_def, map_zero, LinearMap.zero_apply, (lie_skew X Z).symm, neg_zero, add_zero]
@@ -178,24 +181,24 @@ lemma ext' {X Y : HeisenbergAlgebra 𝕜} (h₁ : X.1 = Y.1) (h₂ : X.2 = Y.2) 
   LieTwoCocycle.CentralExtension.ext h₁ h₂
 
 /-- The Heisenberg algebra is a Lie ring. -/
-noncomputable instance : LieRing (HeisenbergAlgebra 𝕜) :=
+@[reducible] noncomputable instance : LieRing (HeisenbergAlgebra 𝕜) :=
   LieTwoCocycle.CentralExtension.instLieRing _
 
 /-- The Heisenberg algebra is a Lie algebra. -/
-noncomputable instance : LieAlgebra 𝕜 (HeisenbergAlgebra 𝕜) :=
+@[reducible] noncomputable instance : LieAlgebra 𝕜 (HeisenbergAlgebra 𝕜) :=
   LieTwoCocycle.CentralExtension.instLieAlgebra _
 
 variable {𝕜}
 
 /-- The projection from Heisenberg algebra to the original abelian Lie algebra. -/
-noncomputable def toAbelianLieAlgebraOn : HeisenbergAlgebra 𝕜 →ₗ⁅𝕜⁆ AbelianLieAlgebraOn ℤ 𝕜 :=
-  LieTwoCocycle.CentralExtension.proj (AbelianLieAlgebraOn.heisenbergCocycle 𝕜)
+noncomputable def toAbelianLieAlgebraOn : HeisenbergAlgebra 𝕜 →ₗ⁅𝕜⁆ AbelianLieAlgebraOn ℤ 𝕜 := by
+  exact LieTwoCocycle.CentralExtension.proj (AbelianLieAlgebraOn.heisenbergCocycle 𝕜)
 
 variable (𝕜)
 
 /-- The embedding of central elements to Heisenberg algebra. -/
-noncomputable def ofCentral : 𝕜 →ₗ⁅𝕜⁆ HeisenbergAlgebra 𝕜 :=
-  LieTwoCocycle.CentralExtension.emb (AbelianLieAlgebraOn.heisenbergCocycle 𝕜)
+noncomputable def ofCentral : 𝕜 →ₗ⁅𝕜⁆ HeisenbergAlgebra 𝕜 := by
+  exact LieTwoCocycle.CentralExtension.emb (AbelianLieAlgebraOn.heisenbergCocycle 𝕜)
 
 lemma bracket_def' (X Y : HeisenbergAlgebra 𝕜) :
     ⁅X, Y⁆ = ⟨⁅toAbelianLieAlgebraOn X, toAbelianLieAlgebraOn Y⁆,
@@ -231,7 +234,7 @@ lemma smul_def' (c : 𝕜) (X : HeisenbergAlgebra 𝕜) :
     (c • X).2 = c * X.2 := rfl
 
 /-- The Heisenberg algebra is a central extension of the Witt algebra. -/
-instance isCentralExtension : LieAlgebra.IsCentralExtension (ofCentral 𝕜) toAbelianLieAlgebraOn :=
+theorem isCentralExtension : LieAlgebra.IsCentralExtension (ofCentral 𝕜) toAbelianLieAlgebraOn :=
   LieTwoCocycle.CentralExtension.isCentralExtension _
 
 /-- The (commonly used) `Jₖ` elements of the Heisenberg algebra, for `k ∈ ℤ`. -/
@@ -270,7 +273,8 @@ lemma toAbelianLieAlgebraOn_kgen :
     · simp [kgen_eq']
     · simp [AbelianLieAlgebraOn.heisenbergCocycle_apply_jgen_jgen, kgen_eq', h]
   · simp [h]
-    apply ext' <;> simp [AbelianLieAlgebraOn.heisenbergCocycle_apply_jgen_jgen, h]
+    apply ext' <;>
+      simp [AbelianLieAlgebraOn.heisenbergCocycle_apply_jgen_jgen, h] <;> rfl
 
 /-- A section of the standard projection from the Heisenberg algebra to the underlying
 abelian Lie algebra. -/

@@ -3,9 +3,12 @@ Copyright (c) 2025 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
+import Mathlib.Algebra.Lie.OfAssociative
 import VirasoroProject.HeisenbergAlgebra
 import VirasoroProject.IndexTri
 import VirasoroProject.LieVerma
+
+attribute [local instance 100] LieRing.ofAssociativeRing
 
 /-!
 # Verma modules for the Virasoro algebra
@@ -143,9 +146,11 @@ lemma heisenbergTri_cartan_basis_none_eq_kgen :
     (heisenbergTri_cartan_basis 𝕜) ⟨none, Set.mem_insert none {some 0}⟩ = heisenbergTri_kgen 𝕜 := by
   ext
   simp only [heisenbergTri_cartan_basis, TriangularDecomposition.ofBasis.basis_part, indexTri,
-             heisenbergTri_kgen_val]
+             heisenbergTri_kgen_val, HeisenbergAlgebra.kgen]
   convert (basisJK 𝕜).basis_submodule_span_apply {none, some 0} ⟨none, Set.mem_insert none {some 0}⟩
-  simp
+  all_goals first
+    | rfl
+    | simp [HeisenbergAlgebra.jgen_eq', HeisenbergAlgebra.kgen_eq']
 
 open HeisenbergAlgebra in
 lemma heisenbergTri_cartan_basis_some_eq_jzero :
@@ -153,10 +158,13 @@ lemma heisenbergTri_cartan_basis_some_eq_jzero :
       = heisenbergTri_jzero 𝕜 := by
   ext
   simp only [heisenbergTri_cartan_basis, TriangularDecomposition.ofBasis.basis_part, indexTri,
-             heisenbergTri_jzero_val]
+             heisenbergTri_jzero_val, HeisenbergAlgebra.jgen]
   convert (basisJK 𝕜).basis_submodule_span_apply {none, some 0}
           ⟨some 0, Set.mem_insert_of_mem none rfl⟩
-  simp
+  all_goals first
+    | rfl
+    | simp [HeisenbergAlgebra.jgen_eq', HeisenbergAlgebra.kgen_eq']
+    | simp [HeisenbergAlgebra.jgen_eq', HeisenbergAlgebra.kgen_eq']
 
 lemma heisenbergTri_kgen_mem_cartan :
     .kgen 𝕜 ∈ (heisenbergTri 𝕜).cartan := by
