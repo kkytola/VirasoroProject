@@ -165,3 +165,18 @@ Pick one, roughly in order of robustness:
 
 Recommended: apply fix (1), verify `lake build` succeeds from a clean
 `.lake` directory, and commit the regenerated `lake-manifest.json`.
+
+## Status in this checkout
+
+Fix (3), the local-only workaround, has been applied here: the
+`.lake/packages/UnicodeBasic` checkout was manually moved onto the pinned
+commit (`git fetch origin cff8377... && git checkout --detach cff8377...`).
+`lake build` now proceeds past dependency resolution and compiles
+Mathlib/the project normally from this machine. This is **not** a fix to
+the repository itself — no tracked file changed, `.lake/` is gitignored,
+so a fresh clone (and CI) will still fail until fix (1) or (2) is applied
+and committed. We don't have push access to
+`fgdorais/lean4-unicode-basic`, so the underlying orphaned commit can't be
+fixed upstream directly; worth considering opening an issue/PR there
+(e.g. pointing out the history rewrite) or, more practically, just
+carrying out fix (1)/(2) here regardless of what upstream does.
