@@ -15,6 +15,16 @@ import «VirasoroProject».LieCohomologySmallDegree
 import «VirasoroProject».LieVerma
 import «VirasoroProject».SectionSES
 import «VirasoroProject».Sugawara
+import «VirasoroProject».ToMathlib.Algebra.Lie.Abelian
+import «VirasoroProject».ToMathlib.Algebra.Lie.Basic
+import «VirasoroProject».ToMathlib.LinearAlgebra.Basis.Defs
+import «VirasoroProject».ToMathlib.LinearAlgebra.Basis.FinsumRepr
+import «VirasoroProject».ToMathlib.LinearAlgebra.Finsupp.Supported
+import «VirasoroProject».ToMathlib.Topology.Algebra.BigOperators.FinProd
+import «VirasoroProject».ToMathlib.Topology.Algebra.ConstMulAction
+import «VirasoroProject».ToMathlib.Topology.Algebra.InfiniteSum.Basic
+import «VirasoroProject».ToMathlib.Topology.Algebra.Module.LinearMap.Defs
+import «VirasoroProject».ToMathlib.Topology.Order
 import «VirasoroProject».VermaModule
 import «VirasoroProject».VirasoroAlgebra
 import «VirasoroProject».VirasoroCocycle
