@@ -101,6 +101,11 @@ noncomputable def representationOfBasis
     have key := LieAlgebra.representationOfBasisAux_property B genComm
     exact LinearMap.congr_fun (LinearMap.congr_fun key X) Y
 
+/-- On basis elements, `LieAlgebra.representationOfBasis` acts by the assigned operators. -/
+@[simp] lemma representationOfBasis_apply_basis (i : ι) :
+    representationOfBasis B genComm (B i) = genOper i :=
+  representationOfBasisAux_apply_basis B genOper i
+
 end representation
 
 open LieAlgebra in

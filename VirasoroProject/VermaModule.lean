@@ -5,7 +5,6 @@ Authors: Kalle Kytölä
 -/
 import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.GroupTheory.GroupAction.Ring
-import Mathlib.Order.CompletePartialOrder
 
 /-!
 # Verma modules over algebras

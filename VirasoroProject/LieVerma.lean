@@ -92,7 +92,7 @@ def ofBasis {ι : Type*} [Nontrivial 𝕜] [NoZeroSMulDivisors 𝕜 𝓰]
               + ∑ᶠ i ∈ Bp 0, B.repr X i • B i := by
         nth_rw 1 [← B.finsum_repr_smul_basis X]
         have supp_finite_aux : (Function.support (fun i ↦ B.repr X i • B i)).Finite := by
-          apply (Finsupp.finite_support (B.repr X)).subset
+          apply (Finsupp.hasFiniteSupport (B.repr X)).subset
           intro i hi
           simp only [Function.mem_support, ne_eq] at hi ⊢
           exact fun h ↦ hi (by rw [h, zero_smul])

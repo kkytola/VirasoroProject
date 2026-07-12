@@ -3,11 +3,9 @@ Copyright (c) 2025 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
-import Mathlib.Algebra.Order.Ring.Star
-import Mathlib.Analysis.Normed.Ring.Lemmas
-import Mathlib.Data.Int.Star
 import Mathlib.Data.Sign.Defs
-import Mathlib.Order.CompletePartialOrder
+import Mathlib.Data.Set.Lattice
+import Mathlib.Tactic.Linarith
 
 /-!
 # An auxiliary tri-partition of indices

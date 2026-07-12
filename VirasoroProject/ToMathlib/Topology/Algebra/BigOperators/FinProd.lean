@@ -1,4 +1,17 @@
+/-
+Copyright (c) 2025 Kalle Kytölä. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kalle Kytölä
+-/
 import Mathlib.Algebra.BigOperators.Finprod
+
+/-!
+# Auxiliary lemmas about sums over finite supports
+
+Lemmas about `Finset.sum` and `finsum` interacting with `Function.support`, candidates for
+upstreaming to Mathlib. The lemma `finsum_add_finsum_compl` is used in the bosonic Sugawara
+construction (`VirasoroProject.Sugawara`).
+-/
 
 section
 

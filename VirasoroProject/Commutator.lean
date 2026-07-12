@@ -35,6 +35,16 @@ lemma commutator_comm (A B : V →ₗ[𝕜] V) :
     A.commutator B = - B.commutator A := by
   simp [LinearMap.commutator]
 
+lemma add_commutator (A B C : V →ₗ[𝕜] V) :
+    (A + B).commutator C = A.commutator C + B.commutator C := by
+  simp only [commutator, add_mul, mul_add, sub_eq_add_neg, neg_add_rev]
+  grind
+
+lemma commutator_add (A B C : V →ₗ[𝕜] V) :
+    A.commutator (B + C) = A.commutator B + A.commutator C := by
+  simp only [commutator, add_mul, mul_add, sub_eq_add_neg, neg_add_rev]
+  grind
+
 lemma mul_eq_mul_add_commutator (A B : V →ₗ[𝕜] V) :
     A * B = B * A + A.commutator B := by
   simp [LinearMap.commutator]
@@ -52,6 +62,16 @@ lemma commutator_pair' (A B C : V →ₗ[𝕜] V) :
   calc  A * (B * C) - B * C * A
     _ = A * B * C - B * A * C + B * A * C - B * C * A     := by simp [← mul_assoc]
     _ = B * (A * C - C * A) + (A * B - B * A) * C         := by simp [mul_sub, sub_mul, ← mul_assoc]
+
+lemma smul_commutator {𝕜 : Type*} [Field 𝕜] (V : Type*) [AddCommGroup V] [Module 𝕜 V]
+    (c : 𝕜) (A B : V →ₗ[𝕜] V) :
+    (c • A).commutator B = c • A.commutator B := by
+  simp [LinearMap.commutator, smul_sub]
+
+lemma commutator_smul {𝕜 : Type*} [Field 𝕜] (V : Type*) [AddCommGroup V] [Module 𝕜 V]
+    (c : 𝕜) (A B : V →ₗ[𝕜] V) :
+    A.commutator (c • B) = c • A.commutator B := by
+  simp [LinearMap.commutator, smul_sub]
 
 @[simp] lemma commutator_smul_one {𝕜 : Type*} [Field 𝕜] (V : Type*) [AddCommGroup V] [Module 𝕜 V]
     (A : V →ₗ[𝕜] V) (c : 𝕜) :

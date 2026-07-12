@@ -1,6 +1,8 @@
 -- This module serves as the root of the `VirasoroProject` library.
 -- Import modules here that should be built as part of the library.
+import «VirasoroProject».CentralChargeCalc
 import «VirasoroProject».CentralExtension
+import «VirasoroProject».Commutator
 import «VirasoroProject».CyclicTripleSum
 import «VirasoroProject».FockSpace
 import «VirasoroProject».FockSpaceSugawara

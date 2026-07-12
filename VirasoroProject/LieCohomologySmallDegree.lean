@@ -258,8 +258,7 @@ instance : Module 𝕜 (LieTwoCocycle 𝕜 𝓰 𝓪) where
   add_smul c c' γ := by ext1 ; simpa using Module.add_smul c c' γ.toBilin
   zero_smul γ := by ext1 ; simp
 
-instance [LieAlgebra 𝕜 𝓰] [AddCommGroup 𝓪] [Module 𝕜 𝓪] :
-    AddCommGroup (LieTwoCocycle 𝕜 𝓰 𝓪) where
+instance : AddCommGroup (LieTwoCocycle 𝕜 𝓰 𝓪) where
   zero_add γ := AddZeroClass.zero_add γ
   add_zero γ := AddZeroClass.add_zero γ
   nsmul := HSMul.hSMul

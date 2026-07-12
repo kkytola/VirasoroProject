@@ -16,7 +16,7 @@ lemma finsum_mem_span {ι R V : Type*} [Semiring R] [AddCommMonoid V] [Module R 
     ∑ᶠ i, cfs i • vs i ∈ Submodule.span R (Set.range vs) := by
   by_cases h : {i | cfs i • vs i ≠ 0}.Finite
   · let s : Finset ι := h.toFinset
-    rw [finsum_eq_finset_sum_of_support_subset (s := s) _ (fun i hi ↦ by simpa [s] using hi)]
+    rw [finsum_eq_finsetSum_of_support_subset (s := s) _ (fun i hi ↦ by simpa [s] using hi)]
     apply Submodule.sum_smul_mem
     exact fun i his ↦ Submodule.mem_span_of_mem (Set.mem_range_self i)
   · suffices junk : ∑ᶠ i, cfs i • vs i = 0 by simp [junk]
@@ -29,7 +29,7 @@ lemma finsum_mem_mem_span {ι R V : Type*}
     ∑ᶠ i ∈ s, cfs i • vs i ∈ Submodule.span R (vs '' s) := by
   by_cases h : {i | cfs i • vs i ≠ 0 ∧ i ∈ s}.Finite
   · let t : Finset ι := h.toFinset
-    rw [finsum_eq_finset_sum_of_support_subset (s := t) _ ?_]
+    rw [finsum_eq_finsetSum_of_support_subset (s := t) _ ?_]
     · classical
       have aux : ∑ i ∈ t, ∑ᶠ (_ : i ∈ s), cfs i • vs i = ∑ i ∈ t.filter s, cfs i • vs i  := by
         rw [Finset.sum_filter]
@@ -74,7 +74,7 @@ lemma finsum_repr_smul_basis {R M ι : Type*} [Semiring R] [Nontrivial R]
     [AddCommGroup M] [Module R M] [NoZeroSMulDivisors R M] (B : Basis ι R M) (v : M) :
     ∑ᶠ i, B.repr v i • B i = v := by
   have obs : (Function.support fun i ↦ B.repr v i • B i).Finite := by
-    apply (Finsupp.finite_support (B.repr v)).subset
+    apply (Finsupp.hasFiniteSupport (B.repr v)).subset
     intro i hi
     simp only [Function.mem_support, ne_eq] at hi ⊢
     exact fun h ↦ hi (by rw [h, zero_smul])
@@ -83,7 +83,7 @@ lemma finsum_repr_smul_basis {R M ι : Type*} [Semiring R] [Nontrivial R]
   rw [map_sum]
   simp only [map_smul, Basis.repr_self, Finsupp.smul_single, smul_eq_mul, mul_one]
   ext i
-  simp only [Finsupp.coe_finset_sum, Finset.sum_apply]
+  simp only [Finsupp.coe_finsetSum, Finset.sum_apply]
   rw [Finset.sum_eq_single i]
   · simp
   · intro j _ j_ne_i
@@ -131,12 +131,12 @@ noncomputable def basis_submodule_span {R M ι : Type*} [Semiring R] [Nontrivial
       simp only [Finsupp.coe_add, Pi.add_apply, AddMemClass.mk_add_mk, Subtype.mk.injEq]
       rw [← finsum_add_distrib]
       · simp [add_smul]
-      · exact cf₁.finite_support.subset <| smul_support_subset_left ..
-      · exact cf₂.finite_support.subset <| smul_support_subset_left ..
+      · exact cf₁.hasFiniteSupport.subset <| smul_support_subset_left ..
+      · exact cf₂.hasFiniteSupport.subset <| smul_support_subset_left ..
     map_smul' r cf := by
       simp only [Finsupp.coe_smul, Pi.smul_apply, smul_assoc, RingHom.id_apply, SetLike.mk_smul_mk,
                  Subtype.mk.injEq]
-      exact (smul_finsum' r (cf.finite_support.subset <| smul_support_subset_left ..)).symm }
+      exact (smul_finsum' r (cf.hasFiniteSupport.subset <| smul_support_subset_left ..)).symm }
   have fog : f ∘ g = id := by
     funext cf
     ext i

@@ -3,12 +3,6 @@ Copyright (c) 2024 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
-import Mathlib.Algebra.Azumaya.Basic
-import Mathlib.Algebra.Order.Ring.Star
-import Mathlib.Analysis.Normed.Ring.Lemmas
-import Mathlib.Data.Int.Star
-import Mathlib.GroupTheory.MonoidLocalization.Basic
-import Mathlib.LinearAlgebra.Dual.Lemmas
 import VirasoroProject.LieCohomologySmallDegree
 import VirasoroProject.WittAlgebra
 /-!

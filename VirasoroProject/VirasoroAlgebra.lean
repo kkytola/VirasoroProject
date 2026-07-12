@@ -76,14 +76,14 @@ lemma ext' {X Y : VirasoroAlgebra 𝕜} (h₁ : X.1 = Y.1) (h₂ : X.2 = Y.2) :
 variable {𝕜}
 
 /-- The projection from Virasoro algebra to Witt algebra. -/
-noncomputable def toWittAlgebra : VirasoroAlgebra 𝕜 →ₗ⁅𝕜⁆ WittAlgebra 𝕜 := by
-  exact LieTwoCocycle.CentralExtension.proj (WittAlgebra.virasoroCocycle 𝕜)
+noncomputable def toWittAlgebra : VirasoroAlgebra 𝕜 →ₗ⁅𝕜⁆ WittAlgebra 𝕜 :=
+  LieTwoCocycle.CentralExtension.proj (WittAlgebra.virasoroCocycle 𝕜)
 
 variable (𝕜)
 
 /-- The embedding of central elements to Virasoro algebra. -/
-noncomputable def ofCentral : 𝕜 →ₗ⁅𝕜⁆ VirasoroAlgebra 𝕜 := by
-  exact LieTwoCocycle.CentralExtension.emb (WittAlgebra.virasoroCocycle 𝕜)
+noncomputable def ofCentral : 𝕜 →ₗ⁅𝕜⁆ VirasoroAlgebra 𝕜 :=
+  LieTwoCocycle.CentralExtension.emb (WittAlgebra.virasoroCocycle 𝕜)
 
 lemma bracket_def' (X Y : VirasoroAlgebra 𝕜) :
     ⁅X, Y⁆ = ⟨⁅toWittAlgebra X, toWittAlgebra Y⁆,
@@ -101,6 +101,10 @@ lemma add_def' (X Y : VirasoroAlgebra 𝕜) :
 
 lemma smul_def' (c : 𝕜) (X : VirasoroAlgebra 𝕜) :
     c • X = ⟨c • X.1, c * X.2⟩ := rfl
+
+@[simp] lemma zero_fst : (0 : VirasoroAlgebra 𝕜).1 = 0 := rfl
+
+@[simp] lemma zero_snd : (0 : VirasoroAlgebra 𝕜).2 = 0 := rfl
 
 @[simp] lemma add_fst (X Y : VirasoroAlgebra 𝕜) :
     (X + Y).1 = X.1 + Y.1 := rfl
@@ -131,6 +135,14 @@ lemma cgen_eq' : cgen 𝕜 = ⟨0, 1⟩ := rfl
 
 lemma lgen_eq' (n : ℤ) : lgen 𝕜 n = ⟨WittAlgebra.lgen 𝕜 n, 0⟩ := rfl
 
+@[simp] lemma lgen_fst (n : ℤ) : (lgen 𝕜 n).1 = WittAlgebra.lgen 𝕜 n := rfl
+
+@[simp] lemma lgen_snd (n : ℤ) : (lgen 𝕜 n).2 = 0 := rfl
+
+@[simp] lemma cgen_fst : (cgen 𝕜).1 = 0 := rfl
+
+@[simp] lemma cgen_snd : (cgen 𝕜).2 = 1 := rfl
+
 @[simp] lemma ofCentral_apply (a : 𝕜) : ofCentral 𝕜 a = a • (cgen 𝕜) := by
   change (⟨0, a⟩ : VirasoroAlgebra 𝕜) = a • ⟨0, 1⟩
   aesop
@@ -152,16 +164,8 @@ lemma lgen_eq' (n : ℤ) : lgen 𝕜 n = ⟨WittAlgebra.lgen 𝕜 n, 0⟩ := rfl
 @[simp] lemma lgen_bracket (n m : ℤ) :
     ⁅lgen 𝕜 n, lgen 𝕜 m⁆
       = (n - m : 𝕜) • lgen 𝕜 (n + m) + if n + m = 0 then ((n^3 - n : 𝕜)/12) • cgen 𝕜 else 0 := by
-  simp_rw [bracket_def']
-  by_cases h : n + m = 0
-  · simp [h]
-    apply ext'
-    · simp [lgen, cgen_eq']
-    · simp [WittAlgebra.virasoroCocycle_apply_lgen_lgen, lgen, cgen_eq', h]
-  · simp [h]
-    apply ext'
-    · simp [lgen]
-    · simp [WittAlgebra.virasoroCocycle_apply_lgen_lgen, h, lgen]
+  by_cases h : n + m = 0 <;> (apply ext') <;>
+    simp [h, WittAlgebra.virasoroCocycle_apply_lgen_lgen]
 
 lemma lgen_bracket' (n m : ℤ) :
     ⁅lgen 𝕜 n, lgen 𝕜 m⁆
