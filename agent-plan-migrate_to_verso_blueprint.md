@@ -1,6 +1,8 @@
 # Migration plan: `leanblueprint` (plasTeX) → Verso blueprint
 
-**Status:** plan — not yet implemented.
+**Status:** implemented through Phase 5 (2026-07-28); Phase 6 (decommission) deferred
+until the first green Pages deployment, per §10. See "Implementation record" at the
+end of this file for resolved open questions and documented deviations.
 **Audience:** a coding agent (orchestrator) and its subagents.
 **Repo:** `VirasoroProject` (Lean 4 formalization of Virasoro-algebra topics, depends on Mathlib).
 
@@ -584,3 +586,78 @@ working.
   deployment has been manually spot-checked.
 - Suggested PR sequence: (1) toolchain baseline, (2) scaffold+pilot, (3) macros+chapters
   [+parity script], (4) CI+links cutover, (5) decommission.
+
+---
+
+## Implementation record (added 2026-07-28)
+
+### Resolved open questions (§4.4)
+
+- **Q1 — parent path-require:** YES. `require VirasoroProject from ".."` works with the
+  TOML parent lakefile; VirasoroProject artifacts are reused from `../.lake/build`.
+- **Q2 — `experimental.module`:** no interference with non-module VirasoroProject/Mathlib
+  imports. Kept as in the template.
+- **Q3 — labels with `:` and `.`:** fully supported (upstream `LabelNameParsing.lean`
+  handles TeX-style labels explicitly; stored via `Name.mkSimple`, no dot-splitting).
+  All labels kept verbatim.
+- **Q4 — titled statements:** there is NO title option (full option list:
+  `lean, autoDeps, parent, priority, owner, tags, effort, pr_url, uses, uses_origin,
+  uses_intent`). Bracket titles became bold run-ins `*Title.*` as the first body line.
+- **Q5 — display math:** `\begin{align*}` → `` $$`\begin{aligned}…\end{aligned}` ``
+  (KaTeX renders the math, `throwOnError:false`). Numbered `align` treated the same;
+  the 3 `eq:` labels dropped. NOTE (correction to §1.2/§7.1): two `\eqref`s DID exist
+  in `lie_algebra_cohomology.tex`; the references were removed with the sentences kept
+  meaningful (documented in that chapter's port).
+- **Q6 — `--output <dir>`:** replaces `_out/site`; HTML lands under `<dir>/html-multi`.
+  CI copies `_out/site/html-multi` → `home_page/blueprint` instead.
+- **Q7 — PDF:** no LaTeX engine on the dev machine; `vbp build --pdf` (lualatex) is a
+  `continue-on-error` step in CI — the HTML site deploys even if the PDF fails.
+
+### Deviations from the plan
+
+1. **Toolchain kept at `v4.32.0-rc1`** (plan B of §4) instead of bumping to stable:
+   the baseline build was green with the existing cache, and VersoBlueprint@v4.32.0
+   compiles fine under rc1. `blueprint-verso/lean-toolchain` pins rc1 explicitly
+   (lake update had auto-written v4.32.0-stable, which broke the mathlib cache).
+   `blueprint-verso/lake-manifest.json` was reconciled so that mathlib and friends
+   match the root manifest exactly (lake had floated `plausible`; re-pinned).
+2. **No LT witness blocks** (§7.1): parity is machine-checked directly against the
+   LaTeX sources by `blueprint-verso/scripts/parity_check.py` (node kinds, labels,
+   per-node lean-name multisets, statement/proof uses-edges), which supersedes the
+   witness mechanism. PARITY OK: 53 statements / 29 proofs / 69 lean refs / 86
+   uses-edges on both sides.
+3. **Verso markup, not markdown**: bold is `*x*`, emphasis `_x_` (Verso linter).
+   PORTING.md was corrected accordingly after the pilot build.
+4. **Chapter imports** are per-module (`import VirasoroProject.WittAlgebra` etc.,
+   narrowest set containing the referenced declarations) as the plan originally
+   wanted, not the umbrella import PORTING.md temporarily suggested.
+
+### Pre-existing defects in the OLD blueprint discovered by the port
+
+1. `witt_cohomology.tex:34`: `\uses{def:CyclicTripleSum}` — label defined nowhere
+   (dangling edge). Kept verbatim; parity script reports it as a NOTE.
+2. `sugawara.tex:357`: `\uses{..., def:VirasoroVerma}` — typo for
+   `def:VirasoroVermaModule`. Kept verbatim; NOTE in parity script.
+3. `lie_algebra_cohomology.tex` / `central_extension.tex`:
+   `\lean{VirasoroProject.LieOneCochain.bdryHom}` — the declaration is actually
+   named `VirasoroProject.LieOneCochain_bdryHom` (underscore). The integration build
+   warns ("could not be resolved") and would render a dead link, so the name was
+   CORRECTED in the port (both occurrences); allowlisted in `parity_check.py`
+   (`lean_fixes`).
+4. Duplicate LaTeX label `eq:LieTwoCocycle.leibniz` in two files (§1.2) — moot in
+   the port, since `eq:` labels are dropped.
+
+### Status parity (Phase 4 result)
+
+The generated graph has 55 nodes / 86 edges (53 real nodes + 2 phantoms for the
+pre-existing dangling labels). Automatic status: 52/53 statements `formalized`,
+proofs `formalized(WithAncestors)`. The single exception is
+`thm:CentralExtensionOfCohomologyClass` (status `ready`): the old blueprint marked
+it `\leanok` while its `\lean{}` was commented out — i.e. the old blueprint
+over-claimed; Verso reports the honest status. Attaching the intended declaration
+to that node is a content follow-up for the author, not part of the verbatim port.
+
+Cosmetic note: node display labels render with guillemets («def:WittAlgebra») in
+the graph UI, an artifact of Lean `Name` printing for labels containing `:`.
+Harmless; could be polished later via the `verso.blueprint.trimTeXLabelPrefix`
+option or a label rename if desired.
