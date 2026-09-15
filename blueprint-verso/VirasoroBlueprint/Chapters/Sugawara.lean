@@ -327,7 +327,7 @@ $`\vir` with central charge $`c = 1` via the Sugawara construction
 ({bpref "thm:SugawaraRepresentation"}[]).
 :::
 
-:::lemma_ "lem:VacuumHighestWeightVector" (uses := "def:ChargedFockSpaceSugawara, def:VirasoroVerma") (lean := "VirasoroProject.ChargedFockSpace.sugawaraRepresentation_lgen_zero_apply_vacuum, VirasoroProject.ChargedFockSpace.sugawaraRepresentation_lgen_pos_apply_vacuum, VirasoroProject.ChargedFockSpace.virasoroVermaToChargedFockSpace")
+:::lemma_ "lem:VacuumHighestWeightVector" (uses := "def:ChargedFockSpaceSugawara, def:VirasoroVermaModule") (lean := "VirasoroProject.ChargedFockSpace.sugawaraRepresentation_lgen_zero_apply_vacuum, VirasoroProject.ChargedFockSpace.sugawaraRepresentation_lgen_pos_apply_vacuum, VirasoroProject.ChargedFockSpace.virasoroVermaToChargedFockSpace")
 *The vacuum of the charged Fock space is a highest weight vector.*
 The vacuum vector $`\FockVacuum^{\alpha}` of the charged Fock space of
 charge $`\alpha \in \bbk` satisfies

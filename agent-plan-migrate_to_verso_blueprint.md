@@ -635,9 +635,14 @@ working.
 ### Pre-existing defects in the OLD blueprint discovered by the port
 
 1. `witt_cohomology.tex:34`: `\uses{def:CyclicTripleSum}` — label defined nowhere
-   (dangling edge). Kept verbatim; parity script reports it as a NOTE.
+   (dangling edge). FIXED (2026-07-28, post-port, at the author's request): a
+   `def:CyclicTripleSum` node was added at the top of the Lie-algebra-cohomology
+   chapter, linked to `VirasoroProject.cyclicTripleSum` and
+   `VirasoroProject.cyclicTripleSumHom`; its prose is a `TO BE WRITTEN`
+   placeholder for the author. Allowlisted in `parity_check.py` (`added_nodes`).
 2. `sugawara.tex:357`: `\uses{..., def:VirasoroVerma}` — typo for
-   `def:VirasoroVermaModule`. Kept verbatim; NOTE in parity script.
+   `def:VirasoroVermaModule`. FIXED (2026-07-28, post-port, at the author's
+   request); allowlisted in `parity_check.py` (`renames`).
 3. `lie_algebra_cohomology.tex` / `central_extension.tex`:
    `\lean{VirasoroProject.LieOneCochain.bdryHom}` — the declaration is actually
    named `VirasoroProject.LieOneCochain_bdryHom` (underscore). The integration build
@@ -659,14 +664,15 @@ too. Formalizing it (or linking a declaration, if one exists) is a content
 follow-up for the author, not part of the verbatim port.
 
 The 15 nodes reported as locally formalized but with an incomplete dependency
-closure are exactly the downstream cone of the two phantom nodes created by the
+closure were exactly the downstream cone of the two phantom nodes created by the
 old blueprint's dangling `\uses{}` labels (verified: 15 of 15 explained, none
-unexplained). `def:CyclicTripleSum` alone has 15 descendants, since it feeds the
+unexplained). `def:CyclicTripleSum` alone had 15 descendants, since it feeds the
 proof of `lem:WittAlgebraIsLieAlgebra` and thus the whole Witt/Virasoro chain.
-The underlying mathematics *is* formalized (`VirasoroProject/CyclicTripleSum.lean`);
-adding a blueprint node for it, and fixing the `def:VirasoroVerma` →
-`def:VirasoroVermaModule` typo, would turn that whole cone fully green. Both are
-content fixes to the blueprint, deliberately out of scope for the verbatim port.
+
+Both dangling labels were fixed on 2026-07-28 at the author's request (defects 1
+and 2 above). The graph is now 54 nodes / 86 edges with **53/54 statements and
+53/54 proofs fully formalized**; the sole remaining incomplete node is
+`thm:CentralExtensionOfCohomologyClass`, which is genuinely unformalized.
 
 Cosmetic note: node display labels render with guillemets («def:WittAlgebra») in
 the graph UI, an artifact of Lean `Name` printing for labels containing `:`.

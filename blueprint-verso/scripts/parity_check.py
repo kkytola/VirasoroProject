@@ -108,10 +108,21 @@ def main():
     root = Path(__file__).resolve().parent.parent.parent
     old_dir = root / "blueprint" / "src" / "chapters"
     new_dir = root / "blueprint-verso" / "VirasoroBlueprint" / "Chapters"
-    renames = {}  # old label -> new label, for documented deviations
-    # Documented corrections of Lean names that were wrong in the old blueprint
-    # (the declaration never existed under the old name; see the migration plan's
-    # "Pre-existing defects" list).
+    # Documented, deliberate corrections of defects in the old blueprint; see the
+    # migration plan's "Pre-existing defects" list. Everything not listed here must
+    # still match the old blueprint exactly.
+    #
+    # old label -> new label: `def:VirasoroVerma` was a typo in sugawara.tex for the
+    # label actually defined in verma.tex.
+    renames = {
+        "def:VirasoroVerma": "def:VirasoroVermaModule",
+    }
+    # Nodes added on the Verso side that the old blueprint never defined.
+    # `def:CyclicTripleSum` was cited by witt_cohomology.tex but defined nowhere.
+    added_nodes = {
+        "def:CyclicTripleSum",
+    }
+    # Lean names that never existed under the name the old blueprint used.
     lean_fixes = {
         "VirasoroProject.LieOneCochain.bdryHom": "VirasoroProject.LieOneCochain_bdryHom",
     }
@@ -143,8 +154,10 @@ def main():
         if lab not in new:
             err(f"node {lab!r} missing from Verso blueprint")
     for lab in new:
-        if lab not in old:
+        if lab not in old and lab not in added_nodes:
             err(f"node {lab!r} not present in old blueprint")
+    for lab in sorted(added_nodes & set(new)):
+        print(f"NOTE: node added on the Verso side (documented): {lab}")
     for lab in sorted(set(old) & set(new)):
         o, n = old[lab], new[lab]
         if o.kind != n.kind:

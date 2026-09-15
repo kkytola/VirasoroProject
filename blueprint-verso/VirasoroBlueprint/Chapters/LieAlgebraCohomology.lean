@@ -1,6 +1,7 @@
 import Verso
 import VersoManual
 import VersoBlueprint
+import VirasoroProject.CyclicTripleSum
 import VirasoroProject.LieCohomologySmallDegree
 import VirasoroBlueprint.TeXPrelude
 
@@ -14,6 +15,11 @@ Let $`\bbk` be a field and let $`\gLie` be a Lie algebra over $`\bbk`.
 Fix also a vector space $`\aLie` over $`\bbk`, (interpreted, when necessary,
 as an abelian Lie algebra, i.e., all Lie brackets in $`\aLie` are taken to
 be zero).
+
+:::definition "def:CyclicTripleSum" (lean := "VirasoroProject.cyclicTripleSum, VirasoroProject.cyclicTripleSumHom")
+*Cyclic triple sum.*
+TO BE WRITTEN
+:::
 
 :::definition "def:LieOneCochain" (lean := "VirasoroProject.LieOneCochain")
 *Lie algebra 1-cochain.*
