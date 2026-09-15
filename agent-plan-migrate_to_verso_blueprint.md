@@ -652,10 +652,21 @@ working.
 The generated graph has 55 nodes / 86 edges (53 real nodes + 2 phantoms for the
 pre-existing dangling labels). Automatic status: 52/53 statements `formalized`,
 proofs `formalized(WithAncestors)`. The single exception is
-`thm:CentralExtensionOfCohomologyClass` (status `ready`): the old blueprint marked
-it `\leanok` while its `\lean{}` was commented out — i.e. the old blueprint
-over-claimed; Verso reports the honest status. Attaching the intended declaration
-to that node is a content follow-up for the author, not part of the verbatim port.
+`thm:CentralExtensionOfCohomologyClass` (status `ready`): in
+`central_extension.tex:155-156` both `\lean{}` and `\leanok` are commented out, so
+this statement is genuinely unformalized and the old blueprint reported it as such
+too. Formalizing it (or linking a declaration, if one exists) is a content
+follow-up for the author, not part of the verbatim port.
+
+The 15 nodes reported as locally formalized but with an incomplete dependency
+closure are exactly the downstream cone of the two phantom nodes created by the
+old blueprint's dangling `\uses{}` labels (verified: 15 of 15 explained, none
+unexplained). `def:CyclicTripleSum` alone has 15 descendants, since it feeds the
+proof of `lem:WittAlgebraIsLieAlgebra` and thus the whole Witt/Virasoro chain.
+The underlying mathematics *is* formalized (`VirasoroProject/CyclicTripleSum.lean`);
+adding a blueprint node for it, and fixing the `def:VirasoroVerma` →
+`def:VirasoroVermaModule` typo, would turn that whole cone fully green. Both are
+content fixes to the blueprint, deliberately out of scope for the verbatim port.
 
 Cosmetic note: node display labels render with guillemets («def:WittAlgebra») in
 the graph UI, an artifact of Lean `Name` printing for labels containing `:`.
