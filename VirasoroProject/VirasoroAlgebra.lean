@@ -181,11 +181,18 @@ noncomputable def lsection : WittAlgebra 𝕜 →ₗ[𝕜] VirasoroAlgebra 𝕜 
     lsection 𝕜 (WittAlgebra.lgen 𝕜 n) = lgen 𝕜 n :=
   rfl
 
+/-- `lsection` is a section of `toWittAlgebra`. Stated as a named lemma (rather than
+passing `rfl` inline) so that the recorded proof term carries this type: `simp` cannot
+match a `rfl`-typed proof against it at its reduced transparency. -/
+lemma toWittAlgebra_comp_lsection :
+    (toWittAlgebra : VirasoroAlgebra 𝕜 →ₗ⁅𝕜⁆ WittAlgebra 𝕜).toLinearMap ∘ₗ lsection 𝕜 = 1 :=
+  rfl
+
 open Module in
 /-- The most commonly used basis of the Virasoro algebra, consisting of `Lₙ` (`n ∈ ℤ`)
 and the central element `C`. (Lean notation: `lgen _ n` and `cgen _`, respectively.) -/
 noncomputable def basisLC : Basis (Option ℤ) 𝕜 (VirasoroAlgebra 𝕜) :=
-  ((isCentralExtension 𝕜).basis (lsection 𝕜) rfl
+  ((isCentralExtension 𝕜).basis (lsection 𝕜) (toWittAlgebra_comp_lsection 𝕜)
         (Basis.singleton Unit 𝕜) (WittAlgebra.lgen 𝕜)).reindex
     { toFun uz := match uz with
         | Sum.inl _ => none
