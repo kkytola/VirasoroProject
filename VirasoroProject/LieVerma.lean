@@ -3,7 +3,7 @@ Copyright (c) 2025 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
-import Mathlib.Data.Sign.Defs
+import Mathlib.Basic.Sign.Defs
 import VirasoroProject.LieAlgebraModuleUEA
 import VirasoroProject.ToMathlib.LinearAlgebra.Basis.FinsumRepr
 import VirasoroProject.VermaModule

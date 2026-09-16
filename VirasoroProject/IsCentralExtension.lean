@@ -82,9 +82,23 @@ namespace LieTwoCocycle.CentralExtension
 then `LieTwoCocycle.CentralExtension.emb` gives the corresponding embedding `𝓪 ⟶ 𝓮`. -/
 def emb [IsLieAbelian 𝓪] : 𝓪 →ₗ⁅𝕜⁆ γ.CentralExtension where
   toFun := fun A ↦ ⟨0, A⟩
-  map_add' A₁ A₂ := by simp [add_def]
-  map_smul' c A := by simp [smul_def]
-  map_lie' := by intro A₁ A₂ ; simp [lie_def, trivial_lie_zero 𝓪 𝓪 A₁ A₂]
+  map_add' A₁ A₂ := by
+    ext
+    · show (0 : 𝓰) = 0 + 0
+      exact (add_zero 0).symm
+    · rfl
+  map_smul' c A := by
+    ext
+    · show (0 : 𝓰) = c • 0
+      exact (smul_zero c).symm
+    · rfl
+  map_lie' := by
+    intro A₁ A₂
+    ext
+    · show (0 : 𝓰) = ⁅(0 : 𝓰), (0 : 𝓰)⁆
+      exact (lie_zero 0).symm
+    · show ⁅A₁, A₂⁆ = (γ (0 : 𝓰)) (0 : 𝓰)
+      simp [trivial_lie_zero 𝓪 𝓪 A₁ A₂]
 
 /-- If `𝓮` is the (central) extension of `𝓰` by `𝓪` defined by a 2-cocycle `γ ∈ Z²(𝓰,𝓪)`,
 then `LieTwoCocycle.CentralExtension.proj` gives the corresponding projection `𝓮 ⟶ 𝓰`. -/
@@ -107,18 +121,18 @@ lemma mem_range_emb_iff [IsLieAbelian 𝓪] (Z : γ.CentralExtension) :
   rw [LieHom.mem_range]
   refine ⟨?_, ?_⟩
   · intro ⟨A, hA⟩
-    simp [← hA, emb]
+    rw [← hA]
+    rfl
   · intro h
     use Z.2
-    simp only [emb, LieHom.coe_mk]
-    ext <;> simp_all
+    ext
+    · exact h.symm
+    · rfl
 
 lemma mem_ker_proj_iff (Z : γ.CentralExtension) :
     Z ∈ (LieTwoCocycle.CentralExtension.proj γ).ker ↔ Z.1 = 0 := by
   rw [LieHom.mem_ker]
-  refine ⟨?_, ?_⟩
-  · intro h ; simpa [proj]
-  · intro h ; simpa only [proj, LieHom.coe_mk] using h
+  exact ⟨fun h ↦ h, fun h ↦ h⟩
 
 lemma range_emb_eq_ker_proj [IsLieAbelian 𝓪] :
     (LieTwoCocycle.CentralExtension.emb γ).range = (LieTwoCocycle.CentralExtension.proj γ).ker := by
@@ -146,15 +160,26 @@ theorem isCentralExtension [IsLieAbelian 𝓪] (γ : LieTwoCocycle 𝕜 𝓰 �
   __ := LieTwoCocycle.CentralExtension.isExtension γ
   central := by
     intro A Z
-    simp only [emb, LieHom.coe_mk, lie_def, zero_lie, map_zero, LinearMap.zero_apply]
-    rfl
+    ext
+    · show ⁅(0 : 𝓰), Z.1⁆ = 0
+      exact zero_lie Z.1
+    · show (γ (0 : 𝓰)) Z.1 = 0
+      simp
 
 /-- A standard section of a Lie algebra central extension associated to a Lie 2-cocycle. -/
 noncomputable def stdSection (γ : LieTwoCocycle 𝕜 𝓰 𝓪) :
     𝓰 →ₗ[𝕜] γ.CentralExtension where
   toFun X := ⟨X, 0⟩
-  map_add' X₁ X₂ := by rw [LieTwoCocycle.CentralExtension.add_def] ; simp
-  map_smul' c X := by rw [LieTwoCocycle.CentralExtension.smul_def] ; simp
+  map_add' X₁ X₂ := by
+    ext
+    · rfl
+    · show (0 : 𝓪) = 0 + 0
+      exact (add_zero 0).symm
+  map_smul' c X := by
+    ext
+    · rfl
+    · show (0 : 𝓪) = c • 0
+      exact (smul_zero c).symm
 
 lemma stdSection_prop (γ : LieTwoCocycle 𝕜 𝓰 𝓪) :
     proj γ ∘ₗ stdSection γ = (1 : 𝓰 →ₗ[𝕜] 𝓰) :=
@@ -188,12 +213,12 @@ noncomputable def basis {ιA ιG  : Type u'} (basA : Basis ιA 𝕜 𝓪) (basG 
 @[simp] lemma basis_eq_of_left {ιA ιG  : Type u'} (basA : Basis ιA 𝕜 𝓪) (basG : Basis ιG 𝕜 𝓰)
     (ia : ιA) :
     basis ex σ hσ basA basG (Sum.inl ia) = i (basA ia) := by
-  simp [basis]
+  simp [basis, ses_basis, ses_basis'] <;> rfl
 
 @[simp] lemma basis_eq_of_right {ιA ιG  : Type u'} (basA : Basis ιA 𝕜 𝓪) (basG : Basis ιG 𝕜 𝓰)
     (ig : ιG):
     basis ex σ hσ basA basG (Sum.inr ig) = σ (basG ig) := by
-  simp [basis]
+  simp [basis, ses_basis, ses_basis'] <;> rfl
 
 end LieAlgebra.IsExtension
 

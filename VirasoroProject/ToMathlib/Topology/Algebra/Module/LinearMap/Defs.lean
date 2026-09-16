@@ -17,7 +17,7 @@ The original statement is kept as a deprecated alias for the record; new code sh
 `map_finsum` directly.
 -/
 
-@[deprecated map_finsum (since := "2026-07-12")]
+@[deprecated _root_.map_finsum (since := "2026-07-12")]
 theorem LinearMap.map_finsum {ι 𝕜 : Type*} [Semiring 𝕜]
     {V : Type*} [AddCommMonoid V] [Module 𝕜 V] {W : Type*} [AddCommMonoid W] [Module 𝕜 W]
     (f : V →ₗ[𝕜] W) (a : ι → V) (ha : (Function.support a).Finite) :
