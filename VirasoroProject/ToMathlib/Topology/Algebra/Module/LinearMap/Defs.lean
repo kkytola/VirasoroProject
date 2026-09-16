@@ -15,7 +15,7 @@ import Mathlib.Algebra.Module.LinearMap.Defs
 
 -/
 
-@[deprecated map_finsum (since := "2026-07-12")]
+@[deprecated _root_.map_finsum (since := "2026-07-12")]
 theorem LinearMap.map_finsum {ι 𝕜 : Type*} [Semiring 𝕜]
     {V : Type*} [AddCommMonoid V] [Module 𝕜 V] {W : Type*} [AddCommMonoid W] [Module 𝕜 W]
     (f : V →ₗ[𝕜] W) (a : ι → V) (ha : (Function.support a).Finite) :
