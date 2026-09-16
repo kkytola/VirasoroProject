@@ -82,7 +82,6 @@ private lemma commutator_lsmul_jgen_of_module_uea_heisenbergAlgebra
     · simp only [hkl, ↓reduceIte, map_zero, zero_smul] at key ⊢
       simp_rw [← smul_assoc, ← sub_smul]
       convert key.symm using 1
-      rw [smul_eq_mul, smul_eq_mul, LieRing.of_associative_ring_bracket]
   ext v
   convert key v using 1
   all_goals first

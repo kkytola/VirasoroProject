@@ -285,10 +285,18 @@ noncomputable def jsection : AbelianLieAlgebraOn ℤ 𝕜 →ₗ[𝕜] Heisenber
     jsection 𝕜 (AbelianLieAlgebraOn.jgen 𝕜 l) = jgen 𝕜 l :=
   rfl
 
+/-- `jsection` is a section of `toAbelianLieAlgebraOn`. Stated as a named lemma (rather than
+passing `rfl` inline) so that the recorded proof term carries this type: `simp` cannot
+match a `rfl`-typed proof against it at its reduced transparency. -/
+lemma toAbelianLieAlgebraOn_comp_jsection :
+    (toAbelianLieAlgebraOn : HeisenbergAlgebra 𝕜 →ₗ⁅𝕜⁆ AbelianLieAlgebraOn ℤ 𝕜).toLinearMap
+      ∘ₗ jsection 𝕜 = 1 :=
+  rfl
+
 /-- The most commonly used basis of the Heisenberg algebra, consisting of `Jₖ` (`k ∈ ℤ`)
 and the central element `K`. (Lean notation: `jgen _ k` and `kgen _`, respectively.) -/
 noncomputable def basisJK : Basis (Option ℤ) 𝕜 (HeisenbergAlgebra 𝕜) :=
-  ((isCentralExtension 𝕜).basis (jsection 𝕜) rfl
+  ((isCentralExtension 𝕜).basis (jsection 𝕜) (toAbelianLieAlgebraOn_comp_jsection 𝕜)
         (Basis.singleton Unit 𝕜) (AbelianLieAlgebraOn.jgen 𝕜)).reindex
     { toFun uz := match uz with
         | Sum.inl _ => none
