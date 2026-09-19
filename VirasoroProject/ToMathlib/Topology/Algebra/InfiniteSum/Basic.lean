@@ -8,15 +8,6 @@ import Mathlib.Topology.Algebra.InfiniteSum.Group
 /-!
 # Summability in a discrete group is eventual vanishing
 
-Candidate for Mathlib: in a discrete topological additive group, a family is summable
-iff all but finitely many of its terms vanish.
-
-Upstream status (checked against Mathlib `052559c`, 2026-07): both directions have been
-incorporated (`Summable.hasFiniteSupport_of_discreteTopology` and
-`summable_of_hasFiniteSupport`); only this packaged iff — in the `Filter.cofinite`
-phrasing convenient for `filter_upwards` — is not in Mathlib. Compared to the original
-version of this lemma, the proof is now a two-liner from the incorporated halves, and a
-spurious `[DecidableEq ι]` hypothesis is gone.
 -/
 
 open Filter
