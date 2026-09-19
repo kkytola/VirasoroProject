@@ -2,7 +2,7 @@ import Lake
 open Lake DSL
 
 require VirasoroProject from ".."
-require VersoBlueprint from git "https://github.com/leanprover/verso-blueprint"@"v4.32.0"
+require VersoBlueprint from git "https://github.com/leanprover/verso-blueprint"@"v4.34.0"
 
 package VirasoroBlueprint where
   precompileModules := false

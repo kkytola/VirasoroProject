@@ -99,23 +99,23 @@ def bracket : γ.CentralExtension
     map_add' := by
       intro W₁ W₂
       ext
-      · simp [lie_add]
-      · simp [map_add]
+      · simp [lie_add] <;> rfl
+      · simp [map_add] <;> rfl
     map_smul' := by
       intro c W
       ext
-      · simp [lie_smul]
-      · simp [map_smul] }
+      · simp [lie_smul] <;> rfl
+      · simp [map_smul] <;> rfl }
   map_add' := by
     intro Z₁ Z₂
     ext W
-    · simp [add_lie]
-    · simp [map_add]
+    · simp [add_lie] <;> rfl
+    · simp [map_add] <;> rfl
   map_smul' := by
     intro c Z
     ext W
-    · simp [smul_lie]
-    · simp [map_smul]
+    · simp [smul_lie] <;> rfl
+    · simp [map_smul] <;> rfl
 
 @[simp] lemma bracket_apply (Z W : γ.CentralExtension) :
     γ.bracket Z W = ⟨⁅Z.fst, W.fst⁆, γ Z.fst W.fst⟩ := rfl
@@ -232,9 +232,8 @@ lemma hom_of_coboundary_add (γ₁ γ₂ γ₃ : LieTwoCocycle 𝕜 𝓰 𝓪)
           ((β₁ + β₂).bdryHom γ₁) := by
   ext Z
   · rfl
-  · simp only [LieTwoCocycle.CentralExtension.congr, Prod.mk.eta, LieOneCochain.bdryHom,
-               LieHom.comp_apply, LieHom.coe_mk]
-    ac_rfl
+  · show Z.2 + β₁ Z.1 + β₂ Z.1 = Z.2 + (β₁ + β₂) Z.1
+    exact add_assoc _ _ _
 
 /-- A Lie algebra isomorphism between two central extensions determined by cocycles
 which differ by a coboundary. -/
@@ -253,19 +252,19 @@ noncomputable def equiv_of_lieTwoCoboundary {γ' : LieTwoCocycle 𝕜 𝓰 𝓪}
       (by
         convert LieTwoCocycle.CentralExtension.hom_of_coboundary_add γ γ' γ β (-β) obs obs'
         ext1 Z
-        simp only [LieHom.coe_id, id_eq, LieTwoCocycle.CentralExtension.congr, Prod.mk.eta,
-                  LieOneCochain.bdryHom, add_neg_cancel, LieHom.comp_apply, LieHom.coe_mk]
         ext
         · rfl
-        · simp only [left_eq_add] ; rfl)
+        · show Z.2 = Z.2 + (β + -β) Z.1
+          rw [add_neg_cancel]
+          exact (add_zero _).symm)
       (by
         convert LieTwoCocycle.CentralExtension.hom_of_coboundary_add γ' γ γ' (-β) β obs' obs
         ext1 Z
-        simp only [LieHom.coe_id, id_eq, LieTwoCocycle.CentralExtension.congr, Prod.mk.eta,
-                  LieOneCochain.bdryHom, LieHom.comp_apply, LieHom.coe_mk]
         ext
         · rfl
-        · simp only [neg_add_cancel, left_eq_add] ; rfl)
+        · show Z.2 = Z.2 + (-β + β) Z.1
+          rw [neg_add_cancel]
+          exact (add_zero _).symm)
 
 end CentralExtension -- namespace
 

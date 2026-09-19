@@ -1,8 +1,9 @@
 import VersoBlueprint
 
 /-!
-Math-mode TeX macros for the Virasoro blueprint, ported from
-`blueprint/src/macros/common.tex`.
+Math-mode TeX macros for the Virasoro blueprint, ported from the macro file of the
+former plasTeX blueprint (`blueprint/src/macros/common.tex`, removed from the tree
+once the Verso blueprint took over; recoverable from the Git history).
 
 Not ported:
 - the `\newtheorem` setup (superseded by blueprint node directives);
@@ -12,6 +13,17 @@ Deviation: `\normalOrder` originally expanded to `{\mathbb{:} #1 \mathbb{:}}`;
 `\mathbb` applied to a colon is not renderable in KaTeX, so plain colons are
 used here (visual change only, the standard physics notation `:A:` remains).
 -/
+
+/-
+`\mathscr` (used by `\UEA`, `\Verma`, `\FockSpace`) is built into KaTeX but is not
+provided by the packages verso-blueprint loads for the PDF (amsmath, amssymb,
+mathtools), which made `lake exe vbp build --pdf` fail outright. `\providecommand`
+only defines it when it is missing, so the HTML keeps true script glyphs from
+KaTeX and only the PDF falls back to calligraphic ones.
+-/
+tex_prelude r#"
+\providecommand{\mathscr}{\mathcal}
+"#
 
 tex_prelude r#"
 \newcommand{\bN}{\mathbb{N}}

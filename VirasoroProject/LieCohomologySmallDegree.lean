@@ -395,9 +395,10 @@ lemma cohomologyClass_add_bdry (γ : LieTwoCocycle 𝕜 𝓰 𝓪) (β : LieOneC
 /-- A cocycle representing a trivial cohomology class is a coboundary. -/
 lemma exists_eq_bdry (γ : LieTwoCocycle 𝕜 𝓰 𝓪) (hγ : γ.cohomologyClass = 0) :
     ∃ β : LieOneCochain 𝕜 𝓰 𝓪, γ = β.bdry := by
-  simp_rw [@Eq.comm (LieTwoCocycle 𝕜 𝓰 𝓪) γ _]
-  simpa [LieOneCochain_bdryHom] using (Submodule.Quotient.eq _).mp <|
+  obtain ⟨β, hβ⟩ := (Submodule.Quotient.eq _).mp <|
     show γ.cohomologyClass = LieTwoCocycle.cohomologyClass 0 by rw [hγ] ; rfl
+  rw [sub_zero] at hβ
+  exact ⟨β, hβ.symm⟩
 
 end LieTwoCocycle -- namespace
 
