@@ -7,15 +7,6 @@ import Mathlib.LinearAlgebra.Finsupp.Supported
 
 /-!
 # Membership of `finsum`s of scaled vectors in spans
-
-Candidates for Mathlib: a (possibly infinite, but then junk-valued) sum
-`∑ᶠ i, cfs i • vs i` lies in the span of the vectors `vs`, and the `∑ᶠ i ∈ s`-variant
-lies in the span of the image `vs '' s`.
-
-These are used by `VirasoroProject.ToMathlib.LinearAlgebra.Basis.FinsumRepr` (bases of
-spans of basis-vector subfamilies).
-
-Upstream status (checked against Mathlib `052559c`, 2026-07): not in Mathlib.
 -/
 
 lemma finsum_mem_span {ι R V : Type*} [Semiring R] [AddCommMonoid V] [Module R V]

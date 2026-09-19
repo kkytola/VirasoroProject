@@ -8,10 +8,6 @@ import Mathlib.Algebra.BigOperators.Finprod
 /-!
 # Auxiliary lemmas about sums over finite supports
 
-Lemmas about `Finset.sum` and `finsum` interacting with `Function.support`, candidates for
-upstreaming to Mathlib. The lemma `finsum_add_finsum_compl` is used in the bosonic Sugawara
-construction (`VirasoroProject.Sugawara`).
-
 NOTE (naming): Mathlib naming around reindexed and split sums is inconsistent, compare e.g.
 `Equiv.tsum_eq` with `finprod_comp_equiv`. Similarly, should `finsum_add_distrib`,
 `finsum_sub_distrib`, `finsum_neg_distrib` just be `finsum_add`, `finsum_sub`, `finsum_neg`?

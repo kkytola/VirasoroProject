@@ -11,10 +11,6 @@ import Mathlib
 Closed forms for the sums of `x`, `x²`, and general quadratic polynomials over an integer
 interval `Finset.Ico a b`, with values cast into a field of characteristic zero.
 
-These are the elementary "Faulhaber" inputs to the central-charge computation of the basic
-bosonic Sugawara construction (`VirasoroProject.Sugawara`): there, the boundary terms are
-supported on an integer interval, and their weighted sums are quadratic polynomials of the
-summation index.
 
 All three lemmas hold for any `a b : ℤ` with `a ≤ b`, so they cover both sign regimes
 (`0 ≤ n` and `n ≤ 0`) of the central-charge computation without any reflection tricks.

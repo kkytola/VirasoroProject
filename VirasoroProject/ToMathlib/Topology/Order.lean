@@ -7,14 +7,6 @@ import Mathlib.Topology.Order
 
 /-!
 # Convergence in a discrete space is eventual equality
-
-Candidate for Mathlib: a packaged iff for `Tendsto f F (𝓝 x)` in a discrete space.
-It is a two-lemma combination of existing Mathlib API (`nhds_discrete` and
-`tendsto_pure`), so upstreaming is optional; kept here since the packaged form is the
-statement one actually looks for.
-
-Upstream status (checked against Mathlib `052559c`, 2026-07): not packaged in Mathlib;
-both ingredients are.
 -/
 
 open Filter
