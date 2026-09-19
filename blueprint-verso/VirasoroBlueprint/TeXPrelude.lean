@@ -14,6 +14,17 @@ Deviation: `\normalOrder` originally expanded to `{\mathbb{:} #1 \mathbb{:}}`;
 used here (visual change only, the standard physics notation `:A:` remains).
 -/
 
+/-
+`\mathscr` (used by `\UEA`, `\Verma`, `\FockSpace`) is built into KaTeX but is not
+provided by the packages verso-blueprint loads for the PDF (amsmath, amssymb,
+mathtools), which made `lake exe vbp build --pdf` fail outright. `\providecommand`
+only defines it when it is missing, so the HTML keeps true script glyphs from
+KaTeX and only the PDF falls back to calligraphic ones.
+-/
+tex_prelude r#"
+\providecommand{\mathscr}{\mathcal}
+"#
+
 tex_prelude r#"
 \newcommand{\bN}{\mathbb{N}}
 \newcommand{\bZ}{\mathbb{Z}}
