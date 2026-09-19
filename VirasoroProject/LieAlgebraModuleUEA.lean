@@ -5,8 +5,9 @@ Authors: Kalle Kytölä
 -/
 import Mathlib.Algebra.Lie.UniversalEnveloping
 import Mathlib.GroupTheory.GroupAction.Ring
-import Mathlib.Order.CompletePartialOrder
 import VirasoroProject.LieAlgebraRepresentationOfBasis
+
+attribute [local instance 100] LieRing.ofAssociativeRing
 
 /-!
 # Modules over the universal enveloping algebra of a Lie algebra
@@ -79,7 +80,7 @@ lemma Algebra.smul_scalar_smul_eq_smul_algebraMap_mul (c : 𝕜) (a : A) :
 variable (V : Type*) [AddCommGroup V] [Module A V]
 
 /-- Any module over an algebra is a module over the scalars. -/
-def moduleScalarOfModule : Module 𝕜 V :=
+@[reducible] def moduleScalarOfModule : Module 𝕜 V :=
   Module.compHom _ (algebraMap 𝕜 A)
 
 lemma moduleScalarOfModule.smul_def (r : 𝕜) (v : V) :
@@ -246,9 +247,8 @@ abbrev ιUEA := UniversalEnvelopingAlgebra.ι
 
 lemma UniversalEnvelopingAlgebra.mkAlgHom_range_eq_top :
     (UniversalEnvelopingAlgebra.mkAlgHom 𝕜 𝓰).range = ⊤ := by
-  simp only [UniversalEnvelopingAlgebra.mkAlgHom, RingQuot.mkAlgHom]
   rw [AlgHom.range_eq_top]
-  exact RingQuot.mkRingHom_surjective (UniversalEnvelopingAlgebra.Rel 𝕜 𝓰)
+  exact RingCon.mkₐ_surjective _
 
 variable {𝕜 𝓰} in
 lemma UniversalEnvelopingAlgebra.mkAlgHom_surjective :
@@ -358,7 +358,7 @@ variable (ρ : LieAlgebra.Representation 𝕜 𝕂 𝓰 V)
 
 /-- A representation of a `𝕜`-Lie algebra `𝓰` on a vector space `V` defines a `𝓤 𝕜 𝓰`-module
 structure on `V`. -/
-noncomputable def LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra :
+@[reducible] noncomputable def LieAlgebra.Representation.moduleUniversalEnvelopingAlgebra :
     Module (𝓤 𝕜 𝓰) V where
   smul a v := UniversalEnvelopingAlgebra.lift 𝕜 ρ a v
   one_smul v := by

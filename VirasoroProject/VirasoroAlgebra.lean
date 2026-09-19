@@ -3,9 +3,12 @@ Copyright (c) 2024 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
+import Mathlib.Algebra.Lie.OfAssociative
 import VirasoroProject.IsCentralExtension
 import VirasoroProject.ToMathlib.Algebra.Lie.Abelian
 import VirasoroProject.VirasoroCocycle
+
+attribute [local instance 100] LieRing.ofAssociativeRing
 
 /-!
 # The Virasoro algebra
@@ -63,11 +66,11 @@ lemma ext' {X Y : VirasoroAlgebra 𝕜} (h₁ : X.1 = Y.1) (h₂ : X.2 = Y.2) :
   LieTwoCocycle.CentralExtension.ext h₁ h₂
 
 /-- The Virasoro algebra is a Lie ring. -/
-noncomputable instance : LieRing (VirasoroAlgebra 𝕜) :=
+@[reducible] noncomputable instance : LieRing (VirasoroAlgebra 𝕜) :=
   LieTwoCocycle.CentralExtension.instLieRing _
 
 /-- The Virasoro algebra is a Lie algebra. -/
-noncomputable instance : LieAlgebra 𝕜 (VirasoroAlgebra 𝕜) :=
+@[reducible] noncomputable instance : LieAlgebra 𝕜 (VirasoroAlgebra 𝕜) :=
   LieTwoCocycle.CentralExtension.instLieAlgebra _
 
 variable {𝕜}
@@ -99,6 +102,10 @@ lemma add_def' (X Y : VirasoroAlgebra 𝕜) :
 lemma smul_def' (c : 𝕜) (X : VirasoroAlgebra 𝕜) :
     c • X = ⟨c • X.1, c * X.2⟩ := rfl
 
+@[simp] lemma zero_fst : (0 : VirasoroAlgebra 𝕜).1 = 0 := rfl
+
+@[simp] lemma zero_snd : (0 : VirasoroAlgebra 𝕜).2 = 0 := rfl
+
 @[simp] lemma add_fst (X Y : VirasoroAlgebra 𝕜) :
     (X + Y).1 = X.1 + Y.1 := rfl
 
@@ -112,7 +119,7 @@ lemma smul_def' (c : 𝕜) (X : VirasoroAlgebra 𝕜) :
     (c • X).2 = c * X.2 := rfl
 
 /-- The Virasoro algebra is a central extension of the Witt algebra. -/
-instance isCentralExtension : LieAlgebra.IsCentralExtension (ofCentral 𝕜) toWittAlgebra :=
+theorem isCentralExtension : LieAlgebra.IsCentralExtension (ofCentral 𝕜) toWittAlgebra :=
   LieTwoCocycle.CentralExtension.isCentralExtension _
 
 /-- The (commonly used) `Lₙ` elements of the Virasoro algebra, for `n ∈ ℤ`. -/
@@ -127,6 +134,14 @@ lemma cgen_eq_ofCentral_one : cgen 𝕜 = ofCentral 𝕜 1 := rfl
 lemma cgen_eq' : cgen 𝕜 = ⟨0, 1⟩ := rfl
 
 lemma lgen_eq' (n : ℤ) : lgen 𝕜 n = ⟨WittAlgebra.lgen 𝕜 n, 0⟩ := rfl
+
+@[simp] lemma lgen_fst (n : ℤ) : (lgen 𝕜 n).1 = WittAlgebra.lgen 𝕜 n := rfl
+
+@[simp] lemma lgen_snd (n : ℤ) : (lgen 𝕜 n).2 = 0 := rfl
+
+@[simp] lemma cgen_fst : (cgen 𝕜).1 = 0 := rfl
+
+@[simp] lemma cgen_snd : (cgen 𝕜).2 = 1 := rfl
 
 @[simp] lemma ofCentral_apply (a : 𝕜) : ofCentral 𝕜 a = a • (cgen 𝕜) := by
   change (⟨0, a⟩ : VirasoroAlgebra 𝕜) = a • ⟨0, 1⟩
@@ -149,16 +164,8 @@ lemma lgen_eq' (n : ℤ) : lgen 𝕜 n = ⟨WittAlgebra.lgen 𝕜 n, 0⟩ := rfl
 @[simp] lemma lgen_bracket (n m : ℤ) :
     ⁅lgen 𝕜 n, lgen 𝕜 m⁆
       = (n - m : 𝕜) • lgen 𝕜 (n + m) + if n + m = 0 then ((n^3 - n : 𝕜)/12) • cgen 𝕜 else 0 := by
-  simp_rw [bracket_def']
-  by_cases h : n + m = 0
-  · simp [h]
-    apply ext'
-    · simp [lgen, cgen_eq']
-    · simp [WittAlgebra.virasoroCocycle_apply_lgen_lgen, lgen, cgen_eq', h]
-  · simp [h]
-    apply ext'
-    · simp [lgen]
-    · simp [WittAlgebra.virasoroCocycle_apply_lgen_lgen, h, lgen]
+  by_cases h : n + m = 0 <;> (apply ext') <;>
+    simp [h, WittAlgebra.virasoroCocycle_apply_lgen_lgen]
 
 lemma lgen_bracket' (n m : ℤ) :
     ⁅lgen 𝕜 n, lgen 𝕜 m⁆

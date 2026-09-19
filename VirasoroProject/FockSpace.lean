@@ -3,9 +3,12 @@ Copyright (c) 2025 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
+import Mathlib.Algebra.Lie.OfAssociative
 import VirasoroProject.HeisenbergAlgebra
 import VirasoroProject.IndexTri
 import VirasoroProject.LieVerma
+
+attribute [local instance 100] LieRing.ofAssociativeRing
 
 /-!
 # Verma modules for the Virasoro algebra
@@ -141,22 +144,19 @@ noncomputable def heisenbergTri_jzero : (heisenbergTri 𝕜).part 0 :=
 open HeisenbergAlgebra in
 lemma heisenbergTri_cartan_basis_none_eq_kgen :
     (heisenbergTri_cartan_basis 𝕜) ⟨none, Set.mem_insert none {some 0}⟩ = heisenbergTri_kgen 𝕜 := by
-  ext
-  simp only [heisenbergTri_cartan_basis, TriangularDecomposition.ofBasis.basis_part, indexTri,
-             heisenbergTri_kgen_val]
-  convert (basisJK 𝕜).basis_submodule_span_apply {none, some 0} ⟨none, Set.mem_insert none {some 0}⟩
-  simp
+  apply Subtype.ext
+  have h := (basisJK 𝕜).basis_submodule_span_apply {none, some 0}
+    ⟨none, Set.mem_insert none {some 0}⟩
+  rwa [basisJK_none] at h
 
 open HeisenbergAlgebra in
 lemma heisenbergTri_cartan_basis_some_eq_jzero :
-    (heisenbergTri_cartan_basis 𝕜) ⟨some 0, by exact Set.mem_insert_of_mem none rfl⟩
+    (heisenbergTri_cartan_basis 𝕜) ⟨some 0, Set.mem_insert_of_mem none rfl⟩
       = heisenbergTri_jzero 𝕜 := by
-  ext
-  simp only [heisenbergTri_cartan_basis, TriangularDecomposition.ofBasis.basis_part, indexTri,
-             heisenbergTri_jzero_val]
-  convert (basisJK 𝕜).basis_submodule_span_apply {none, some 0}
-          ⟨some 0, Set.mem_insert_of_mem none rfl⟩
-  simp
+  apply Subtype.ext
+  have h := (basisJK 𝕜).basis_submodule_span_apply {none, some 0}
+    ⟨some 0, Set.mem_insert_of_mem none rfl⟩
+  rwa [basisJK_some] at h
 
 lemma heisenbergTri_kgen_mem_cartan :
     .kgen 𝕜 ∈ (heisenbergTri 𝕜).cartan := by
@@ -175,24 +175,12 @@ lemma heisenbergTri_jgen_pos_mem_upper {n : ℤ} (n_pos : 0 < n) :
 lemma HeisenbergAlgebra.hw_apply_kgen (α : 𝕜) :
     hw 𝕜 α (heisenbergTri_kgen 𝕜) = 1 := by
   rw [← heisenbergTri_cartan_basis_none_eq_kgen]
-  simp only [hw, Basis.constr_apply_fintype]
-  simp only [Basis.equivFun_self, smul_eq_mul, mul_ite, ite_mul, one_mul, zero_mul]
-  rw [Finset.sum_eq_single ⟨none, Set.mem_insert none {some 0}⟩]
-  · simp
-  · intro j _ hj
-    simp [hj.symm, show ¬ (j : Option ℤ) = none by aesop]
-  · simp
+  simp [hw, Basis.constr_basis, -Basis.constr_apply_fintype]
 
 lemma HeisenbergAlgebra.hw_apply_jzero (α : 𝕜) :
     hw 𝕜 α (heisenbergTri_jzero 𝕜) = α := by
   rw [← heisenbergTri_cartan_basis_some_eq_jzero]
-  simp only [hw, Basis.constr_apply_fintype]
-  simp only [Basis.equivFun_self, smul_eq_mul, mul_ite, ite_mul, one_mul, zero_mul]
-  rw [Finset.sum_eq_single ⟨some 0, by exact Set.mem_insert_of_mem none rfl⟩]
-  · simp
-  · intro j _ hj
-    simp [hj.symm]
-  · simp
+  simp [hw, Basis.constr_basis, -Basis.constr_apply_fintype]
 
 /-- The charged Fock space with charge `α`. -/
 abbrev ChargedFockSpace (α : 𝕜) := (heisenbergTri 𝕜).VermaHW (HeisenbergAlgebra.hw 𝕜 α)
@@ -294,11 +282,11 @@ lemma ChargedFockSpace.eventually_jgen_smul_eq_zero (α : 𝕜) (v : ChargedFock
     simp [vacuum_cyclic 𝕜 α]
   obtain ⟨a, hav⟩ := Submodule.mem_span_singleton.mp aux
   filter_upwards [uea_eventually_commute_jgen _ a, Ioi_mem_atTop 0] with k hk k_pos
-  -- `calcify`?
-  rw [← hav, ← mul_smul]
-  rw [show _ * a = a * _ from hk]
-  rw [mul_smul]
-  rw [jgen_pos_vacuum _ _ k_pos, smul_zero]
+  calc ιUEA 𝕜 (jgen 𝕜 k) • v
+      = (ιUEA 𝕜 (jgen 𝕜 k) * a) • vacuum 𝕜 α := by rw [← hav, mul_smul]
+    _ = (a * ιUEA 𝕜 (jgen 𝕜 k)) • vacuum 𝕜 α := by rw [hk]
+    _ = a • ιUEA 𝕜 (jgen 𝕜 k) • vacuum 𝕜 α := mul_smul ..
+    _ = 0 := by rw [jgen_pos_vacuum _ _ k_pos, smul_zero]
 
 end ChargedFockSpace
 

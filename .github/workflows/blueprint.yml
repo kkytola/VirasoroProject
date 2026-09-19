@@ -5,6 +5,8 @@ on:
     branches:
       - main # Trigger on pushes to the default branch
   workflow_dispatch:        # Allow manual triggering of the workflow from the GitHub Actions interface
+                            # (on non-main refs this builds everything but skips the Pages deployment,
+                            # so it can be used as a dress rehearsal from a branch)
 
 # Cancel previous runs if a new commit is pushed to the same PR or branch
 concurrency:
@@ -52,7 +54,7 @@ jobs:
 
       - name: Build project API documentation
         run: ~/.elan/bin/lake -R -Kenv=dev build VirasoroProject:docs
-      
+
       - name: Check for `home_page` folder # this is meant to detect a Jekyll-based website
         id: check_home_page
         run: |
@@ -64,30 +66,42 @@ jobs:
             echo "HOME_PAGE_EXISTS=false" >> $GITHUB_ENV
           fi
 
-      - name: Build blueprint and copy to `home_page/blueprint`
-        uses: xu-cheng/texlive-action@v2
+      # The verso blueprint lives in its own Lake workspace (blueprint-verso/) that
+      # path-requires this project. Mathlib is excluded from the cache below (too big
+      # for the 10 GB per-repo cache budget); `lake exe cache get` restores it instead.
+      - name: Cache blueprint workspace (verso toolchain builds)
+        uses: actions/cache@v4
         with:
-          docker_image: ghcr.io/xu-cheng/texlive-full:20250101
-          run: |
-            # Install necessary dependencies and build the blueprint
-            apk update
-            apk add --update make py3-pip git pkgconfig graphviz graphviz-dev gcc musl-dev
-            git config --global --add safe.directory $GITHUB_WORKSPACE
-            git config --global --add safe.directory `pwd`
-            python3 -m venv env
-            source env/bin/activate
-            pip install --upgrade pip requests wheel
-            pip install pygraphviz --global-option=build_ext --global-option="-L/usr/lib/graphviz/" --global-option="-R/usr/lib/graphviz/"
-            pip install leanblueprint
-            leanblueprint pdf
-            mkdir -p home_page
-            cp blueprint/print/print.pdf home_page/blueprint.pdf
-            leanblueprint web
-            cp -r blueprint/web home_page/blueprint
+          path: |
+            blueprint-verso/.lake
+            !blueprint-verso/.lake/packages/mathlib
+          key: BlueprintVerso-${{ hashFiles('blueprint-verso/lake-manifest.json', 'blueprint-verso/lean-toolchain') }}
 
-      - name: Check declarations mentioned in the blueprint exist in Lean code
+      - name: Get Mathlib cache for the blueprint workspace
+        working-directory: blueprint-verso
+        run: ~/.elan/bin/lake exe cache get || true
+
+      - name: Build verso blueprint site
+        working-directory: blueprint-verso
         run: |
-            ~/.elan/bin/lake exe checkdecls blueprint/lean_decls
+          ~/.elan/bin/lake exe vbp build
+          mkdir -p ../home_page
+          cp -r _out/site/html-multi ../home_page/blueprint
+
+      - name: Install LuaLaTeX for the blueprint PDF
+        continue-on-error: true
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            texlive-luatex texlive-latex-recommended texlive-latex-extra texlive-fonts-recommended
+
+      - name: Build blueprint PDF # non-fatal: the HTML site deploys even if the PDF fails
+        id: blueprint_pdf
+        continue-on-error: true
+        working-directory: blueprint-verso
+        run: |
+          ~/.elan/bin/lake exe vbp build --pdf
+          cp _out/site/pdf/main.pdf ../home_page/blueprint.pdf
 
       - name: Copy API documentation to `home_page/docs`
         run: cp -r .lake/build/doc home_page/docs
@@ -118,8 +132,8 @@ jobs:
 
       - name: Deploy to GitHub Pages
         id: deployment
+        if: github.ref == 'refs/heads/main'
         uses: actions/deploy-pages@v4
 
       - name: Make sure the API documentation cache works
         run: mv home_page/docs .lake/build/doc
-     

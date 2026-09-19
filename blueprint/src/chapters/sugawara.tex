@@ -85,7 +85,7 @@ $\Joper_k \, v = 0$ for $k \gg 0$, i.e.,
 \begin{lemma}[Local finite support for homogeneous normal ordered products]
   \label{lem:NormalOrderingFiniteSupport}
   \uses{def:NormalOrdering}
-  \lean{VirasoroProject.finite_support_smul_pairNO_heiOper_apply}
+  \lean{VirasoroProject.hasFiniteSupport_smul_pairNO_apply}
   \leanok
   Suppose that $(\Joper_{k})_{k \in \bZ}$ satisfy the local truncation condition
   \tagHeiTrunc{}. Then for any $n \in \bZ$ and any $v \in V$,
@@ -182,8 +182,8 @@ $\Joper_k \, v = 0$ for $k \gg 0$, i.e.,
     = \; &
     -k \, \normalOrder{\Joper_{n+k} \, \Joper_{m-k}}
     - (m-k) \, \normalOrder{\Joper_{k} \, \Joper_{n+m-k}} \\
-      & \; + (n+k) \, \delta_{n+m,0}
-        \Big( \indicator{-n \le k < 0} - \indicator{0 \le k < - n} \Big) \, \id_V .
+      & \; + k \, (n+k) \, \delta_{n+m,0}
+        \Big( \indicator{k + n \le 0} - \indicator{k \le 0} \Big) \, \id_V .
   \end{align*}
   where $\indicator{\mathrm{condition}}$ is defined as $1$ if the condition is true
   and $0$ otherwise.
@@ -191,10 +191,15 @@ $\Joper_k \, v = 0$ for $k \gg 0$, i.e.,
 \begin{proof}
   \uses{lem:CommutatorSugawaraHeisenberg, lem:AlternativeNormalOrdering}
   \leanok
-  Calculation, using Lemmas~\ref{lem:SugawaraCommutatorSeries},
-  \ref{lem:AlternativeNormalOrdering}, and~\ref{lem:CommutatorSugawaraHeisenberg},
-  the commutation relations \tagHeiComm{},
-  and the commutator formula $[A,BC] = B[A,C] + [A,B]C$ again.
+  Calculation: by the alternative normal ordering
+  (Lemma~\ref{lem:AlternativeNormalOrdering}) and the commutation relations \tagHeiComm{},
+  the normal ordered product differs from the plain product
+  $\Joper_k \, \Joper_{m-k}$ by an explicit multiple of $\id_V$, which is central.
+  The commutator with the plain product is evaluated using
+  Lemma~\ref{lem:CommutatorSugawaraHeisenberg}
+  and the commutator formula $[A,BC] = B[A,C] + [A,B]C$; converting the plain products back
+  to normal ordered products (again up to explicit multiples of $\id_V$)
+  yields the asserted boundary terms.
 \end{proof}
 
 \begin{lemma}[Auxiliary calculation]

@@ -3,232 +3,103 @@ Copyright (c) 2025 Kalle Kytölä. All rights reserved.
 Released under Apache 2.0 license as described in the file LICENSE.
 Authors: Kalle Kytölä
 -/
-import Mathlib.Algebra.EuclideanDomain.Field
-import Mathlib.Algebra.Lie.OfAssociative
-import Mathlib.Algebra.Order.Ring.Star
-import Mathlib.Analysis.Normed.Field.Lemmas
-import Mathlib.Data.Int.Star
-import Mathlib.RingTheory.Henselian
+import Mathlib
 
 /-!
 # Central charge calculations for Sugawara constructions
 
-This file contains the crucial auxiliary calculations leading to the values of the central charge
-in various Sugawara constructions. The calculations make use of "discrete integration" on `ℤ`.
+Closed forms for the sums of `x`, `x²`, and general quadratic polynomials over an integer
+interval `Finset.Ico a b`, with values cast into a field of characteristic zero.
 
-## Main definitions
 
-* `zPrimitive`: A "discrete integral function" to a given function `f : ℤ → R`. The defining
-  properties of `F = zPrimitive f` are `F(0) = 0` and `F(n+1) - F(n) = f(n)`.
-* `zMonomialF`: The `d`th discrete monomial function is defined by `d`-fold discrete integration
-  of the constant function `1`. (The continuum analogue is the monomial `1/d! • x^d`.)
+All three lemmas hold for any `a b : ℤ` with `a ≤ b`, so they cover both sign regimes
+(`0 ≤ n` and `n ≤ 0`) of the central-charge computation without any reflection tricks.
 
 ## Main statements
 
-* `zMonomialF_eq` The `d`th discrete monomial function is given by
-  `n ↦ 1/d! • ∏ j (0 ≤ j < d), (n - j)`
-* `bosonic_sugawara_cc_calc`: For any `n ∈ ℤ`, we have
-   `zPrimitive (fun l ↦ (l : R) * (n - l)) n = (n^3 - n) / 6`.
+* `sum_Ico_quadratic`: `∑ x ∈ Finset.Ico a b, (c₂ x² + c₁ x + c₀)` in closed form.
 * `bosonic_sugawara_cc_calc_nonneg`: For any `n ∈ ℕ`, we have
-   `∑ l (0 ≤ l < n), (l : ℚ) * (n - l) = (n^3 - n) / 6`.
-
-## TODO
-
-* TODO: Add variants of the calculation for fermionic Sugawara constructions etc.
+  `∑ l (0 ≤ l < n), (l : ℚ) * (n - l) = (n^3 - n) / 6`.
 
 ## Tags
 
-central charge, Sugawara construction
+central charge, Sugawara construction, Gauss sum
 
 -/
 
 namespace VirasoroProject
 
+variable {𝕜 : Type*} [Field 𝕜] [CharZero 𝕜]
 
+/-- Gauss sum over an integer interval `∑_{x=a}^{b-1} x = (a+b-1)(b-a)/2`, cast into a field of
+characteristic zero. -/
+lemma sum_Ico_id (a b : ℤ) (hab : a ≤ b) :
+    ∑ x ∈ Finset.Ico a b, (x : 𝕜) = ((a : 𝕜) + b - 1) * ((b : 𝕜) - a) / 2 := by
+  induction b, hab using Int.leInduction with
+  | base => simp
+  | succ b hb ih =>
+    have hins : Finset.Ico a (b + 1) = insert b (Finset.Ico a b) := by
+      ext x; simp only [Finset.mem_Ico, Finset.mem_insert]; omega
+    rw [hins, Finset.sum_insert (by simp only [Finset.mem_Ico]; omega), ih]
+    push_cast; ring
 
-section central_charge_calculation
+/-- Sum of squares over an integer interval
+`∑_{x=a}^{b-1} x² = (b-1)b(2b-1)/6 - (a-1)a(2a-1)/6`, cast into a field of characteristic
+zero. -/
+lemma sum_Ico_sq (a b : ℤ) (hab : a ≤ b) :
+    ∑ x ∈ Finset.Ico a b, (x : 𝕜) ^ 2
+      = ((b : 𝕜) - 1) * (b : 𝕜) * (2 * (b : 𝕜) - 1) / 6
+        - ((a : 𝕜) - 1) * (a : 𝕜) * (2 * (a : 𝕜) - 1) / 6 := by
+  induction b, hab using Int.leInduction with
+  | base => simp
+  | succ b hb ih =>
+    have hins : Finset.Ico a (b + 1) = insert b (Finset.Ico a b) := by
+      ext x; simp only [Finset.mem_Ico, Finset.mem_insert]; omega
+    rw [hins, Finset.sum_insert (by simp only [Finset.mem_Ico]; omega), ih]
+    push_cast; ring
 
-open Finset
+/-- Closed form for the sum of a quadratic polynomial `c₂ x² + c₁ x + c₀` over an integer
+interval `Finset.Ico a b`, cast into a field of characteristic zero. -/
+lemma sum_Ico_quadratic (a b : ℤ) (hab : a ≤ b) (c₂ c₁ c₀ : 𝕜) :
+    ∑ x ∈ Finset.Ico a b, (c₂ * (x : 𝕜) ^ 2 + c₁ * (x : 𝕜) + c₀)
+      = c₂ * (((b : 𝕜) - 1) * (b : 𝕜) * (2 * (b : 𝕜) - 1) / 6
+              - ((a : 𝕜) - 1) * (a : 𝕜) * (2 * (a : 𝕜) - 1) / 6)
+        + c₁ * (((a : 𝕜) + b - 1) * ((b : 𝕜) - a) / 2)
+        + c₀ * ((b : 𝕜) - a) := by
+  have hcard : ((Finset.Ico a b).card : 𝕜) = (b : 𝕜) - a := by
+    rw [Int.card_Ico]
+    exact_mod_cast Int.toNat_of_nonneg (by omega : (0 : ℤ) ≤ b - a)
+  rw [Finset.sum_add_distrib, Finset.sum_add_distrib, ← Finset.mul_sum, ← Finset.mul_sum,
+      Finset.sum_const, nsmul_eq_mul, hcard, sum_Ico_id a b hab, sum_Ico_sq a b hab]
+  ring
 
-/-- A discrete integral of a function on `ℤ`. -/
-def zPrimitive {R : Type*} [AddCommGroup R] (f : ℤ → R) (n : ℤ) : R :=
-  if 0 ≤ n then ∑ j ∈ range (Int.toNat n), f j else -(∑ j ∈ range (Int.natAbs n), f (-j-1))
+/-- The Gauss sum `∑_{l=0}^{n-1} l = (n² - n) / 2` for `n ∈ ℕ`, evaluated in `ℚ`. -/
+private lemma sum_range_id_cast (n : ℕ) :
+    ∑ l ∈ Finset.range n, (l : ℚ) = ((n : ℚ) ^ 2 - n) / 2 := by
+  induction n with
+  | zero => simp
+  | succ n ih => rw [Finset.sum_range_succ, ih]; push_cast; ring
 
-@[simp] lemma zPrimitive_zero {R : Type*} [AddCommGroup R] (f : ℤ → R) :
-    zPrimitive f 0 = 0 :=
-  rfl
+/-- The elementary sum `∑_{l=0}^{n-1} l (n - l) = (n³ - n) / 6` for `n ∈ ℕ`, evaluated in `ℚ`.
 
-@[simp] lemma zPrimitive_apply_of_nonneg {R : Type*} [AddCommGroup R] (f : ℤ → R)
-    {n : ℤ} (hn : 0 ≤ n) :
-    zPrimitive f n = ∑ j ∈ range (Int.toNat n), f j := by
-  simp [zPrimitive, hn]
-
-@[simp] lemma zPrimitive_apply_of_nonpos {R : Type*} [AddCommGroup R] (f : ℤ → R)
-    {n : ℤ} (hn : n ≤ 0) :
-    zPrimitive f n = -(∑ j ∈ range (Int.natAbs n), f (-j-1)) := by
-  by_cases hn' : n = 0
-  · simp [hn']
-  · grind [zPrimitive]
-
-@[simp] lemma zPrimitive_succ {R : Type*} [AddCommGroup R] (f : ℤ → R) (n : ℤ) :
-    zPrimitive f (n + 1) = zPrimitive f n + f n := by
-  by_cases hn : 0 ≤ n
-  · simp [zPrimitive, hn, Int.le_add_one hn, Int.toNat_add hn zero_le_one, sum_range_succ]
-  · simp only [not_le] at hn
-    have n_natAbs : n.natAbs = (n+1).natAbs + 1 := by grind
-    simp only [zPrimitive_apply_of_nonpos _ hn, zPrimitive_apply_of_nonpos _ hn.le, n_natAbs,
-               sum_range_succ, Int.natCast_natAbs, neg_add_rev]
-    simp only [add_comm (-(f _)), add_assoc, left_eq_add]
-    simp [show -|n + 1| - 1 = n by rw [abs_of_nonpos hn, neg_neg] ; ring]
-
-lemma eq_zPrimitive_of_eq_zero_of_forall_eq_add {R : Type*} [AddCommGroup R] {f F : ℤ → R}
-    (h0 : F 0 = 0) (h1 : ∀ n, F (n + 1) = F n + f n) :
-    F = zPrimitive f := by
-  have obsP : ∀ (n : ℕ), F n = zPrimitive f n := by
-    intro n
-    induction n with
-    | zero => simp [h0]
-    | succ n ih => aesop
-  have obsM : ∀ (n : ℕ), F (-n) = zPrimitive f (-n) := by
-    intro n
-    induction n with
-    | zero => simp [h0]
-    | succ n ih =>
-      have keyF := h1 (-(n + 1))
-      have keyP := zPrimitive_succ f (-(n + 1))
-      grind
-  ext m
-  by_cases hm : 0 ≤ m
-  · rw [(Int.toNat_of_nonneg hm).symm]
-    exact obsP m.toNat
-  · have hm' : m < 0 := Int.lt_of_not_ge hm
-    rw [show m = -m.natAbs from Int.eq_neg_comm.mp (by simpa [hm'] using hm'.le)]
-    exact obsM m.natAbs
-
-lemma zPrimitive_add {R : Type*} [AddCommGroup R] (f g : ℤ → R) :
-    zPrimitive (f + g) = zPrimitive f + zPrimitive g  := by
-  apply (eq_zPrimitive_of_eq_zero_of_forall_eq_add ..).symm
-  · simp
-  · intro n
-    simp only [Pi.add_apply, zPrimitive_succ]
-    ac_rfl
-
-lemma zPrimitive_smul {R S : Type*} [AddCommGroup R] [DistribSMul S R]
-    (c : S) (f : ℤ → R) :
-    zPrimitive (c • f) = c • (zPrimitive f) := by
-  apply (eq_zPrimitive_of_eq_zero_of_forall_eq_add ..).symm <;> simp
-
-lemma zPrimitive_sub {R : Type*} [AddCommGroup R] (f g : ℤ → R) :
-    zPrimitive (f - g) = zPrimitive f - zPrimitive g  := by
-  apply (eq_zPrimitive_of_eq_zero_of_forall_eq_add ..).symm
-  · simp
-  · intro n
-    simp only [Pi.sub_apply, zPrimitive_succ, sub_eq_add_neg, neg_add_rev, ← add_assoc]
-    ac_rfl
-
-lemma zPrimitive_mul_left {R : Type*} [Ring R] (c : R) (f : ℤ → R) :
-    zPrimitive (fun n ↦ c * f n) = fun n ↦ c * zPrimitive f n := by
-  apply (eq_zPrimitive_of_eq_zero_of_forall_eq_add ..).symm
-  · simp
-  · intro n
-    simp [mul_add]
-
-lemma zPrimitive_mul_right {R : Type*} [Ring R] (c : R) (f : ℤ → R) :
-    zPrimitive (fun n ↦ f n * c) = fun n ↦ zPrimitive f n * c := by
-  apply (eq_zPrimitive_of_eq_zero_of_forall_eq_add ..).symm
-  · simp
-  · intro n
-    simp [add_mul]
-
-/-- A discrete monomial function of degree `d`, obtained recursively by starting from the
-constant function `1` and taking the discrete privimite `d` times.
-(Note: The resulting normalization is such that this monomial approximately `x ↦ 1/d! * x^d`.) -/
-def zMonomialF (R : Type*) [AddCommGroup R] [One R] (d : ℕ) : ℤ → R := match d with
-  | 0 => fun _ ↦ 1
-  | d + 1 => zPrimitive (zMonomialF R d)
-
-lemma zMonomialF_eq (R : Type*) [Field R] [CharZero R] (d : ℕ) :
-    (zMonomialF R d) = (fun (n : ℤ) ↦ ((∏ j ∈ range d, (n - j : R)) / (Nat.factorial d : R))) := by
-  induction d with
-  | zero =>
-    funext n
-    simp [zMonomialF]
-  | succ d ihd =>
-    rw [zMonomialF, Eq.comm]
-    apply eq_zPrimitive_of_eq_zero_of_forall_eq_add
-    · simpa using Or.inl <| prod_eq_zero_iff.mpr ⟨0, by simp, by simp⟩
-    · intro n
-      have aux₀ : (d.factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
-      have aux₁: ((d+1).factorial : R) ≠ 0 := by simp [Nat.factorial_ne_zero _]
-      have aux' : ((d+1) : R) ≠ 0 := by norm_cast
-      calc  (∏ j ∈ range (d + 1), ((↑(n + 1) : R) - j)) / (d + 1).factorial
-        _ = (∏ x ∈ range (d + 1), (n + 1 - x)) / (d + 1).factorial                      := by simp
-        _ = (∏ j ∈ range (d + 1), (n - j)) / ((d + 1) * d.factorial)
-            + (∏ j ∈ range d, (n - j : R)) / d.factorial                                := ?_
-        _ = (∏ j ∈ range (d + 1), (↑n - ↑j)) / ↑(d + 1).factorial + zMonomialF R d n    := ?_
-      · simp only [Nat.factorial_succ, Nat.cast_mul, Nat.cast_add, Nat.cast_one]
-        simp only [prod_range_succ (fun a ↦ (n : R) - a), Int.cast_prod, Int.cast_sub, Int.cast_add,
-                   Int.cast_one, Int.cast_natCast]
-        field_simp
-        simp [sub_add, prod_range_succ']
-      · simp [ihd, mul_comm _ (d.factorial : R), Nat.factorial_succ, mul_comm]
-
-lemma zMonomialF_zero_eq (R : Type*) [Field R] (n : ℤ) :
-    zMonomialF R 0 n = 1 := by
-  simp [zMonomialF]
-
-lemma zMonomialF_one_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zMonomialF R 1 n = n := by
-  simp [zMonomialF_eq]
-
-lemma zMonomialF_two_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zMonomialF R 2 n = n * (n - 1) / 2 := by
-  simp [zMonomialF_eq, prod_range_succ]
-
-lemma zMonomialF_three_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zMonomialF R 3 n = n * (n - 1) * (n - 2) / 6 := by
-  simp [zMonomialF_eq, prod_range_succ, show Nat.factorial 3 = 6 from rfl]
-
-lemma zMonomialF_four_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zMonomialF R 4 n = n * (n - 1) * (n - 2) * (n - 3) / 24 := by
-  simp [zMonomialF_eq, prod_range_succ, show Nat.factorial 4 = 24 from rfl]
-
-lemma zMonomialF_five_eq (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zMonomialF R 5 n = n * (n - 1) * (n - 2) * (n - 3) * (n - 4) / 120 := by
-  simp [zMonomialF_eq, prod_range_succ, show Nat.factorial 5 = 120 from rfl]
-
-lemma zMonomialF_apply_eq_zero_of_of_nonneg_lt (R : Type*) [Field R] [CharZero R]
-    (d : ℕ) {n : ℕ} (n_lt : n < d) :
-    zMonomialF R d n = 0 := by
-  simp only [zMonomialF_eq R d, Int.cast_natCast, div_eq_zero_iff, Nat.cast_eq_zero]
-  exact Or.inl <| prod_eq_zero_iff.mpr ⟨n, ⟨mem_range.mpr n_lt, by simp⟩⟩
-
-lemma bosonic_sugawara_cc_calc (R : Type*) [Field R] [CharZero R] (n : ℤ) :
-    zPrimitive (fun l ↦ (l : R) * (n - l)) n = (n^3 - n) / 6 := by
-  have obs : (n^3 - n) / 6 = (n - 1 : R) * zMonomialF R 2 n - 2 * zMonomialF R 3 n := by
-    rw [zMonomialF_two_eq, zMonomialF_three_eq]
-    field_simp
-    ring
-  have key : (zPrimitive fun l ↦ (n - 1 : R) * l) - (zPrimitive fun l ↦ 2 * zMonomialF R 2 l)
-              = zPrimitive ((fun (l : ℤ) ↦ (l : R) * (n - l))) := by
-    rw [← zPrimitive_sub]
-    apply congr_arg zPrimitive
-    ext l
-    simp [zMonomialF_two_eq]
-    ring
-  simp_rw [obs, ← key, zPrimitive_mul_left]
-  dsimp
-  congr
-  ext m
-  rw [zMonomialF_one_eq]
-
+(This form of the central charge computation of the basic bosonic Sugawara construction is
+referenced in the blueprint; the Lean proof of `VirasoroProject.commutator_sugawaraGen` uses
+the more general `VirasoroProject.sum_Ico_quadratic` directly.) -/
 lemma bosonic_sugawara_cc_calc_nonneg (n : ℕ) :
-    ∑ l ∈ range n, (l : ℚ) * (n - l) = (n^3 - n) / 6 := by
-  have key := bosonic_sugawara_cc_calc ℚ n
-  simp only [Int.cast_natCast, Nat.cast_nonneg, zPrimitive_apply_of_nonneg, Int.toNat_natCast]
-    at key
-  rw [← key]
+    ∑ l ∈ Finset.range n, (l : ℚ) * (n - l) = (n ^ 3 - n) / 6 := by
+  induction n with
+  | zero => simp
+  | succ n ih =>
+    have expand : ∀ l ∈ Finset.range n, (l : ℚ) * ((n + 1 : ℕ) - l) = (l : ℚ) * (n - l) + l := by
+      intro l _; push_cast; ring
+    calc  ∑ l ∈ Finset.range (n + 1), (l : ℚ) * ((n + 1 : ℕ) - l)
+      -- Split off the top term `l = n`, which contributes `n · 1`.
+      _ = (∑ l ∈ Finset.range n, (l : ℚ) * ((n + 1 : ℕ) - l)) + n := by
+          rw [Finset.sum_range_succ]; push_cast; ring
+      -- In the remaining sum, `l ((n+1) - l) = l (n - l) + l`.
+      _ = ((∑ l ∈ Finset.range n, (l : ℚ) * (n - l)) + ∑ l ∈ Finset.range n, (l : ℚ)) + n := by
+          rw [Finset.sum_congr rfl expand, Finset.sum_add_distrib]
+      _ = ((n + 1 : ℕ) ^ 3 - (n + 1 : ℕ)) / 6 := by
+          rw [ih, sum_range_id_cast]; push_cast; ring
 
-end central_charge_calculation
-
-end VirasoroProject -- namespace
+end VirasoroProject

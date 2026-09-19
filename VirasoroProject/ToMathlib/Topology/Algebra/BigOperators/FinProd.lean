@@ -1,4 +1,18 @@
+/-
+Copyright (c) 2025 Kalle Kytölä. All rights reserved.
+Released under Apache 2.0 license as described in the file LICENSE.
+Authors: Kalle Kytölä
+-/
 import Mathlib.Algebra.BigOperators.Finprod
+
+/-!
+# Auxiliary lemmas about sums over finite supports
+
+NOTE (naming): Mathlib naming around reindexed and split sums is inconsistent, compare e.g.
+`Equiv.tsum_eq` with `finprod_comp_equiv`. Similarly, should `finsum_add_distrib`,
+`finsum_sub_distrib`, `finsum_neg_distrib` just be `finsum_add`, `finsum_sub`, `finsum_neg`?
+Compare with `tsum_add`, `tsum_sub`, `tsum_neg` (and `finsum_smul'`, `smul_finsum'`).
+-/
 
 section
 

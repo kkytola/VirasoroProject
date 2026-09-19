@@ -5,7 +5,6 @@ Authors: Kalle Kytölä
 -/
 import Mathlib.Algebra.Lie.OfAssociative
 import Mathlib.GroupTheory.GroupAction.Ring
-import Mathlib.Order.CompletePartialOrder
 
 /-!
 # Verma modules over algebras
@@ -139,11 +138,10 @@ lemma VermaModule.hwVec_cyclic (η : ι → A × 𝕜) :
 /-- The defining property of the highest weight vector in a Verma module. -/
 lemma VermaModule.apply_hwVec_eq (η : ι → A × 𝕜) (i : ι) :
     (η i).1 • hwVec η = (algebraMap 𝕜 A (η i).2) • hwVec η := by
-  rw [show (algebraMap 𝕜 A (η i).2) • hwVec η
-            = Submodule.Quotient.mk ((algebraMap 𝕜 A (η i).2) • 1) from rfl]
-  rw [hwVec, ← Submodule.Quotient.mk_smul, ← sub_eq_zero, ← Submodule.Quotient.mk_sub]
-  apply (Submodule.Quotient.mk_eq_zero ..).mpr
-  exact Submodule.mem_span_of_mem (by simp)
+  show (Submodule.Quotient.mk ((η i).1 • (1 : A)) : VermaModule η)
+      = Submodule.Quotient.mk ((algebraMap 𝕜 A (η i).2) • 1)
+  rw [Submodule.Quotient.eq]
+  exact Submodule.mem_span_of_mem ⟨i, by simp⟩
 
 variable {M : Type*} [AddCommGroup M] [Module A M]
 
@@ -166,7 +164,8 @@ universal property is the assigned highest weight vector in the image module. -/
 @[simp] lemma VermaModule.universalMap_hwVec (η : ι → A × 𝕜)
     {hwv : M} (hwv_prop : ∀ i, (η i).1 • hwv = algebraMap 𝕜 A (η i).2 • hwv) :
     universalMap η hwv_prop (hwVec η) = hwv := by
-  convert Submodule.liftQ_apply (vermaIdeal η) (Ring.smulVectorₗ A hwv) 1
+  show Submodule.liftQ (vermaIdeal η) (Ring.smulVectorₗ A hwv) _ (Submodule.Quotient.mk 1) = hwv
+  rw [Submodule.liftQ_apply]
   simp
 
 /-- The range of the map guaranteed by the universal property of a Verma module is the submodule

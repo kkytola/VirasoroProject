@@ -130,22 +130,19 @@ noncomputable def virasoroTri_lzero : (virasoroTri 𝕜).part 0 :=
 open VirasoroAlgebra in
 lemma virasoroTri_cartan_basis_none_eq_cgen :
     (virasoroTri_cartan_basis 𝕜) ⟨none, Set.mem_insert none {some 0}⟩ = virasoroTri_cgen 𝕜 := by
-  ext
-  simp only [virasoroTri_cartan_basis, TriangularDecomposition.ofBasis.basis_part, indexTri,
-             virasoroTri_cgen_val]
-  convert (basisLC 𝕜).basis_submodule_span_apply {none, some 0} ⟨none, Set.mem_insert none {some 0}⟩
-  simp
+  apply Subtype.ext
+  have h := (basisLC 𝕜).basis_submodule_span_apply {none, some 0}
+    ⟨none, Set.mem_insert none {some 0}⟩
+  rwa [basisLC_none] at h
 
 open VirasoroAlgebra in
 lemma virasoroTri_cartan_basis_some_eq_lzero :
-    (virasoroTri_cartan_basis 𝕜) ⟨some 0, by exact Set.mem_insert_of_mem none rfl⟩
+    (virasoroTri_cartan_basis 𝕜) ⟨some 0, Set.mem_insert_of_mem none rfl⟩
       = virasoroTri_lzero 𝕜 := by
-  ext
-  simp only [virasoroTri_cartan_basis, TriangularDecomposition.ofBasis.basis_part, indexTri,
-             virasoroTri_lzero_val]
-  convert (basisLC 𝕜).basis_submodule_span_apply {none, some 0}
-          ⟨some 0, Set.mem_insert_of_mem none rfl⟩
-  simp
+  apply Subtype.ext
+  have h := (basisLC 𝕜).basis_submodule_span_apply {none, some 0}
+    ⟨some 0, Set.mem_insert_of_mem none rfl⟩
+  rwa [basisLC_some] at h
 
 lemma virasoroTri_cgen_mem_cartan :
     .cgen 𝕜 ∈ (virasoroTri 𝕜).cartan := by
@@ -164,24 +161,12 @@ lemma virasoroTri_lgen_pos_mem_upper {n : ℤ} (n_pos : 0 < n) :
 lemma VirasoroAlgebra.hw_apply_cgen (c h : 𝕜) :
     hw 𝕜 c h (virasoroTri_cgen 𝕜) = c := by
   rw [← virasoroTri_cartan_basis_none_eq_cgen]
-  simp only [hw, Basis.constr_apply_fintype]
-  simp only [Basis.equivFun_self, smul_eq_mul, mul_ite, ite_mul, one_mul, zero_mul]
-  rw [Finset.sum_eq_single ⟨none, Set.mem_insert none {some 0}⟩]
-  · simp
-  · intro j _ hj
-    simp [hj.symm, show ¬ (j : Option ℤ) = none by aesop]
-  · simp
+  simp [hw, Basis.constr_basis, -Basis.constr_apply_fintype]
 
 lemma VirasoroAlgebra.hw_apply_lzero (c h : 𝕜) :
     hw 𝕜 c h (virasoroTri_lzero 𝕜) = h := by
   rw [← virasoroTri_cartan_basis_some_eq_lzero]
-  simp only [hw, Basis.constr_apply_fintype]
-  simp only [Basis.equivFun_self, smul_eq_mul, mul_ite, ite_mul, one_mul, zero_mul]
-  rw [Finset.sum_eq_single ⟨some 0, by exact Set.mem_insert_of_mem none rfl⟩]
-  · simp
-  · intro j _ hj
-    simp [hj.symm]
-  · simp
+  simp [hw, Basis.constr_basis, -Basis.constr_apply_fintype]
 
 /-- The Verma module for the Virasoso algebra with central charge `c` and conformal weight `h`. -/
 abbrev VirasoroVerma (c h : 𝕜) := (virasoroTri 𝕜).VermaHW (VirasoroAlgebra.hw 𝕜 c h)

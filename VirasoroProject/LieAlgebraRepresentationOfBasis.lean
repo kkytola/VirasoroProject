@@ -7,6 +7,8 @@ import Mathlib.Algebra.Lie.OfAssociative
 import VirasoroProject.Commutator
 import VirasoroProject.ToMathlib.Algebra.Lie.Basic
 
+attribute [local instance 100] LieRing.ofAssociativeRing
+
 /-!
 # Constructing representations of Lie algebras from operators corresponding to a basis
 
@@ -98,6 +100,11 @@ noncomputable def representationOfBasis
     intro X Y
     have key := LieAlgebra.representationOfBasisAux_property B genComm
     exact LinearMap.congr_fun (LinearMap.congr_fun key X) Y
+
+/-- On basis elements, `LieAlgebra.representationOfBasis` acts by the assigned operators. -/
+@[simp] lemma representationOfBasis_apply_basis (i : ι) :
+    representationOfBasis B genComm (B i) = genOper i :=
+  representationOfBasisAux_apply_basis B genOper i
 
 end representation
 
