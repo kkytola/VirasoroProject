@@ -9,9 +9,9 @@ import Mathlib.Algebra.Module.LinearMap.Defs
 /-!
 # Linear maps distribute over `finsum` — **incorporated into Mathlib**
 
-The lemma `LinearMap.map_finsum` below has been incorporated into Mathlib in generalized
-form: `map_finsum` applies to any bundled map of an `AddMonoidHomClass` (which also settles
-the "generalize beyond plain linear maps" TODO that the original statement here carried).
+-- NOTE: Mathlib naming is inconsistent:
+--#check Equiv.tsum_eq
+--#check finsum_comp_equiv
 
 The original statement is kept as a deprecated alias for the record; new code should use
 `map_finsum` directly.
