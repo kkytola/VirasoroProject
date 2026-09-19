@@ -1,8 +1,9 @@
 import VersoBlueprint
 
 /-!
-Math-mode TeX macros for the Virasoro blueprint, ported from
-`blueprint/src/macros/common.tex`.
+Math-mode TeX macros for the Virasoro blueprint, ported from the macro file of the
+former plasTeX blueprint (`blueprint/src/macros/common.tex`, removed from the tree
+once the Verso blueprint took over; recoverable from the Git history).
 
 Not ported:
 - the `\newtheorem` setup (superseded by blueprint node directives);

@@ -12,10 +12,6 @@ name = "mathlib"
 scope = "leanprover-community"
 version = "git#v4.34.0"
 
-[[require]]
-name = "checkdecls"
-git = "https://github.com/PatrickMassot/checkdecls.git"
-
 # Pinned to the release tag matching lean-toolchain: doc-gen4's `main` tracks the
 # next Lean release candidate, so an unpinned `main` breaks on every bump.
 [[require]]
